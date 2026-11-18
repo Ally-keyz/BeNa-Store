@@ -1,0 +1,417 @@
+BENA ORIGINS — TOMORROW'S RUNBOOK
+Prepared: 2026-11-19
+Phase: Backend live; frontend starts tomorrow
+Backend repo: https://github.com/Ally-keyz/BeNa-Store
+Backend live: https://bena-origins.onrender.com
+Docs: /api/docs   (Swagger UI)
+Health: /health (liveness), /health/ready (Shopify + config)
+
+====================================================================
+0. RULES FOR TOMORROW
+====================================================================
+
+- Never put Shopify tokens, the Customer Account client secret, ADMIN_JWT_SECRET,
+  SESSION_SECRET, or webhook secrets in frontend code, VITE_* variables, or Git.
+- `.env`, `.env.render`, and `.env.*` stay local / Render-only.
+- Do not change the Shopify theme, live product data, DNS, or payments.
+- Do not complete a real checkout. Cart create/update tests are allowed.
+- Do not register webhooks or publish the frontend without owner approval.
+- Frontend may consume only the REST API + public Socket.IO namespace.
+
+====================================================================
+1. FIRST: FINISH THE LIVE CUSTOMER LOGIN CHECK
+====================================================================
+
+Open in a browser (same host for all steps):
+
+  https://bena-origins.onrender.com/api/v1/auth/login?returnTo=/
+
+Sign in with a real customer account.
+
+Then open:
+
+  https://bena-origins.onrender.com/api/v1/auth/session
+
+Expected:
+  { "enabled": true, "authenticated": true, "customer": {...}, "csrfToken": "..." }
+
+Then:
+
+  https://bena-origins.onrender.com/api/v1/account/me
+  https://bena-origins.onrender.com/api/v1/account/orders
+  https://bena-origins.onrender.com/api/v1/account/addresses
+
+If account/orders fails with an access error:
+  Shopify Admin -> Headless -> Be Na Store Headless -> Customer Account API
+  -> Permissions: enable customer_read_customers + customer_read_orders
+  -> Submit/Save.
+
+If login fails:
+  invalid_client  -> Render Client ID/secret does not match the current Shopify client.
+  invalid_token   -> JS-origin mismatch (should not apply to Confidential; report it).
+  redirect_uri    -> callback in Shopify must be exactly:
+                     https://bena-origins.onrender.com/api/v1/auth/callback
+  state cookie    -> must open callback on the Render host over HTTPS.
+
+After a successful login, delete the OLD Customer Account API credentials in
+Shopify (keep the new ones).
+
+Record result:
+  [ ] /auth/session authenticated
+  [ ] /account/me works
+  [ ] /account/orders works
+  [ ] /account/addresses works
+
+====================================================================
+2. WEBHOOKS (make readiness "ok")
+====================================================================
+
+Shopify Admin -> Settings -> Notifications -> Webhooks -> Create webhook:
+
+  Product update
+    URL: https://bena-origins.onrender.com/webhooks/shopify
+    Format: JSON, API version 2026-10
+
+  Inventory level update
+    URL: https://bena-origins.onrender.com/webhooks/shopify
+    Format: JSON, API version 2026-10
+
+Copy the signing secret Shopify shows and set in Render:
+
+  SHOPIFY_WEBHOOK_SECRET=<signing secret>
+  PUBLIC_WEBHOOK_BASE_URL=https://bena-origins.onrender.com
+
+Redeploy/restart. Then:
+
+  curl https://bena-origins.onrender.com/health/ready
+
+Expected: status "ok" (or only non-webhook warnings).
+
+Do not subscribe to both orders/fulfilled and fulfillments/create.
+Order webhooks can be added after basic webhook delivery is confirmed.
+
+====================================================================
+3. METAFIELDS (current live products return null metafields)
+====================================================================
+
+Shopify Admin -> Settings -> Custom data -> Products -> Add definition.
+Create product-level definitions, namespace `custom`:
+
+  nutrition      (multi-line text or rich text)
+  ingredients    (multi-line text or rich text)
+  allergens      (multi-line text)
+  origin         (single-line text)
+  preparation    (multi-line text)
+
+For each definition:
+  Access / Permissions -> enable Storefront access -> Save.
+
+Then fill the values on products. Definition alone is not enough.
+
+Verify:
+
+  https://bena-origins.onrender.com/api/v1/products/<handle>
+
+Expected: data.metafields.nutrition/ingredients/allergens/origin/preparation
+are not null where values exist. If values are JSON/list types, the frontend
+must parse them; the API returns raw metafield values.
+
+Live audit (Render Shell or local with matching admin secret):
+
+  node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({sub:'admin',role:'admin'},process.env.ADMIN_JWT_SECRET,{algorithm:'HS256',expiresIn:3600}))"
+
+  curl "https://bena-origins.onrender.com/api/v1/audit/products?limit=50" \
+    -H "Authorization: Bearer <token>"
+
+Save the JSON/Markdown report; do not fix live data automatically.
+
+====================================================================
+4. TODAY'S LIVE BASELINE (already tested)
+====================================================================
+
+Working:
+  - Shopify Storefront API 2026-10, live products/collections/search
+  - product detail, prices, images, inventory quantities, unit price
+  - cart create/get with a real Shopify checkoutUrl
+  - localization (28 countries), policies, shipping report
+  - admin API key/JWT, public Socket.IO, admin socket rejection without auth
+  - customer login redirect + PKCE + state/nonce; Shopify accepted new client
+  - token exchange now returns invalid_grant for a fake code (correct)
+  - 91 automated tests, strict typecheck, lint, production build
+
+Still open:
+  - one real customer login (section 1)
+  - webhook secret/delivery
+  - metafield definitions/values
+  - newsletter provider decision
+  - review app confirmation
+  - frontend
+
+====================================================================
+5. FRONTEND KICKOFF — DECISIONS
+====================================================================
+
+Recommended: separate frontend repo, e.g. `BeNa-Storefront`, deployed on
+Vercel/Netlify/Cloudflare Pages. Alternative: `frontend/` inside the backend
+repo (Render ignores it). Decide before scaffolding.
+
+Stack:
+  React + TypeScript + Vite + Tailwind CSS + React Router + Socket.IO client
+  TanStack Query (server state) and a small cart/auth context
+  Vitest + React Testing Library; Playwright later for e2e
+
+API base:
+  VITE_API_BASE_URL=https://bena-origins.onrender.com/api/v1
+  VITE_SOCKET_URL=https://bena-origins.onrender.com
+  VITE_SITE_URL=https://benaorigins.de
+
+No Shopify secrets in VITE_*.
+
+IMPORTANT — cookies and cross-site:
+  Render (`onrender.com`) and the storefront (`benaorigins.de`) are different
+  sites. The session cookie is HttpOnly, Secure, SameSite=Lax and will NOT be
+  sent by a browser from benaorigins.de to onrender.com on XHR/fetch.
+  Options:
+    A. Add a Render custom domain `api.benaorigins.de` (DNS change — approval).
+    B. Proxy `/api` and `/socket.io` through the storefront dev/prod host.
+  For local dev, add a Vite proxy `/api` -> Render so the browser sees
+  same-origin requests and cookies work. Do not test auth from localhost
+  directly against the Render host and expect the cookie to be sent.
+
+CORS:
+  Backend currently allows:
+    https://benaorigins.de
+    https://www.benaorigins.de
+    https://bena-origins.onrender.com
+  Add the exact frontend dev/preview origin if calling the API directly.
+
+====================================================================
+6. FRONTEND SCAFFOLD COMMANDS (run tomorrow)
+====================================================================
+
+  npm create vite@latest bena-storefront -- --template react-ts
+  cd bena-storefront
+  npm install
+  npm install react-router-dom @tanstack/react-query socket.io-client
+  npm install -D tailwindcss @tailwindcss/vite vitest @testing-library/react \
+    @testing-library/jest-dom jsdom @types/node
+
+Add Tailwind per current Tailwind docs (v4 uses @tailwindcss/vite).
+Add `.env.local`:
+
+  VITE_API_BASE_URL=https://bena-origins.onrender.com/api/v1
+  VITE_SOCKET_URL=https://bena-origins.onrender.com
+  VITE_SITE_URL=https://benaorigins.de
+
+For local dev proxy (recommended), Vite config:
+
+  server: {
+    proxy: {
+      '/api': { target: 'https://bena-origins.onrender.com', changeOrigin: true, secure: true },
+      '/socket.io': { target: 'https://bena-origins.onrender.com', ws: true, changeOrigin: true }
+    }
+  }
+
+Then use same-origin `/api/v1` during development. In production either use the
+proxy on the storefront host or the custom `api.benaorigins.de` domain.
+
+====================================================================
+7. FRONTEND FOLDER TARGET
+====================================================================
+
+  src/
+    app/            providers, router, layouts
+    api/            fetch wrapper, endpoints, query keys
+    types/          copy from backend src/types (api/domain/audit/auth) or generate from OpenAPI
+    features/
+      catalog/      products, collections, search
+      product/      detail, variants, images, metafields
+      cart/         cart drawer, lines, buyer identity, discount codes
+      account/      login state, profile, orders, addresses
+      policies/     shipping/refund/privacy/terms/legal
+      seo/          metadata + JSON-LD consumers
+    components/     Button, Price, Quantity, Skeleton, ErrorState
+    hooks/          useSession, useCart, useProducts
+    lib/            money, units, formatting
+    styles/         Tailwind tokens/theme
+    routes/         Home, Products, Product, Collection, Search, Cart, Policies,
+                    Account, Orders, Addresses, 404
+
+Frontend rules:
+  - One fetch wrapper for { success, data, meta, error }.
+  - Always read meta.warnings in development (fixture/live status).
+  - Use cursor pagination: meta.pagination.endCursor -> ?after=
+  - URL-encode cartId (it may contain ?key=).
+  - Never build checkout URLs manually; redirect to data.checkoutUrl.
+  - Never call Shopify directly; use the backend only.
+  - Do not store Shopify tokens; store only cart id and session status.
+  - On cart 404: discard stored cart id and create a new cart.
+  - Checkout redirect leaves the app (Shopify-hosted).
+
+====================================================================
+8. FRONTEND INTEGRATION CHECKLIST
+====================================================================
+
+Catalog:
+  [ ] GET /products?first=20
+  [ ] GET /products/:handle
+  [ ] GET /collections
+  [ ] GET /collections/:handle
+  [ ] GET /search?q=
+  [ ] GET /search/suggestions?q=
+  [ ] country/language selector sends ?country=DE&language=DE
+
+Product page:
+  [ ] variants + price + compare-at + unit price
+  [ ] images with alt text and responsive sizes
+  [ ] description HTML sanitized/rendered safely
+  [ ] metafields block when non-null
+  [ ] JSON-LD/meta from GET /seo/product/:handle during prerender
+
+Cart:
+  [ ] POST /cart
+  [ ] POST/PATCH/DELETE /cart/:cartId/lines
+  [ ] PATCH buyer-identity + discount-codes
+  [ ] redirect to checkoutUrl
+  [ ] persist cart id safely; recreate on 404
+
+Auth (only when enabled):
+  [ ] "Sign in" navigates to GET /auth/login?returnTo=/account
+  [ ] GET /auth/session with credentials: 'include'
+  [ ] show customer email/logged-in state
+  [ ] send x-csrf-token for POST /auth/logout and /account/cart/associate
+  [ ] logout handles JSON/redirect response
+  [ ] account/me, orders, addresses read-only
+  [ ] associate cart after login
+
+Sockets:
+  [ ] connect to /storefront
+  [ ] connection.ready
+  [ ] product.changed -> refetch product
+  [ ] never treat socket data as source of truth
+  [ ] admin namespace stays out of public frontend
+
+SEO:
+  [ ] use docs/seo-strategy.md
+  [ ] prerender/SSG for product/collection/policy pages
+  [ ] canonical URLs from /seo/*
+  [ ] JSON-LD Product/Breadcrumb/Organization
+  [ ] sitemap/robots from backend data, served by frontend host
+  [ ] noindex cart/account/search
+
+====================================================================
+9. API CHEAT SHEET
+====================================================================
+
+GET  /api/v1/products?first=&after=&query=&sortKey=&country=&language=
+GET  /api/v1/products/:handle
+GET  /api/v1/collections
+GET  /api/v1/collections/:handle
+GET  /api/v1/search?q=
+GET  /api/v1/search/suggestions?q=
+POST /api/v1/cart
+GET  /api/v1/cart/:cartId
+POST/PATCH/DELETE /api/v1/cart/:cartId/lines
+PATCH /api/v1/cart/:cartId/buyer-identity
+PATCH /api/v1/cart/:cartId/discount-codes
+GET  /api/v1/localization
+GET  /api/v1/shipping
+GET  /api/v1/policies
+GET  /api/v1/auth/login | /auth/callback | /auth/session
+POST /api/v1/auth/logout
+GET  /api/v1/account/me | /account/orders | /account/addresses
+POST /api/v1/account/cart/associate
+GET  /api/v1/seo/product/:handle
+GET  /api/v1/seo/collection/:handle
+GET  /api/v1/seo/page/:handle
+GET  /api/v1/seo/sitemap | /seo/sitemap.xml
+GET  /api/v1/seo/robots | /seo/robots.txt
+GET  /health | /health/ready
+POST /webhooks/shopify (Shopify only)
+
+Swagger: https://bena-origins.onrender.com/api/docs
+
+====================================================================
+10. KNOWN ISSUES / OPEN DECISIONS
+====================================================================
+
+- Metafields are null on live products: definitions/values pending.
+- Product tags are empty for sampled products (data, not API).
+- Some live product titles contain excessive whitespace and merged copy;
+  audit flags these. Do not fix live data without approval.
+- Storefront free Render instance sleeps (50s+ cold start); upgrade before
+  production traffic/webhooks/sockets.
+- Customer Account session cookie is same-site only (SameSite=Lax).
+  Use api.benaorigins.de or proxy; do not change DNS without approval.
+- Webhook secret is not set; readiness is degraded until it is.
+- Newsletter provider is `mock`; choose Klaviyo/Mailchimp/webhook.
+- Reviews app is not confirmed; run /api/v1/reviews/assessment with admin JWT.
+- Delete old Customer Account API credentials after the live login succeeds.
+- `.env.render` is local-only and gitignored; never commit it.
+- Backend admin token: mint with the Render ADMIN_JWT_SECRET (matches local
+  `.env.render` if imported) or set ADMIN_API_KEY_SHA256 and use x-admin-key.
+
+====================================================================
+11. TOMORROW'S ORDER OF WORK
+====================================================================
+
+09:00  Complete real customer login; verify session/account endpoints.
+09:30  Create webhooks, set SHOPIFY_WEBHOOK_SECRET, confirm readiness ok.
+10:00  Create/expose food metafields; fill values; verify product detail.
+10:30  Run live audit; save report; list priority fixes (report only).
+11:00  Decide frontend repo/location + create Vite app + Tailwind + router.
+11:30  API client + types + TanStack Query; catalog list/detail.
+13:00  Collections, search, suggestions.
+13:30  Cart flow + checkout redirect.
+14:30  Auth UI + session + account pages (using same-origin proxy/custom domain).
+15:30  Policies/shipping/localization pages.
+16:00  SEO/prerender setup + metadata/JSON-LD consumers.
+17:00  Tests, lint, typecheck, preview deploy; review with owner.
+
+====================================================================
+12. DEFINITION OF DONE FOR TOMORROW
+====================================================================
+
+[ ] Live customer login verified end-to-end (session authenticated)
+[ ] Webhooks deliver; readiness ok
+[ ] Metafields configured and visible
+[ ] Audit report saved
+[ ] Frontend app scaffolded and deployed to a preview URL
+[ ] Live products/collections/search on the frontend
+[ ] Live cart create + Shopify checkout redirect works (no purchase)
+[ ] Auth session/account pages work from the frontend origin/proxy
+[ ] No secrets in frontend bundle or Git
+[ ] Tests/lint/typecheck pass
+[ ] Owner review before DNS or production publish
+
+====================================================================
+13. USEFUL COMMANDS
+====================================================================
+
+Backend tests (local):
+  npm test
+  npm run typecheck
+  npm run lint
+  npm run build
+
+Live smoke (read-only):
+  npm run smoke
+
+Live checks:
+  curl https://bena-origins.onrender.com/health
+  curl https://bena-origins.onrender.com/health/ready
+  curl "https://bena-origins.onrender.com/api/v1/products?first=3"
+
+Frontend:
+  npm run dev
+  npm run build
+  npm run preview
+  npm run test
+
+Git backend:
+  git status
+  git add -A
+  git commit -m "..."
+  git push
+
+END OF RUNBOOK
