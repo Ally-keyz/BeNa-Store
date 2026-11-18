@@ -165,10 +165,6 @@ export const CART_FRAGMENT = /* GraphQL */ `
       email
       phone
       countryCode
-      customer {
-        id
-        email
-      }
     }
     deliveryGroups(first: 5) {
       edges {

@@ -63,7 +63,7 @@ const EnvSchema = z.object({
     z.coerce.number().int().min(60).max(86_400).default(3600),
   ),
 
-  AUTH_CUSTOMER_ACCOUNTS_ENABLED: booleanish.default(false),
+  AUTH_CUSTOMER_ACCOUNTS_ENABLED: z.preprocess(emptyToUndefined, booleanish.default(false)),
   AUTH_SESSION_TTL_SECONDS: z.preprocess(
     emptyToUndefined,
     z.coerce.number().int().min(60).max(2_592_000).default(86_400),
@@ -78,7 +78,7 @@ const EnvSchema = z.object({
   ),
   SESSION_SECRET: optionalString,
   COOKIE_DOMAIN: optionalString,
-  COOKIE_SECURE: booleanish.optional(),
+  COOKIE_SECURE: z.preprocess(emptyToUndefined, booleanish.optional()),
   SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID: optionalString,
   SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_SECRET: optionalString,
   SHOPIFY_CUSTOMER_ACCOUNT_SCOPE: z

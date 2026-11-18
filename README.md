@@ -4,10 +4,11 @@ Backend for the future React + TypeScript storefront of **benaorigins.de**. Shop
 single source of truth for products, variants, prices, inventory, carts, orders, discounts and
 payments. This repository contains **no product/order database** and does not implement checkout.
 
-> **Current status:** phases 1-7 + authentication addendum implemented and covered by 91 automated tests. Everything runs in
-> **fixture mode** in this environment because no Shopify credentials were supplied. Live Shopify
-> calls are therefore **UNVERIFIED** until credentials are added (see
-> [Credentials & keys](#10-credentials--keys-report)).
+> **Current status:** phases 1-7 + authentication addendum implemented and covered by 91 automated tests.
+> Live **tokenless** Storefront API reads + guest cart create/get were verified on 2026-11-19 against
+> `benaafricanshop.myshopify.com` (API `2026-10`). Token-gated features (metafields/tags/inventory),
+> live Customer Account API login, webhooks and provider integrations remain **UNVERIFIED** until
+> their credentials are supplied (see [Credentials & keys](#10-credentials--keys-report)).
 >
 > No frontend UI was built. No theme, DNS, product, inventory, price, payment or order data was
 > changed. No webhook was registered against Shopify.
@@ -94,6 +95,52 @@ npm run smoke          # read-only live smoke (fixture message when no credentia
 **Storefront API version:** `2026-10` (latest stable verified against Shopify docs on
 2026-11-19). Configurable via `SHOPIFY_API_VERSION`.
 
+### Deploy to Render
+
+Repository: `https://github.com/Ally-keyz/BeNa-Store`
+
+One-click blueprint:
+
+```text
+https://render.com/deploy?repo=https://github.com/Ally-keyz/BeNa-Store
+```
+
+or Render Dashboard → **New → Blueprint** → select the repo.
+
+`render.yaml` configures:
+
+- Node 20, `npm ci --include=dev && npm run build && npm prune --omit=dev`, `npm start`
+- health check `/health`
+- live Shopify mode (`SHOPIFY_MOCK_MODE=false`, store domain, API `2026-10`)
+- production CORS for `benaorigins.de` / `www.benaorigins.de`
+- generated `ADMIN_JWT_SECRET` + `SESSION_SECRET`
+- Customer Account public endpoints and client ID
+- `AUTH_CUSTOMER_ACCOUNTS_ENABLED=false` until the Render URL is registered in Shopify
+
+Render prompts for secrets marked `sync: false`:
+
+- `SHOPIFY_STOREFRONT_PRIVATE_TOKEN` (recommended; without it, tokenless live reads still work)
+- `SHOPIFY_STOREFRONT_PUBLIC_TOKEN` (optional)
+- `SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_SECRET`
+- `SHOPIFY_WEBHOOK_SECRET` + `PUBLIC_WEBHOOK_BASE_URL` (later)
+- `ADMIN_API_KEY_SHA256` (optional; JWT auth is generated)
+- `REDIS_URL` (optional)
+
+After the first deploy:
+
+1. Copy the service URL (`https://<service>.onrender.com`).
+2. Set `API_PUBLIC_URL` to that URL.
+3. Register `https://<service>.onrender.com/api/v1/auth/callback` and
+   `https://<service>.onrender.com` (JS origin) in Shopify's Customer Account API settings.
+4. Set `SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI`, `SHOPIFY_CUSTOMER_ACCOUNT_JS_ORIGIN`, and
+   `AUTH_CUSTOMER_ACCOUNTS_ENABLED=true`, then redeploy.
+5. Verify `/health/ready` and `/api/v1/products` show live Shopify data.
+
+Free Render services sleep after inactivity and are not suitable for production Socket.IO traffic.
+Upgrade before connecting the real storefront. For cookie-safe customer sessions, put the API on a
+custom domain under the same site as the storefront (e.g. `api.benaorigins.de`) when DNS changes are
+approved; do not change production DNS without approval.
+
 ---
 
 ## 3. Implemented REST endpoints
@@ -173,20 +220,25 @@ Notes:
 
 | Capability | Implementation | Verified live? |
 | --- | --- | --- |
-| Storefront GraphQL client | `ShopifyGraphqlClient` (fetch, timeout, throttle retry, buyer-IP header, private/public token headers) | ❌ fixtures only |
-| API version | `2026-10` default, env-configurable, regex-validated | Docs only |
-| Products / variants / prices / images | Full fragment incl. unit price + measurement, inventory quantity (token-only fields toggled) | ❌ fixtures only |
-| Metafields (nutrition, ingredients, allergens, origin, preparation) | `metafields(identifiers:)`, namespace/key configurable, graceful ACCESS_DENIED fallback | ❌ fixtures only |
-| Collections / collection products | Cursor pagination, `@inContext` | ❌ fixtures only |
-| Search + predictive search | `products(query:)` + `predictiveSearch` | ❌ fixtures only |
-| Cart | create/get/add/update/remove, buyer identity, discount codes, delivery groups, real `checkoutUrl` | ❌ fixtures only |
-| Localization / markets | `localization` query; market handles derived (Storefront API `market` is deprecated) | ❌ fixtures only |
-| Policies / pages | Shop policies + legal-notice page lookup | ❌ fixtures only |
+| Storefront GraphQL client | `ShopifyGraphqlClient` (fetch, timeout, throttle retry, buyer-IP header, private/public token headers) | ✅ live tokenless (2026-11-19) |
+| API version | `2026-10` default, env-configurable, regex-validated | ✅ live tokenless |
+| Products / variants / prices / images | Full fragment incl. unit price + measurement, inventory quantity (token-only fields toggled) | ✅ live tokenless (list + detail) |
+| Metafields (nutrition, ingredients, allergens, origin, preparation) | `metafields(identifiers:)`, namespace/key configurable, graceful ACCESS_DENIED fallback | ❌ token required — **UNVERIFIED** |
+| Collections / collection products | Cursor pagination, `@inContext` | ✅ live tokenless (list) |
+| Search + predictive search | `products(query:)` + `predictiveSearch` | ✅ live tokenless |
+| Cart | create/get/add/update/remove, buyer identity, discount codes, delivery groups, real `checkoutUrl` | ✅ live create/get (`checkoutUrl` hosted by Shopify); mutations mock-tested |
+| Localization / markets | `localization` query; market handles derived (Storefront API `market` is deprecated) | ✅ live tokenless (28 countries) |
+| Policies / pages | Shop policies + legal-notice page lookup | ✅ live tokenless |
 | Customer Account API (Layer 1) | OAuth Code + PKCE BFF, sessions, refresh, profile/orders/addresses, cart association | ❌ mock OAuth only — **UNVERIFIED** |
 | Newsletter | `mock` (default), `webhook`, `klaviyo`, `mailchimp` adapters | ❌ provider calls unverified |
 | Reviews app | Public-page signature detection + config override | ❌ detection not run against live site in tests |
 | Admin API | **Only** the webhook registration script (dry-run default) | ❌ never called |
 | Webhooks | HMAC (base64/hex), timing-safe, dedup (memory/Redis), Zod payloads | ❌ no live deliveries |
+
+Live tokenless verification performed against `benaafricanshop.myshopify.com` with Storefront API
+`2026-10`: products, product detail, collections, search, predictive search, localization, policies,
+shipping, and cart create/get. `checkoutUrl` is a real Shopify-hosted URL. Storefront tokens are
+still required for metafields, tags and inventory quantities.
 
 Data source visibility: every response carries `meta.dataSource` (`shopify` or `fixture`) and
 fixture mode adds an explicit warning. Mock records live in `src/fixtures/mock/` and are labelled as
@@ -199,6 +251,9 @@ such.
 - **Token-required fields:** `tags`, `quantityAvailable`, `metafields` are only requested when a
   Storefront token exists. Without a token, tokenless Storefront access still serves products,
   collections, search and carts; the API reports reduced capabilities instead of failing.
+- **Guest cart scoping:** the cart query deliberately does **not** request `buyerIdentity.customer`,
+  because that field requires `unauthenticated_read_customers` and would break tokenless guest
+  carts. Enable that scope only when you need to read the customer object.
 - **Buyer IP:** propagated via `Shopify-Storefront-Buyer-IP` from the incoming request context when
   a private token is used.
 - **No Admin token at runtime:** the Admin API token is only read by `scripts/register-webhooks.ts`.
@@ -288,11 +343,15 @@ Additional verification performed:
 - Runtime smoke against `dist/server.js` in fixture mode:
   `health=ok ready=ok source=fixture`; products, suggestions, cart (`checkout hostedBy=shopify`),
   audit report (7 products, average 60.6) all responded correctly.
+- **Live tokenless smoke** against `benaafricanshop.myshopify.com` (`NODE_ENV=production`,
+  `SHOPIFY_MOCK_MODE=false`): Storefront ping OK; products + product detail; collections; search;
+  predictive search; localization (28 countries); policies; shipping report; cart create/get with a
+  real Shopify-hosted `checkoutUrl`. No real checkout was completed.
 - Fixture audit script produced JSON + Markdown reports under `reports/` (gitignored).
 
-**Not tested:** any live Shopify request, live webhook delivery, live review detection, Klaviyo/
-Mailchimp calls, Redis adapter (no instance), real checkout. `npm run smoke` is read-only and
-reports fixture mode when credentials are absent.
+**Not tested live yet:** token-gated metafields/tags/inventory (needs Storefront token), Customer
+Account API login (needs client secret + registered callback), live webhook delivery, review
+detection, Klaviyo/Mailchimp, Redis adapter, real checkout. `npm run smoke` is read-only.
 
 ---
 
