@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "node16",
+    "moduleResolution": "node16",
     "rootDir": ".",
     "outDir": "dist",
     "strict": true,
@@ -24,8 +24,7 @@
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts",
-    "scripts/**/*.ts",
-    "vitest.config.ts"
+    "scripts/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }
