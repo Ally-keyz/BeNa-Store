@@ -87,7 +87,7 @@ services:
         value: "true"
 
       - key: SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID
-        value: 63193325-4e1e-4cbf-a5c3-78523e52f96e
+        value: 6a04fd8a-dab4-4038-871b-127fe73e3845
       - key: SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_SECRET
         sync: false
       - key: SHOPIFY_CUSTOMER_ACCOUNT_SCOPE
