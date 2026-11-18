@@ -1,0 +1,121 @@
+# BeNa Origins — Updated Technical Architecture
+
+Use the following technology stack for the project.
+
+## Backend
+- Node.js
+- TypeScript
+- Express.js (unless the existing project already has an appropriate backend framework)
+- Shopify Storefront API using GraphQL
+- Zod for validation
+- Socket.IO for necessary real-time communication
+- Shopify webhooks for relevant event handling
+- Vitest or Jest for automated tests
+
+## Frontend
+- React
+- TypeScript
+- Tailwind CSS
+- Socket.IO client where real-time functionality is required
+- React Router for navigation if appropriate
+
+## Commerce
+- Existing BeNa Origins Shopify store.
+- Shopify remains the single source of truth for products, variants, prices, inventory, carts, orders, discounts and payments.
+- Use Shopify Storefront API for customer-facing commerce operations.
+- Use Shopify-hosted checkout through the actual cart checkoutUrl.
+- Do not create a duplicate product or order database.
+
+## Backend architecture
+
+Organize the backend into clearly separated modules:
+
+- config
+- routes
+- controllers
+- services
+- integrations
+- middleware
+- schemas
+- types
+- utils
+- webhooks
+- sockets
+
+Implement REST endpoints for:
+
+- Products
+- Collections
+- Search
+- Product details
+- Product information completeness
+- Cart operations
+- Localization and markets
+- Shipping information
+- Store policies
+- Newsletter integration
+- Customer reviews integration assessment
+- Health checks
+
+Use Shopify GraphQL queries and mutations inside dedicated Shopify service modules. Controllers must not contain Shopify GraphQL logic directly.
+
+## Socket.IO
+
+Set up Socket.IO on the Node.js server and provide a reusable socket service.
+
+Only implement real-time events when they have a clear business purpose.
+
+Potential events:
+- order status updates
+- inventory-related notifications
+- administrative notifications
+
+Use Shopify webhooks as the source of relevant commerce events. Validate webhook signatures and prevent duplicate event processing.
+
+Never use Socket.IO as the source of truth for inventory, prices, payments or orders.
+
+## Frontend integration preparation
+
+The backend must expose documented REST endpoints that the React TypeScript frontend can consume.
+
+Provide:
+- consistent response structures
+- predictable error responses
+- request validation
+- API documentation
+- pagination
+- typed response models
+- secure credential handling
+
+## SEO
+
+Since the frontend uses React rather than Next.js, prepare a strategy for prerendering or static generation of public pages.
+
+Product pages, collection pages and informational pages should have accessible metadata, canonical URLs, structured data and crawlable content.
+
+## Development restrictions
+
+This phase is strictly backend-first.
+
+Do not build frontend UI.
+Do not modify the published Shopify theme.
+Do not change production DNS.
+Do not change live product data.
+Do not alter payments.
+Do not publish the new storefront.
+
+Inspect the existing repository before making architectural decisions.
+
+Implement the backend in phases, test each integration, and document missing Shopify configuration.
+
+At completion, provide:
+1. Project structure.
+2. Implemented REST endpoints.
+3. Shopify integration status.
+4. Socket.IO implementation and event documentation.
+5. Webhook implementation status.
+6. Automated test results.
+7. Environment variable documentation.
+8. Instructions for connecting the future React frontend.
+
+Do not begin UI implementation until the backend has been reviewed and approved.
