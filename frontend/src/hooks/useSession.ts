@@ -19,6 +19,7 @@ export function useSession() {
   return {
     session: query.data,
     isLoading: query.isLoading,
+    isError: query.isError,
     enabled: query.data?.enabled ?? false,
     authenticated: query.data?.authenticated ?? false,
     customer: query.data?.customer ?? null,

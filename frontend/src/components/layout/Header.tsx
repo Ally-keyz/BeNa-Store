@@ -1,38 +1,70 @@
 import { useState, type FormEvent } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, Search, ShoppingBag } from 'lucide-react';
+import { Search, ShoppingBag } from 'lucide-react';
+import { BRAND } from '@/config';
 import { cn } from '@/lib/cn';
 import { pageContainer } from '@/lib/layout';
 import { useCart } from '@/context/CartContext';
-import { BrandLogo } from '@/components/ui/BrandLogo';
-import { Button } from '@/components/ui/Button';
+import logoUrl from '@/assets/logo.webp';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
-import { LanguageSwitch } from './LanguageSwitch';
 import { MobileNav } from './MobileNav';
+import { LanguageSwitch } from './LanguageSwitch';
 
 const DESKTOP_LINKS = [
-  { href: '/shop', labelKey: 'nav.shop', end: true },
-  { href: '/collections/coffee', labelKey: 'nav.coffee' },
-  { href: '/collections/food', labelKey: 'nav.food' },
-  { href: '/collections/crafts', labelKey: 'nav.crafts' },
+  { href: '/', labelKey: 'nav.home', end: true },
+  { href: '/rwandan-products', labelKey: 'nav.rwandanProducts' },
+  { href: '/catalog', labelKey: 'nav.catalog' },
   { href: '/about', labelKey: 'nav.about' },
+  { href: '/contact', labelKey: 'nav.contact' },
 ] as const;
 
+/** Floating "pill" nav: quiet by default, crisp white chip on the active route. */
 function navLinkClass({ isActive }: { isActive: boolean }): string {
   return cn(
-    'relative rounded-sm px-1 py-2 text-sm transition-colors duration-200',
-    isActive ? 'text-ink' : 'text-neutral-700 hover:text-ink',
-    isActive &&
-      'after:absolute after:inset-x-1 after:-bottom-0.5 after:h-px after:bg-chocolate-900',
+    'inline-flex items-center gap-2 whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-medium tracking-[-0.005em] transition-colors duration-200 xl:px-3.5',
+    isActive
+      ? 'bg-white text-black font-semibold'
+      : 'text-zinc-800 hover:bg-white/70 hover:text-ink',
+  );
+}
+
+/**
+ * The logo artwork is a full lock-up with baked-in lettering, which turns to
+ * mush at navbar size. The tile shows only the emblem (woman, coffee branch,
+ * hills) and pairs it with a crisp typographic wordmark instead.
+ */
+function BrandMark() {
+  return (
+    <Link
+      to="/"
+      aria-label={`${BRAND.name} — home`}
+      className="group inline-flex items-center gap-2.5 rounded-full focus-visible:outline-offset-4 sm:gap-3"
+    >
+      <span className="relative block h-11 w-14 shrink-0 overflow-hidden bg-white  transition-shadow duration-300 ">
+        <img
+          src={logoUrl}
+          alt=""
+          width={56}
+          height={44}
+          className="absolute left-1/2 top-0 h-[92px] w-auto max-w-none -translate-x-1/2"
+          loading="eager"
+        />
+      </span>
+      <span className="hidden leading-none min-[360px]:block">
+        <span className="block font-display mt-2 text-[17px] font-semibold tracking-[-0.03em] text-ink">
+          {BRAND.name}
+        </span>
+      </span>
+    </Link>
   );
 }
 
 export function Header() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { itemCount } = useCart();
+  const { itemCount, openCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,60 +83,78 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-chocolate-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85">
-        <div className={cn(pageContainer, 'flex h-14 items-center justify-between gap-4 lg:h-16')}>
-          <div className="flex items-center gap-2 lg:gap-8">
+      <header className="sticky top-0 z-50 border-b border-neutral-200/70 bg-white/85 backdrop-blur-xl supports-[backdrop-filter]:bg-white/75">
+
+        <div
+          className={cn(
+            pageContainer,
+            'relative flex h-16 items-center justify-between gap-4 lg:h-[72px]',
+          )}
+        >
+          <div className="flex min-w-0 items-center gap-1 sm:gap-2">
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="-ml-2 inline-flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-chocolate-50 lg:hidden"
+              className="-ml-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition-colors hover:bg-neutral-100 lg:hidden"
               aria-label={t('a11y.openMenu')}
             >
-              <Menu className="h-5 w-5" aria-hidden="true" />
+              <span className="sr-only">{t('a11y.openMenu')}</span>
+              <MenuIcon />
             </button>
 
-            <BrandLogo />
-
-            <nav aria-label={t('a11y.mainNav')} className="hidden lg:block">
-              <ul className="flex items-center gap-6">
-                {DESKTOP_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <NavLink to={link.href} end={'end' in link && link.end} className={navLinkClass}>
-                      {t(link.labelKey)}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <BrandMark />
           </div>
 
-          <div className="flex items-center gap-1 sm:gap-2">
-            <LanguageSwitch className="mr-1 hidden lg:inline-flex" />
+          <nav
+            aria-label={t('a11y.mainNav')}
+            className="hidden lg:flex lg:flex-1 lg:justify-center xl:absolute xl:left-1/2 xl:top-1/2 xl:flex-none xl:-translate-x-1/2 xl:-translate-y-1/2"
+          >
+            <ul className="flex items-center gap-0.5 rounded-full p-1">
+              {DESKTOP_LINKS.map((link) => (
+                <li key={link.href}>
+                  <NavLink to={link.href} end={'end' in link && link.end} className={navLinkClass}>
+                    {({ isActive }) => (
+                      <>
+                        <span>{t(link.labelKey)}</span>
+                        {isActive ? (
+                          <span aria-hidden="true" className="h-1 w-1 rounded-full bg-brand" />
+                        ) : null}
+                      </>
+                    )}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-chocolate-50"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-ink"
               aria-label={t('common.search')}
             >
-              <Search className="h-5 w-5" aria-hidden="true" />
+              <Search className="h-[19px] w-[19px]" aria-hidden="true" />
             </button>
 
-            <Link
-              to="/cart"
-              className="relative inline-flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-chocolate-50"
+            <LanguageSwitch className="hidden sm:inline-flex" />
+
+            <button
+              type="button"
+              onClick={openCart}
+              className="relative inline-flex h-10 items-center gap-2 rounded-full bg-white pl-3 pr-3 text-white transition-colors hover:bg-neutral-800 sm:pl-3.5 sm:pr-2.5"
               aria-label={cartLabel}
             >
-              <ShoppingBag className="h-5 w-5" aria-hidden="true" />
+              <ShoppingBag className="h-[18px] text-ink w-[18px]" aria-hidden="true" />
               {itemCount > 0 ? (
                 <span
                   aria-hidden="true"
-                  className="absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-chocolate-900 px-1 text-[10px] font-semibold leading-none text-white"
+                  className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-semibold leading-none text-ink"
                 >
                   {itemCount > 99 ? '99+' : itemCount}
                 </span>
               ) : null}
-            </Link>
+            </button>
           </div>
         </div>
       </header>
@@ -118,22 +168,46 @@ export function Header() {
         description={t('header.searchHint')}
         closeLabel={t('header.closeSearch')}
       >
-        <form onSubmit={onSearch} className="flex flex-col gap-3 sm:flex-row">
-          <Input
-            label={t('header.searchLabel')}
-            hideLabel
-            type="search"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={t('header.searchLabel')}
-            autoComplete="off"
-            autoFocus
-          />
-          <Button type="submit" className="shrink-0">
-            {t('header.searchSubmit')}
-          </Button>
+        <form onSubmit={onSearch} className="flex flex-col gap-3">
+          <div className="flex items-center gap-1.5 rounded-full bg-terra-50 p-1.5">
+            <Input
+              label={t('header.searchLabel')}
+              hideLabel
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder={t('header.searchLabel')}
+              autoComplete="off"
+              autoFocus
+              containerClassName="flex-1"
+              className="h-10 border-0 bg-transparent px-3 text-[13.5px] focus-visible:border-0"
+            />
+            <button
+              type="submit"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-ink transition-colors hover:bg-brand-dark"
+              aria-label={t('header.searchSubmit')}
+            >
+              <Search className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+          <p className="text-[13px] text-neutral-600">
+            <a
+              href={`mailto:${BRAND.contactEmail}`}
+              className="underline underline-offset-2 hover:text-ink"
+            >
+              {BRAND.contactEmail}
+            </a>
+          </p>
         </form>
       </Dialog>
     </>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
   );
 }

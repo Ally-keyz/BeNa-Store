@@ -16,7 +16,8 @@ const COLUMNS = [
   {
     headingKey: 'footer.shopHeading',
     links: [
-      { href: '/shop', key: 'nav.shopAll' },
+      { href: '/rwandan-products', key: 'nav.rwandanProducts' },
+      { href: '/catalog', key: 'nav.catalog' },
       { href: '/collections/coffee', key: 'nav.coffee' },
       { href: '/collections/food', key: 'nav.food' },
       { href: '/collections/crafts', key: 'nav.crafts' },
@@ -48,7 +49,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 bg-chocolate-950 text-white">
+    <footer className="mt-16 bg-ink text-white">
       <div className={cn(pageContainer, 'grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-16')}>
         <div className="max-w-sm">
           <p className="font-display text-xl font-semibold tracking-tight">{BRAND.name}</p>

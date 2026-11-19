@@ -34,7 +34,7 @@ export function Accordion({ items, allowMultiple = false, className }: Accordion
   };
 
   return (
-    <div className={cn('divide-y divide-chocolate-100 border-y border-chocolate-100', className)}>
+    <div className={cn('divide-y divide-terra-100 border-y border-terra-100', className)}>
       {items.map((item) => {
         const isOpen = openIds.includes(item.id);
         const buttonId = `${baseId}-button-${item.id}`;
@@ -48,7 +48,7 @@ export function Accordion({ items, allowMultiple = false, className }: Accordion
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggle(item.id)}
-                className="flex w-full items-center justify-between gap-4 py-4 text-left text-[15px] font-medium text-ink transition-colors hover:text-chocolate-700"
+                className="flex w-full items-center justify-between gap-4 py-4 text-left text-[15px] font-medium text-ink transition-colors hover:text-terra-700"
               >
                 {item.title}
                 <ChevronDown

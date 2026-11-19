@@ -56,21 +56,21 @@ export function Drawer({
           className,
         )}
       >
-        <div className="flex items-center justify-between gap-4 border-b border-chocolate-100 px-5 py-4">
+        <div className="flex items-center justify-between gap-4 border-b border-terra-100 px-5 py-4">
           <h2 id={titleId} className="text-base font-semibold">
             {title}
           </h2>
           <button
             type="button"
             onClick={stableClose}
-            className="-m-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-chocolate-50 hover:text-ink"
+            className="-m-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-terra-50 hover:text-ink"
             aria-label={closeLabel}
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-5">{children}</div>
-        {footer ? <div className="border-t border-chocolate-100 px-5 py-4">{footer}</div> : null}
+        {footer ? <div className="border-t border-terra-100 px-5 py-4">{footer}</div> : null}
       </div>
     </div>,
     document.body,

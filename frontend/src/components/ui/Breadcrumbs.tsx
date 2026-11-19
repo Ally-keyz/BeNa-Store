@@ -14,7 +14,16 @@ export interface BreadcrumbsProps {
 
 export function Breadcrumbs({ items, label = 'Breadcrumb', className }: BreadcrumbsProps) {
   return (
-    <nav aria-label={label} className={cn('text-[13px] text-neutral-600', className)}>
+    <nav
+      aria-label={label}
+      className={cn(
+        'text-[13px] text-neutral-600',
+        // The breadcrumb is the page indicator: keep only a hairline of space
+        // between it and whatever section follows on every page.
+        '[&+*]:!pt-[3px]',
+        className,
+      )}
+    >
       <ol className="flex flex-wrap items-center gap-1.5">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

@@ -26,6 +26,10 @@ export interface MarketContextValue {
   localization: LocalizationInfo | undefined;
   isLoading: boolean;
   countries: Array<{ isoCode: string; name: string; currency: string }>;
+  /** ISO 4217 code for the selected market, e.g. `EUR`. */
+  currency: string;
+  /** Human-readable country name for the selected market. */
+  regionName: string;
   /** Uppercase ISO codes for the backend (`?country=DE&language=DE`). */
   marketParams: { country: string; language: string };
   /** Intl locale for money/date formatting. */
@@ -76,6 +80,11 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     [localizationQuery.data],
   );
 
+  const selectedCountry = countries.find((item) => item.isoCode === country);
+  const currency =
+    selectedCountry?.currency ?? localizationQuery.data?.country?.currency.isoCode ?? 'EUR';
+  const regionName = selectedCountry?.name ?? country;
+
   const value = useMemo<MarketContextValue>(
     () => ({
       country,
@@ -85,10 +94,22 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       localization: localizationQuery.data,
       isLoading: localizationQuery.isLoading,
       countries,
+      currency,
+      regionName,
       marketParams: { country, language: language.toUpperCase() },
       formatLocale: language === 'de' ? 'de-DE' : 'en-IE',
     }),
-    [country, language, setCountry, setLanguage, localizationQuery.data, localizationQuery.isLoading, countries],
+    [
+      country,
+      language,
+      setCountry,
+      setLanguage,
+      localizationQuery.data,
+      localizationQuery.isLoading,
+      countries,
+      currency,
+      regionName,
+    ],
   );
 
   return <MarketContext.Provider value={value}>{children}</MarketContext.Provider>;

@@ -12,22 +12,21 @@ export interface MobileNavProps {
 }
 
 const PRIMARY_LINKS = [
-  { href: '/shop', labelKey: 'nav.shopAll', end: true },
-  { href: '/collections/coffee', labelKey: 'nav.coffee' },
-  { href: '/collections/food', labelKey: 'nav.food' },
-  { href: '/collections/crafts', labelKey: 'nav.crafts' },
+  { href: '/', labelKey: 'nav.home', end: true },
+  { href: '/rwandan-products', labelKey: 'nav.rwandanProducts' },
+  { href: '/catalog', labelKey: 'nav.catalog' },
+  { href: '/about', labelKey: 'nav.about' },
+  { href: '/contact', labelKey: 'nav.contact' },
 ] as const;
 
 const SECONDARY_LINKS = [
-  { href: '/about', labelKey: 'nav.about' },
-  { href: '/contact', labelKey: 'nav.contact' },
   { href: '/shipping', labelKey: 'nav.shipping' },
 ] as const;
 
 function itemClass({ isActive }: { isActive: boolean }): string {
   return cn(
     'flex min-h-11 items-center justify-between rounded-lg px-2 text-[15px] transition-colors',
-    isActive ? 'bg-chocolate-50 font-medium text-ink' : 'text-neutral-800 hover:bg-chocolate-50',
+    isActive ? 'bg-terra-50 font-medium text-ink' : 'text-neutral-800 hover:bg-terra-50',
   );
 }
 
@@ -59,7 +58,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           ))}
         </ul>
 
-        <div className="my-5 border-t border-chocolate-100" />
+        <div className="my-5 border-t border-terra-100" />
 
         <ul className="space-y-1">
           {SECONDARY_LINKS.map((link) => (
@@ -73,11 +72,16 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         </ul>
       </nav>
 
-      <div className="mt-8 space-y-5 border-t border-chocolate-100 pt-5">
-        <LanguageSwitch size="md" />
+      <div className="mt-8 space-y-5 border-t border-terra-100 pt-5">
+        <div>
+          <p className="px-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
+            {t('header.language')}
+          </p>
+          <LanguageSwitch size="md" className="mt-2.5" />
+        </div>
         <a
           href={`mailto:${BRAND.contactEmail}`}
-          className="flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm text-neutral-700 hover:bg-chocolate-50 hover:text-ink"
+          className="flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm text-neutral-700 hover:bg-terra-50 hover:text-ink"
         >
           <Mail className="h-4 w-4" aria-hidden="true" />
           {BRAND.contactEmail}

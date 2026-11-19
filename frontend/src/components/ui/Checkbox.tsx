@@ -28,7 +28,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           type="checkbox"
           aria-invalid={error ? true : undefined}
           aria-describedby={[descriptionId, errorId].filter(Boolean).join(' ') || undefined}
-          className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-chocolate-300 accent-chocolate-900"
+          className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-terra-300 accent-brand"
           {...rest}
         />
         <span className="flex-1">
@@ -41,7 +41,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         </span>
       </label>
       {error ? (
-        <p id={errorId} className="mt-1 text-[13px] font-medium text-chocolate-700">
+        <p id={errorId} className="mt-1 text-[13px] font-medium text-terra-700">
           {error}
         </p>
       ) : null}

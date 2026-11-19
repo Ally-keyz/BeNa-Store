@@ -12,6 +12,7 @@ import {
   createCart,
   getCart,
   removeCartLines,
+  updateBuyerIdentity,
   updateCartLines,
   updateDiscountCodes,
 } from '@/api/endpoints';
@@ -36,7 +37,7 @@ export interface CartContextValue {
   itemCount: number;
   isLoading: boolean;
   isUpdating: boolean;
-  /** Open state for the cart drawer (drawer UI arrives in the cart phase). */
+  /** Open state for the shared header cart drawer. */
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -44,6 +45,7 @@ export interface CartContextValue {
   updateLine: (lineId: string, quantity: number) => Promise<void>;
   removeLine: (lineId: string) => Promise<void>;
   applyDiscount: (code: string) => Promise<void>;
+  setBuyerIdentity: (identity: { email?: string; countryCode?: string }) => Promise<void>;
   refresh: () => void;
 }
 
@@ -172,6 +174,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [cartId, commitCart],
   );
 
+  const setBuyerIdentity = useCallback(
+    async (identity: { email?: string; countryCode?: string }) => {
+      setIsUpdating(true);
+      try {
+        if (!cartId) {
+          const result = await createCart({ buyerIdentity: identity });
+          commitCart(result.data);
+          return;
+        }
+        try {
+          const result = await updateBuyerIdentity(cartId, identity);
+          commitCart(result.data);
+        } catch (error) {
+          if (isApiError(error) && error.code === 'NOT_FOUND') {
+            const result = await createCart({ buyerIdentity: identity });
+            commitCart(result.data);
+          } else {
+            throw error;
+          }
+        }
+      } finally {
+        setIsUpdating(false);
+      }
+    },
+    [cartId, commitCart],
+  );
+
   const value = useMemo<CartContextValue>(
     () => ({
       cart: cartQuery.data ?? null,
@@ -185,11 +214,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateLine,
       removeLine,
       applyDiscount,
+      setBuyerIdentity,
       refresh: () => {
         void cartQuery.refetch();
       },
     }),
-    [cartQuery, isUpdating, isOpen, addItem, updateLine, removeLine, applyDiscount],
+    [cartQuery, isUpdating, isOpen, addItem, updateLine, removeLine, applyDiscount, setBuyerIdentity],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

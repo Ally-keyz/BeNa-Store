@@ -4,11 +4,11 @@ import { cn } from '@/lib/cn';
 export type BadgeTone = 'neutral' | 'sale' | 'soon' | 'soldout' | 'outline';
 
 const tones: Record<BadgeTone, string> = {
-  neutral: 'bg-chocolate-100 text-chocolate-900',
-  sale: 'bg-chocolate-900 text-white',
-  soon: 'border border-chocolate-200 bg-white text-chocolate-900',
+  neutral: 'bg-terra-100 text-terra-900',
+  sale: 'bg-brand text-ink',
+  soon: 'border border-terra-200 bg-white text-terra-900',
   soldout: 'bg-neutral-100 text-neutral-700',
-  outline: 'border border-chocolate-200 text-chocolate-900',
+  outline: 'border border-terra-200 text-terra-900',
 };
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

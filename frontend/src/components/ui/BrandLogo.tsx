@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/cn';
 import { BRAND } from '@/config';
+import logoUrl from '@/assets/logo.webp';
 
 /**
  * The supplied logo is shown untouched on a white background.
@@ -15,11 +16,11 @@ export function BrandLogo({ className }: { className?: string }) {
       className={cn('inline-flex items-center rounded-sm', className)}
     >
       <img
-        src="/logo.webp"
+        src={logoUrl}
         alt=""
         width={37}
         height={40}
-        className="h-9 w-auto sm:h-10"
+        className="h-9 w-auto object-contain sm:h-10"
         loading="eager"
       />
     </Link>

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ListChecks, Sprout, Truck } from 'lucide-react';
-import { pageContainer } from '@/lib/layout';
+import { contentContainer } from '@/lib/layout';
 
 const ITEMS = [
   { key: 'trustDirect', Icon: Sprout },
@@ -12,11 +12,11 @@ export function TrustBand() {
   const { t } = useTranslation();
 
   return (
-    <section className="border-y border-chocolate-100 bg-chocolate-50/60" aria-label={t('home.storyEyebrow')}>
-      <div className={`${pageContainer} grid gap-6 py-10 sm:grid-cols-3 sm:gap-8 sm:py-12`}>
+    <section className="border-y border-terra-100 bg-terra-50/60" aria-label={t('home.storyEyebrow')}>
+      <div className={`${contentContainer} grid gap-6 py-10 sm:grid-cols-3 sm:gap-8 sm:py-12`}>
         {ITEMS.map(({ key, Icon }) => (
           <div key={key} className="flex gap-4">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-chocolate-800">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-terra-800">
               <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
             </span>
             <div>

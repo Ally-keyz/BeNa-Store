@@ -38,8 +38,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         className={cn(
           'h-11 w-full rounded-xl border bg-white px-4 text-[15px] text-ink transition-colors duration-200',
           'placeholder:text-neutral-500',
-          'focus-visible:border-chocolate-900 focus-visible:outline-none',
-          error ? 'border-chocolate-700' : 'border-chocolate-200',
+          'focus-visible:border-brand focus-visible:outline-none',
+          error ? 'border-terra-700' : 'border-terra-200',
           className,
         )}
         {...rest}
@@ -50,7 +50,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} className="mt-1.5 text-[13px] font-medium text-chocolate-700">
+        <p id={errorId} className="mt-1.5 text-[13px] font-medium text-terra-700">
           {error}
         </p>
       ) : null}

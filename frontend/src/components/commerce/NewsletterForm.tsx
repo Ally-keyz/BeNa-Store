@@ -1,15 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, Mail } from 'lucide-react';
 import { subscribeNewsletter } from '@/api/endpoints';
-import { errorMessageKey } from '@/api/errors';
-import { isApiError } from '@/api/errors';
+import { errorMessageKey, isApiError } from '@/api/errors';
 import { useMarket } from '@/context/MarketContext';
-import { Input } from '@/components/ui/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/cn';
@@ -27,10 +25,7 @@ interface FormValues {
   consent: boolean;
 }
 
-/**
- * Newsletter form wired to POST /api/v1/newsletter/subscribe.
- * Explicit consent is required; the backend records opt-in metadata.
- */
+/** Modern newsletter field wired to POST /api/v1/newsletter/subscribe. */
 export function NewsletterForm({
   source,
   variant = 'default',
@@ -40,6 +35,7 @@ export function NewsletterForm({
 }: NewsletterFormProps) {
   const { t } = useTranslation();
   const { language } = useMarket();
+  const emailId = useId();
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -47,9 +43,7 @@ export function NewsletterForm({
     () =>
       z.object({
         email: z.string().trim().email(t('errors.VALIDATION_ERROR')),
-        consent: z
-          .boolean()
-          .refine((value) => value === true, t('home.newsletterConsent')),
+        consent: z.boolean().refine((value) => value === true, t('home.newsletterConsent')),
       }),
     [t],
   );
@@ -83,45 +77,80 @@ export function NewsletterForm({
 
   if (status === 'success') {
     return (
-      <p className={cn('text-sm text-chocolate-700', className)} role="status">
-        {successMessage ?? t('home.newsletterSuccess')}
-      </p>
+      <div
+        className={cn(
+          'flex items-center gap-4 rounded-2xl border border-brand/25 bg-terra-50 p-4',
+          className,
+        )}
+        role="status"
+      >
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-ink">
+          <Check className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <p className="text-[14px] font-medium leading-6 text-ink">
+          {successMessage ?? t('home.newsletterSuccess')}
+        </p>
+      </div>
     );
   }
 
   const isFooter = variant === 'footer';
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className={cn('w-full', className)}
-      noValidate
-    >
-      <div className={cn('flex gap-2', isFooter ? 'flex-col sm:flex-row' : 'flex-col sm:flex-row')}>
-        <Input
-          {...register('email')}
-          type="email"
-          autoComplete="email"
-          label={t('home.newsletterEmailLabel')}
-          hideLabel={isFooter}
-          placeholder={t('home.newsletterEmailLabel')}
-          error={errors.email?.message}
-          className={isFooter ? 'bg-white' : undefined}
-        />
-        <Button
-          type="submit"
-          variant={isFooter ? 'secondary' : 'primary'}
-          loading={isSubmitting}
-          className={cn('shrink-0', isFooter && 'sm:mt-0')}
-        >
-          {submitLabel ?? t('home.newsletterSubmit')}
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Button>
+    <form onSubmit={handleSubmit(onSubmit)} className={cn('w-full', className)} noValidate>
+      <div
+        className={cn(
+          'rounded-2xl border p-2 shadow-sm transition-shadow focus-within:shadow-md',
+          isFooter ? 'border-white/20 bg-white/10' : 'border-terra-100 bg-white',
+        )}
+      >
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <div
+            className={cn(
+              'flex flex-1 items-center gap-3 rounded-xl px-4',
+              isFooter ? 'bg-white/10' : 'bg-terra-50',
+            )}
+          >
+            <Mail className="h-[18px] w-[18px] shrink-0 text-brand-dark" aria-hidden="true" />
+            <label htmlFor={emailId} className="sr-only">
+              {t('home.newsletterEmailLabel')}
+            </label>
+            <input
+              {...register('email')}
+              id={emailId}
+              type="email"
+              autoComplete="email"
+              placeholder={t('home.newsletterEmailLabel')}
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? `${emailId}-error` : undefined}
+              className={cn(
+                'h-12 min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none',
+                'placeholder:text-neutral-500',
+                isFooter && 'text-white placeholder:text-white/60',
+              )}
+            />
+          </div>
+          <Button
+            type="submit"
+            variant={isFooter ? 'secondary' : 'primary'}
+            loading={isSubmitting}
+            className="h-12 shrink-0 rounded-xl px-7"
+          >
+            {submitLabel ?? t('home.newsletterSubmit')}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </div>
       </div>
+
+      {errors.email?.message ? (
+        <p id={`${emailId}-error`} className="mt-2 text-[13px] font-medium text-terra-700">
+          {errors.email.message}
+        </p>
+      ) : null}
 
       <Checkbox
         {...register('consent')}
-        className="mt-3"
+        className={cn('mt-4', isFooter && 'text-white/80')}
         label={
           <>
             {t('home.newsletterConsent')}{' '}
@@ -134,7 +163,7 @@ export function NewsletterForm({
       />
 
       {status === 'error' && serverError ? (
-        <p className="mt-2 text-[13px] font-medium text-chocolate-700" role="alert">
+        <p className="mt-2 text-[13px] font-medium text-terra-700" role="alert">
           {serverError}
         </p>
       ) : null}

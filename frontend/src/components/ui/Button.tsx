@@ -20,12 +20,12 @@ export function buttonVariants({
   return cn(
     'inline-flex items-center justify-center gap-2 rounded-full font-medium',
     'transition-colors duration-200 ease-out',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chocolate-900',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
     'disabled:pointer-events-none disabled:opacity-50',
-    variant === 'primary' && 'bg-chocolate-900 text-white hover:bg-chocolate-800',
+    variant === 'primary' && 'bg-brand text-ink hover:bg-brand-dark',
     variant === 'secondary' &&
-      'border border-chocolate-900 bg-transparent text-chocolate-900 hover:bg-chocolate-50',
-    variant === 'ghost' && 'text-ink hover:bg-chocolate-50',
+      'border border-brand bg-white text-terra-800 hover:bg-terra-50',
+    variant === 'ghost' && 'text-ink hover:bg-terra-50',
     size === 'sm' && 'h-9 px-4 text-[13px]',
     size === 'md' && 'h-11 px-5 text-sm',
     size === 'lg' && 'h-12 px-7 text-[15px]',

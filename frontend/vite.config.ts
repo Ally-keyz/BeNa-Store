@@ -16,8 +16,28 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': { target: proxyTarget, changeOrigin: true, secure: true },
-      '/socket.io': { target: proxyTarget, ws: true, changeOrigin: true },
+      '/api': {
+        target: proxyTarget,
+        changeOrigin: true,
+        secure: true,
+        // The backend allowlist contains production origins, not localhost.
+        // A same-origin dev proxy must not leak the browser's local Origin.
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('Origin');
+          });
+        },
+      },
+      '/socket.io': {
+        target: proxyTarget,
+        ws: true,
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('Origin');
+          });
+        },
+      },
     },
   },
 });

@@ -42,7 +42,7 @@ export function Tabs({ items, label, defaultTab, className }: TabsProps) {
         role="tablist"
         aria-label={label}
         onKeyDown={onKeyDown}
-        className="flex gap-1 overflow-x-auto border-b border-chocolate-100"
+        className="flex gap-1 overflow-x-auto border-b border-terra-100"
       >
         {items.map((item) => {
           const selected = item.id === active;
@@ -65,7 +65,7 @@ export function Tabs({ items, label, defaultTab, className }: TabsProps) {
               {selected ? (
                 <span
                   aria-hidden="true"
-                  className="absolute inset-x-3 -bottom-px h-0.5 bg-chocolate-900"
+                  className="absolute inset-x-3 -bottom-px h-0.5 bg-brand"
                 />
               ) : null}
             </button>

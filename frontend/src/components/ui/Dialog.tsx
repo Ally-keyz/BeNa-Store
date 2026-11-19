@@ -71,7 +71,7 @@ export function Dialog({
           <button
             type="button"
             onClick={stableClose}
-            className="-m-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-chocolate-50 hover:text-ink"
+            className="-m-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-terra-50 hover:text-ink"
             aria-label={closeLabel}
           >
             <X className="h-4 w-4" aria-hidden="true" />

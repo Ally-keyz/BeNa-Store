@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   getCollection,
   getCollections,
@@ -14,6 +14,7 @@ import {
   type PageParams,
 } from '@/api/endpoints';
 import { queryKeys } from '@/api/queryKeys';
+import { isApiError } from '@/api/errors';
 import type { CollectionSummary, Product } from '@/types';
 
 export interface PagedResult<T> {
@@ -22,7 +23,7 @@ export interface PagedResult<T> {
   endCursor: string | null;
 }
 
-export function useProducts(params: ListProductsParams) {
+export function useProducts(params: ListProductsParams, enabled = true) {
   return useQuery({
     queryKey: queryKeys.products.list(params),
     queryFn: async ({ signal }): Promise<PagedResult<Product>> => {
@@ -34,6 +35,7 @@ export function useProducts(params: ListProductsParams) {
       };
     },
     staleTime: 60_000,
+    enabled,
   });
 }
 
@@ -64,7 +66,7 @@ export function useCollections(params: ListCollectionsParams) {
   });
 }
 
-export function useCollection(handle: string, params: CollectionProductsParams) {
+export function useCollection(handle: string, params: CollectionProductsParams, enabled = true) {
   return useQuery({
     queryKey: queryKeys.collections.detail(handle, params),
     queryFn: async ({ signal }): Promise<{ collection: CollectionDetailData; endCursor: string | null; hasNextPage: boolean }> => {
@@ -76,7 +78,9 @@ export function useCollection(handle: string, params: CollectionProductsParams) 
       };
     },
     staleTime: 60_000,
-    enabled: Boolean(handle),
+    enabled: Boolean(handle) && enabled,
+    retry: (failureCount, error) =>
+      !(isApiError(error) && error.status === 404) && failureCount < 2,
   });
 }
 
@@ -105,5 +109,70 @@ export function useSearchSuggestions(query: string, market: MarketParams) {
     },
     staleTime: 60_000,
     enabled: query.trim().length >= 2,
+  });
+}
+
+/* Cursor-paginated variants used by listing routes. The backend returns
+ * `meta.pagination.endCursor`; TanStack feeds it back as `pageParam`. */
+
+export function useInfiniteProducts(params: Omit<ListProductsParams, 'after'>) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.products.infinite(params),
+    queryFn: async ({ pageParam, signal }): Promise<PagedResult<Product>> => {
+      const result = await getProducts({ ...params, after: pageParam }, { signal });
+      return {
+        items: result.data,
+        hasNextPage: result.meta.pagination?.hasNextPage ?? false,
+        endCursor: result.meta.pagination?.endCursor ?? null,
+      };
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNextPage ? lastPage.endCursor ?? undefined : undefined,
+    staleTime: 60_000,
+  });
+}
+
+export function useInfiniteCollectionProducts(
+  handle: string,
+  params: Omit<CollectionProductsParams, 'after'>,
+) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.collections.infiniteProducts(handle, params),
+    queryFn: async ({ pageParam, signal }) => {
+      const result = await getCollection(handle, { ...params, after: pageParam }, { signal });
+      return {
+        collection: result.data,
+        items: result.data.products,
+        hasNextPage: result.meta.pagination?.hasNextPage ?? false,
+        endCursor: result.meta.pagination?.endCursor ?? null,
+      };
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNextPage ? lastPage.endCursor ?? undefined : undefined,
+    staleTime: 60_000,
+    enabled: Boolean(handle),
+    retry: (failureCount, error) =>
+      !(isApiError(error) && error.status === 404) && failureCount < 2,
+  });
+}
+
+export function useInfiniteSearch(query: string, params: Omit<PageParams, 'after'>) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.search.infinite(query, params),
+    queryFn: async ({ pageParam, signal }): Promise<PagedResult<Product>> => {
+      const result = await searchProducts(query, { ...params, after: pageParam }, { signal });
+      return {
+        items: result.data.products,
+        hasNextPage: result.meta.pagination?.hasNextPage ?? false,
+        endCursor: result.meta.pagination?.endCursor ?? null,
+      };
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNextPage ? lastPage.endCursor ?? undefined : undefined,
+    staleTime: 30_000,
+    enabled: query.trim().length > 0,
   });
 }

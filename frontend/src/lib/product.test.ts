@@ -1,0 +1,94 @@
+import { describe, expect, it } from 'vitest';
+import type { Product, ProductVariant } from '@/types';
+import { getAvailability, getDefaultVariant, getProductCategory, hasVariantChoice } from './product';
+
+function variant(overrides: Partial<ProductVariant> = {}): ProductVariant {
+  return {
+    id: 'gid://shopify/ProductVariant/1',
+    title: 'Default Title',
+    sku: null,
+    availableForSale: true,
+    quantityAvailable: 1,
+    price: { amount: '10.00', currencyCode: 'EUR' },
+    compareAtPrice: null,
+    unitPrice: null,
+    unitPriceMeasurement: null,
+    requiresShipping: true,
+    selectedOptions: [],
+    image: null,
+    ...overrides,
+  };
+}
+
+function product(overrides: Partial<Product> = {}): Product {
+  return {
+    id: 'gid://shopify/Product/1',
+    handle: 'test-product',
+    title: 'Test product',
+    description: '',
+    descriptionHtml: '',
+    vendor: '',
+    productType: '',
+    tags: [],
+    availableForSale: true,
+    createdAt: '',
+    updatedAt: '',
+    publishedAt: null,
+    onlineStoreUrl: null,
+    url: '',
+    seo: { title: null, description: null },
+    priceRange: {
+      minVariantPrice: { amount: '10.00', currencyCode: 'EUR' },
+      maxVariantPrice: { amount: '10.00', currencyCode: 'EUR' },
+    },
+    compareAtPriceRange: {
+      minVariantPrice: { amount: '0.00', currencyCode: 'EUR' },
+      maxVariantPrice: { amount: '0.00', currencyCode: 'EUR' },
+    },
+    featuredImage: null,
+    images: [],
+    options: [],
+    variants: [variant()],
+    metafields: {
+      nutrition: null,
+      ingredients: null,
+      allergens: null,
+      origin: null,
+      preparation: null,
+    },
+    ...overrides,
+  };
+}
+
+describe('product availability', () => {
+  it('blocks add-to-cart for coming-soon products even when purchasable', () => {
+    expect(getAvailability(product({ title: 'Coming Soon — test' }))).toBe('coming-soon');
+    expect(getAvailability(product({ handle: 'coming-soon-1' }))).toBe('coming-soon');
+    expect(getAvailability(product({ tags: ['coming soon'] }))).toBe('coming-soon');
+  });
+
+  it('uses Shopify availability when no coming-soon signal exists', () => {
+    expect(getAvailability(product())).toBe('available');
+    expect(getAvailability(product({ availableForSale: false }))).toBe('sold-out');
+    expect(getAvailability(product({ variants: [variant({ availableForSale: false })] }))).toBe(
+      'sold-out',
+    );
+  });
+
+  it('selects the first purchasable variant and detects variant choice', () => {
+    const variants = [
+      variant({ id: 'a', availableForSale: false }),
+      variant({ id: 'b', availableForSale: true }),
+    ];
+    expect(getDefaultVariant(product({ variants }))?.id).toBe('b');
+    expect(hasVariantChoice(product({ variants }))).toBe(true);
+    expect(hasVariantChoice(product({ variants: [variant()] }))).toBe(false);
+  });
+
+  it('categorises products from type and tags when a collection is missing', () => {
+    expect(getProductCategory(product({ productType: 'Food', tags: ['coffee'] }))).toBe('coffee');
+    expect(getProductCategory(product({ productType: 'Food', tags: ['pantry'] }))).toBe('food');
+    expect(getProductCategory(product({ tags: ['igiseke', 'basket'] }))).toBe('crafts');
+    expect(getProductCategory(product())).toBe('other');
+  });
+});
