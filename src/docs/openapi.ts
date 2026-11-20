@@ -134,6 +134,7 @@ export function buildOpenApiDocument(serverUrl = 'http://localhost:4000'): JsonS
       { name: 'Reviews' },
       { name: 'Audit' },
       { name: 'SEO' },
+      { name: 'AI' },
       { name: 'Health' },
       { name: 'Webhooks' },
     ],
@@ -215,6 +216,7 @@ export function buildOpenApiDocument(serverUrl = 'http://localhost:4000'): JsonS
                     'UPSTREAM_ERROR',
                     'UPSTREAM_UNAVAILABLE',
                     'NOT_CONFIGURED',
+                    'FEATURE_DISABLED',
                     'BAD_REQUEST',
                     'INTERNAL_ERROR',
                     'METHOD_NOT_ALLOWED',
@@ -705,6 +707,25 @@ export function buildOpenApiDocument(serverUrl = 'http://localhost:4000'): JsonS
           },
         },
       },
+      '/api/v1/ai/suggestions/{handle}': {
+        get: {
+          tags: ['AI'],
+          summary: 'Unverified product-fact suggestions from one free hosted model',
+          description:
+            'Public, rate-limited and cached for one hour. `?refresh=true` bypasses the cache. Returns `503 FEATURE_DISABLED` when AI_API_KEY is missing.',
+          parameters: [
+            handleParam,
+            ...contextParams,
+            param('refresh', 'query', 'Bypass the in-memory cache', { schema: { type: 'boolean' } }),
+          ],
+          responses: {
+            200: successResponse('AI suggestion (always needs review)'),
+            400: { $ref: '#/components/responses/BadRequest' },
+            429: { $ref: '#/components/responses/RateLimited' },
+            503: errorResponse('AI disabled, provider unreachable or rate-limited'),
+          },
+        },
+      },
       '/health': {
         get: { tags: ['Health'], summary: 'Liveness probe', responses: { 200: successResponse('Service alive') } },
       },
@@ -756,6 +777,7 @@ export const OPENAPI_TAGS = [
   'Reviews',
   'Audit',
   'SEO',
+  'AI',
   'Health',
   'Webhooks',
 ];

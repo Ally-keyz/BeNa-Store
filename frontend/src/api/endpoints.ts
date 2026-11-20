@@ -281,8 +281,16 @@ export function getRobots(): Promise<ApiResult<RobotsData>> {
 
 // ---------------------------------------------------------------------- ai ----
 
-export function getAiSuggestions(handle: string): Promise<ApiResult<AISuggestion>> {
-  return apiRequest<AISuggestion>(`/ai/suggestions/${enc(handle)}`);
+export interface AISuggestionParams extends MarketParams {
+  refresh?: boolean;
+  [key: string]: string | number | boolean | undefined;
+}
+
+export function getAiSuggestions(
+  handle: string,
+  params: AISuggestionParams = {},
+): Promise<ApiResult<AISuggestion>> {
+  return apiRequest<AISuggestion>(`/ai/suggestions/${enc(handle)}`, { query: params });
 }
 
 // -------------------------------------------------------------------- auth ---

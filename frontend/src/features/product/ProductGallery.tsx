@@ -46,7 +46,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
       <div className="grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
         {images.length > 1 ? (
           <div
-            className="order-2 flex gap-2 overflow-x-auto pb-1 sm:order-1 sm:max-h-[min(62vh,560px)] sm:flex-col sm:overflow-x-hidden sm:overflow-y-auto sm:pb-0"
+            className="order-2 flex gap-2 overflow-x-auto pb-1 sm:order-1 sm:max-h-[min(64vh,580px)] sm:flex-col sm:overflow-x-hidden sm:overflow-y-auto sm:pb-0"
             role="group"
             aria-label={product.title}
           >
@@ -76,7 +76,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
           type="button"
           onClick={openLightbox}
           aria-label={t('productInfo.openImage', { number: active + 1 })}
-          className="group relative order-1 flex h-[min(62vh,560px)] w-full items-center justify-center overflow-hidden rounded-2xl bg-terra-50 sm:order-2"
+          className="group relative order-1 flex h-[min(64vh,580px)] w-full items-center justify-center overflow-hidden rounded-2xl bg-terra-50 sm:order-2"
         >
           {activeImage ? (
             <ProductImage

@@ -179,16 +179,24 @@ const EnvSchema = z.object({
     .default('auto'),
   REVIEWS_API_TOKEN: optionalString,
 
-  // AI ingredient/allergen suggestions. Opt-in, default off. Runs a free local
-  // model (Ollama) — no external API calls and no per-request cost. Suggestions
-  // are never written to Shopify automatically; they require owner review.
-  AI_ENABLED: booleanish.default(false),
-  AI_PROVIDER: z.enum(['ollama']).default('ollama'),
-  AI_OLLAMA_BASE_URL: optionalString,
-  AI_OLLAMA_MODEL: z.string().trim().min(1).default('llama3.2:3b'),
+  // AI product-fact suggestions. One pretrained hosted model, no training and
+  // no local runtime. Default provider is Groq's free tier; one API key is the
+  // only deployment requirement. Results are cached and never written back.
+  AI_ENABLED: booleanish.default(true),
+  AI_API_KEY: optionalString,
+  AI_BASE_URL: z.string().trim().min(1).default('https://api.groq.com/openai/v1'),
+  AI_MODEL: z.string().trim().min(1).default('openai/gpt-oss-20b'),
   AI_TEMPERATURE: z.preprocess(
     emptyToUndefined,
     z.coerce.number().min(0).max(1).default(0.2),
+  ),
+  AI_CACHE_TTL_SECONDS: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(0).max(86400).default(3600),
+  ),
+  AI_RATE_LIMIT_MAX: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(1).max(1000).default(60),
   ),
 });
 
@@ -284,6 +292,7 @@ export interface AppConfig {
     newsletterMax: number;
     webhookMax: number;
     authMax: number;
+    aiMax: number;
   };
   redisUrl: string | null;
   sentryDsn: string | null;
@@ -301,12 +310,11 @@ export interface AppConfig {
   reviews: { provider: RawEnv['REVIEWS_PROVIDER']; apiToken: string | null };
   ai: {
     enabled: boolean;
-    provider: RawEnv['AI_PROVIDER'];
-    ollama: {
-      baseUrl: string;
-      model: string;
-      temperature: number;
-    };
+    apiKey: string | null;
+    baseUrl: string;
+    model: string;
+    temperature: number;
+    cacheTtlSeconds: number;
   };
   warnings: string[];
 }
@@ -550,6 +558,12 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
     );
   }
 
+  if (env.AI_ENABLED && !env.AI_API_KEY) {
+    warnings.push(
+      'AI suggestions are disabled: set AI_API_KEY (a free Groq key) to enable them. No training or local model is required.',
+    );
+  }
+
   if (env.NEWSLETTER_PROVIDER !== 'mock') {
     const credentialsPresent = {
       webhook: Boolean(env.NEWSLETTER_WEBHOOK_URL),
@@ -693,6 +707,7 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       newsletterMax: env.NEWSLETTER_RATE_LIMIT_MAX,
       webhookMax: env.WEBHOOK_RATE_LIMIT_MAX,
       authMax: env.AUTH_RATE_LIMIT_MAX,
+      aiMax: env.AI_RATE_LIMIT_MAX,
     },
     redisUrl: env.REDIS_URL ?? null,
     sentryDsn: env.SENTRY_DSN ?? null,
@@ -709,13 +724,12 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
     },
     reviews: { provider: env.REVIEWS_PROVIDER, apiToken: env.REVIEWS_API_TOKEN ?? null },
     ai: {
-      enabled: env.AI_ENABLED,
-      provider: env.AI_PROVIDER,
-      ollama: {
-        baseUrl: env.AI_OLLAMA_BASE_URL ?? 'http://localhost:11434',
-        model: env.AI_OLLAMA_MODEL,
-        temperature: env.AI_TEMPERATURE,
-      },
+      enabled: env.AI_ENABLED && Boolean(env.AI_API_KEY),
+      apiKey: env.AI_API_KEY ?? null,
+      baseUrl: env.AI_BASE_URL.replace(/\/+$/, ''),
+      model: env.AI_MODEL,
+      temperature: env.AI_TEMPERATURE,
+      cacheTtlSeconds: env.AI_CACHE_TTL_SECONDS,
     },
     warnings,
   };
@@ -755,8 +769,8 @@ export function safeConfigSummary(config: AppConfig): Record<string, unknown> {
     reviewsProvider: config.reviews.provider,
     ai: {
       enabled: config.ai.enabled,
-      provider: config.ai.provider,
-      model: config.ai.ollama.model,
+      configured: Boolean(config.ai.apiKey),
+      model: config.ai.model,
     },
     redisEnabled: Boolean(config.redisUrl),
     rateLimits: config.rateLimits,

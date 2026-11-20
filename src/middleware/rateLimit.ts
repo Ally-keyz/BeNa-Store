@@ -54,5 +54,10 @@ export function rateLimiters(config: AppConfig) {
       limit: config.rateLimits.authMax,
       handler: limitHandler('Too many authentication attempts. Please retry later.'),
     }),
+    ai: rateLimit({
+      ...base,
+      limit: config.rateLimits.aiMax,
+      handler: limitHandler('Too many AI suggestion requests. Please retry later.'),
+    }),
   };
 }

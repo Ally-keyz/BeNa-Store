@@ -111,6 +111,13 @@ services:
       - key: SHOPIFY_CUSTOMER_ACCOUNT_JS_ORIGIN
         value: https://bena-origins.onrender.com
 
+      # AI product-fact suggestions: paste a free Groq API key in the dashboard.
+      # One server-side env var is all the setup this feature needs.
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_MODEL
+        value: openai/gpt-oss-20b
+
       # Optional integrations (app defaults are safe).
       - key: NEWSLETTER_PROVIDER
         value: mock

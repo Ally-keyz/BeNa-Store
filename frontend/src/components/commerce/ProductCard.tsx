@@ -81,7 +81,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
           aria-hidden="true"
           className="block w-full overflow-hidden rounded-card bg-terra-50"
         >
-          <div className="aspect-square w-full overflow-hidden">
+          <div className="aspect-[11/12] w-full overflow-hidden sm:aspect-square">
             <ProductImage
               image={image}
               alt={alt}
@@ -130,13 +130,13 @@ export function ProductCard({ product, priority = false, className }: ProductCar
         <div className="flex min-h-0 flex-1 flex-col pt-2.5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h3 className="line-clamp-2 text-[15px] font-medium leading-snug text-ink">
+              <h3 className="line-clamp-2 text-base font-medium leading-snug text-ink sm:text-[15px]">
                 <Link to={productHref} className="rounded-sm hover:text-terra-700">
                   {title}
                 </Link>
               </h3>
               {description ? (
-                <p className="line-clamp-1 mt-1 text-[12px] leading-4 text-neutral-600">
+                <p className="line-clamp-1 mt-1 text-[13px] leading-4 text-neutral-600 sm:text-[12px]">
                   {description}
                 </p>
               ) : null}

@@ -20,14 +20,17 @@ export function ProductGrid({
   skeletonCount = 8,
 }: ProductGridProps) {
   const { t } = useTranslation();
-  const classes = cn('grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6', className);
+  const classes = cn(
+    'grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6',
+    className,
+  );
 
   if (loading) {
     return (
       <div className={classes} aria-label={t('a11y.loading')} aria-busy="true">
         {Array.from({ length: skeletonCount }, (_, index) => (
           <div key={index}>
-            <Skeleton className="aspect-square w-full rounded-card" />
+            <Skeleton className="aspect-[11/12] w-full rounded-card sm:aspect-square" />
             <Skeleton className="mt-3 h-4 w-3/4" />
             <Skeleton className="mt-2 h-3 w-1/2" />
           </div>

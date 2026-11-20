@@ -371,7 +371,14 @@ export class FixtureCommerceClient implements CommerceClient {
             availableForSale: variant.availableForSale,
             price: variant.price,
             image: variant.image,
-            product: { id: product.id, handle: product.handle, title: product.title, description: product.description, url: product.url },
+            product: {
+              id: product.id,
+              handle: product.handle,
+              title: product.title,
+              description: product.description,
+              descriptionHtml: product.descriptionHtml,
+              url: product.url,
+            },
             selectedOptions: variant.selectedOptions,
           },
         };

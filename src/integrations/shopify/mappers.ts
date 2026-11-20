@@ -212,6 +212,7 @@ function mapCartLine(raw: RawCart['lines']['edges'][number]['node'], siteUrl: st
             handle: merchandise.product.handle,
             title: merchandise.product.title,
             description: merchandise.product.description ?? '',
+            descriptionHtml: merchandise.product.descriptionHtml ?? '',
             url:
               merchandise.product.onlineStoreUrl ??
               `${siteUrl}/products/${merchandise.product.handle}`,

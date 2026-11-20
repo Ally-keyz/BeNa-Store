@@ -195,6 +195,8 @@ export const sitemapQuery = z.object({
 
 // ---------------------------------------------------------------- ai ----
 
-export const aiSuggestParams = handleParams.extend({
+export const aiSuggestParams = handleParams;
+
+export const aiSuggestQuery = marketContextQuery.extend({
   refresh: booleanQuery.optional(),
 });

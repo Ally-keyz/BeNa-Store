@@ -151,6 +151,7 @@ export const CART_FRAGMENT = /* GraphQL */ `
                 handle
                 title
                 description
+                descriptionHtml
                 onlineStoreUrl
               }
             }

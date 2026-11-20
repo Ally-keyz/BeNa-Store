@@ -119,6 +119,7 @@ export interface RawCartLine {
       handle: string;
       title: string;
       description: string;
+      descriptionHtml: string;
       onlineStoreUrl?: string | null;
     };
   } | null;

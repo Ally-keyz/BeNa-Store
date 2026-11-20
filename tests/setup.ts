@@ -13,6 +13,7 @@ const ISOLATED_KEYS = [
   'COOKIE_DOMAIN',
   'COOKIE_SECURE',
   'AUTH_CUSTOMER_ACCOUNTS_ENABLED',
+  'AI_API_KEY',
   'SHOPIFY_STORE_DOMAIN',
   'SHOPIFY_MOCK_MODE',
   'SHOPIFY_STOREFRONT_PRIVATE_TOKEN',
@@ -39,3 +40,10 @@ const ISOLATED_KEYS = [
 for (const key of ISOLATED_KEYS) {
   process.env[key] = '';
 }
+
+process.env.AI_ENABLED = 'true';
+process.env.AI_BASE_URL = 'https://api.groq.com/openai/v1';
+process.env.AI_MODEL = 'openai/gpt-oss-20b';
+process.env.AI_TEMPERATURE = '0.2';
+process.env.AI_CACHE_TTL_SECONDS = '3600';
+process.env.AI_RATE_LIMIT_MAX = '60';

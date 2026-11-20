@@ -162,6 +162,7 @@ Errors use `{ "success": false, "error": { "code", "message", "details?", "reque
 | GET | `/api/v1/collections/:handle` | Collection + paginated products | ✅ tested (fixtures) |
 | GET | `/api/v1/search?q=` | Product search (Shopify relevance) | ✅ tested (fixtures) |
 | GET | `/api/v1/search/suggestions?q=` | Predictive search: products, collections, pages, query suggestions | ✅ tested (fixtures) |
+| GET | `/api/v1/ai/suggestions/:handle` | Unverified food-fact suggestions from one free hosted model (public, rate-limited, cached) | ✅ tested (fixtures) |
 | POST | `/api/v1/cart` | Create Shopify cart; returns real `checkoutUrl` | ✅ tested (fixtures) |
 | GET | `/api/v1/cart/:cartId` | Read cart | ✅ tested |
 | POST | `/api/v1/cart/:cartId/lines` | Add lines | ✅ tested |
@@ -457,6 +458,31 @@ kept server-side because the backend proxies all traffic. Use the **private** to
 | `REVIEWS_PROVIDER` | `auto` | no | `auto` \| `judge_me` \| `loox` \| `stamped` \| `yotpo` \| `okendo` \| `shopify_product_reviews` \| `none` |
 | `REVIEWS_API_TOKEN` | — | **yes** | reserved; no review API calls are made in this phase |
 | `SENTRY_DSN` | — | yes | reserved, not wired yet |
+
+### AI product-fact suggestions
+
+One job only: suggest ingredient / allergen / nutrition / origin / preparation values for a product
+sheet. It uses a **single pretrained hosted model** through an OpenAI-compatible API, so there is
+no training step, no model download, no local inference server and only one deployment variable.
+
+| Variable | Default | Secret | Purpose |
+| --- | --- | --- | --- |
+| `AI_API_KEY` | — | **yes** | free Groq key; without it the feature is silently hidden in the storefront |
+| `AI_ENABLED` | `true` | no | set `false` to disable all AI routes |
+| `AI_BASE_URL` | `https://api.groq.com/openai/v1` | no | any OpenAI-compatible endpoint |
+| `AI_MODEL` | `openai/gpt-oss-20b` | no | pretrained model id (Groq free tier) |
+| `AI_TEMPERATURE` | `0.2` | no | low variance for label-style answers |
+| `AI_CACHE_TTL_SECONDS` | `3600` | no | in-memory result cache; `0` disables it |
+| `AI_RATE_LIMIT_MAX` | `60` | no | public requests per IP per rate-limit window |
+
+Setup in three steps: create a free key at [Groq Console](https://console.groq.com/keys), set
+`AI_API_KEY` in `.env` (or Render's dashboard — `render.yaml` already declares it), and deploy.
+The key stays server-side; the browser calls `GET /api/v1/ai/suggestions/:handle` with no
+credentials. Results are cached for an hour to protect the free quota, `?refresh=true` bypasses the
+cache, and `?country`/`?language` are forwarded to the product lookup. Every result is marked
+`verified: false` / `needsReview: true`; the storefront keeps the "check the packaging" warning
+visible and never writes suggestions back to Shopify. When the key is missing or the provider
+fails, the AI accordion is simply omitted and the rest of the product page is unaffected.
 
 ---
 

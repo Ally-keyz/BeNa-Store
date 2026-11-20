@@ -15,13 +15,13 @@ import { matchesProductCategory } from '@/lib/product';
 import { errorMessageKey, isApiError } from '@/api/errors';
 import { ALL_CATEGORIES, CategoryFilter } from './CategoryFilter';
 
-const GRID = 'grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:gap-x-6';
+const GRID = 'grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-4 md:grid-cols-3 lg:gap-x-6';
 const PANEL = 'rounded-3xl border border-terra-100 bg-terra-50/70 p-6';
 
 function ProductSkeleton() {
   return (
     <div>
-      <Skeleton className="aspect-square w-full rounded-3xl" />
+      <Skeleton className="aspect-[11/12] w-full rounded-3xl sm:aspect-square" />
       <Skeleton className="mt-3 h-4 w-3/4" />
       <Skeleton className="mt-2 h-4 w-1/3" />
     </div>

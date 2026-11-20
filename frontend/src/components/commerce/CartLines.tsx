@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Trash2 } from 'lucide-react';
 import type { CartLine } from '@/types';
 import { formatMoney } from '@/lib/money';
+import { stripHtml } from '@/lib/sanitize';
 import { useMarket } from '@/context/MarketContext';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/components/ui/Toast';
@@ -44,7 +45,14 @@ export function CartLines({ lines, compact = false }: CartLinesProps) {
         const title = variantTitle && !isDefaultVariant && variantTitle !== productTitle
           ? `${productTitle} — ${variantTitle}`
           : productTitle;
-        const options = merchandise?.selectedOptions.map((option) => option.value).join(' · ');
+        const options = (merchandise?.selectedOptions ?? [])
+          .filter((option) => !/^default\s*title$/i.test(option.value.trim()))
+          .map((option) => option.value.trim())
+          .filter(Boolean)
+          .join(' · ');
+        const description = merchandise
+          ? stripHtml(merchandise.product.descriptionHtml) || merchandise.product.description
+          : '';
         const each = formatMoney(line.cost.amountPerQuantity, { locale: formatLocale });
         return (
           <li key={line.id} className="flex gap-4 py-5 first:pt-0">
@@ -66,9 +74,9 @@ export function CartLines({ lines, compact = false }: CartLinesProps) {
                 <div className="min-w-0">
                   <p className="truncate text-[15px] font-medium text-ink">{title}</p>
                   {options ? <p className="mt-0.5 text-[13px] text-neutral-600">{options}</p> : null}
-                  {merchandise?.product.description ? (
-                    <p className="mt-0.5 line-clamp-1 text-[12px] text-neutral-500">
-                      {merchandise.product.description}
+                  {description ? (
+                    <p className="line-clamp-1 mt-1 text-[12px] leading-4 text-neutral-600">
+                      {description}
                     </p>
                   ) : null}
                   {each && line.quantity > 1 ? (

@@ -91,6 +91,8 @@ function cartLine(product, quantity = 1) {
         id: product.id,
         handle: product.handle,
         title: product.title,
+        description: product.description,
+        descriptionHtml: product.descriptionHtml,
         url: product.url,
       },
       selectedOptions: variant.selectedOptions,

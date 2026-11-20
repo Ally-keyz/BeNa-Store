@@ -9,6 +9,7 @@ import { z } from 'zod';
 import {
   addCartLinesBody,
   aiSuggestParams,
+  aiSuggestQuery,
   auditCatalogQuery,
   auditProductParams,
   collectionDetailQuery,
@@ -193,15 +194,15 @@ export function createApiRouter(
   // ---------------------------------------------------------------------- ai ---
   router.get(
     '/ai/suggestions/:handle',
-    adminGuard,
-    validate({ params: aiSuggestParams, query: marketContextQuery }),
+    limiters.ai,
+    validate({ params: aiSuggestParams, query: aiSuggestQuery }),
     asyncHandler(async (_req, res) => {
       const { params, query } = getValidated<{
         params: z.infer<typeof aiSuggestParams>;
-        query: z.infer<typeof marketContextQuery>;
+        query: z.infer<typeof aiSuggestQuery>;
       }>(res);
       const product = await container.services.products.byHandle(params.handle, query);
-      const suggestion = await container.services.ai.suggest(product);
+      const suggestion = await container.services.ai.suggest(product, { refresh: query.refresh });
       res.json(success(res, suggestion, baseMeta(container)));
     }),
   );

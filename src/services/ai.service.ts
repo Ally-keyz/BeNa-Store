@@ -2,21 +2,18 @@ import type { Logger } from 'pino';
 import type { AppConfig } from '../config/env';
 import type { Product } from '../types/domain';
 import type { AISuggestion, AISuggestedField } from '../types/domain';
-import { featureDisabled, upstreamUnavailable } from '../utils/errors';
+import { AppError, featureDisabled, upstreamUnavailable } from '../utils/errors';
 
-interface OllamaGenerateRequest {
+interface ChatCompletionRequest {
   model: string;
-  prompt: string;
-  stream: boolean;
+  messages: Array<{ role: 'system' | 'user'; content: string }>;
   temperature: number;
-  format?: 'json';
+  response_format: { type: 'json_object' };
+  max_tokens: number;
 }
 
-interface OllamaGenerateResponse {
-  model: string;
-  created_at: string;
-  response: string;
-  done: boolean;
+interface ChatCompletionResponse {
+  choices?: Array<{ message?: { content?: string } }>;
 }
 
 interface RawSuggestion {
@@ -25,6 +22,11 @@ interface RawSuggestion {
   nutrition?: { value?: string; confidence?: number; rationale?: string };
   origin?: { value?: string; confidence?: number; rationale?: string };
   preparation?: { value?: string; confidence?: number; rationale?: string };
+}
+
+interface CachedSuggestion {
+  value: AISuggestion;
+  expiresAt: number;
 }
 
 function clampConfidence(value: unknown): number {
@@ -40,13 +42,15 @@ function toSuggestedField(raw: RawSuggestion[keyof RawSuggestion] | undefined): 
   return {
     value,
     confidence: clampConfidence(raw.confidence),
-    rationale: typeof raw.rationale === 'string' && raw.rationale.trim().length > 0 ? raw.rationale.trim() : 'No rationale provided.',
+    rationale:
+      typeof raw.rationale === 'string' && raw.rationale.trim().length > 0
+        ? raw.rationale.trim()
+        : 'No rationale provided.',
   };
 }
 
 function extractJson(text: string): unknown {
   const trimmed = text.trim();
-  // Strip markdown fences if present.
   const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
   const candidate = fenced ? fenced[1] : trimmed;
   const start = candidate.indexOf('{');
@@ -58,54 +62,73 @@ function extractJson(text: string): unknown {
 }
 
 /**
- * AI ingredient/allergen suggestion service.
- *
- * Uses a free local Ollama model — no external API calls and no per-request cost.
- * Outputs are suggestions only: `verified` is false, `needsReview` is true, and
- * nothing is written to Shopify automatically. Allergen suggestions require
- * extra caution and must be reviewed by an owner before being trusted.
+ * Single-purpose AI service: advisory product facts only.
+ * Uses one pretrained hosted model through an OpenAI-compatible API. No
+ * training, no local runtime and no writes to Shopify. Outputs are marked as
+ * unverified and must be checked against packaging before publication.
  */
 export class AiService {
+  private readonly cache = new Map<string, CachedSuggestion>();
+  private readonly inFlight = new Map<string, Promise<AISuggestion>>();
+
   constructor(
     private readonly config: AppConfig,
     private readonly logger: Logger,
   ) {}
 
-  async suggest(product: Product): Promise<AISuggestion> {
-    if (!this.config.ai.enabled) {
-      throw featureDisabled(
-        'AI suggestions are disabled. Set AI_ENABLED=true and ensure Ollama is running.',
-      );
+  async suggest(product: Product, options: { refresh?: boolean } = {}): Promise<AISuggestion> {
+    const { apiKey, model, cacheTtlSeconds } = this.config.ai;
+    if (!this.config.ai.enabled || !apiKey) {
+      throw featureDisabled('AI suggestions are disabled. Set AI_API_KEY to enable them.');
     }
 
-    const prompt = this.buildPrompt(product);
-    let raw: unknown;
+    const key = `${model}:${product.handle}`;
+    const cached = this.cache.get(key);
+    if (!options.refresh && cached && cached.expiresAt > Date.now()) {
+      return cached.value;
+    }
+
+    const running = this.inFlight.get(key);
+    if (running) return running;
+
+    const task = this.generate(product)
+      .then((suggestion) => {
+        if (cacheTtlSeconds > 0) {
+          this.cache.set(key, {
+            value: suggestion,
+            expiresAt: Date.now() + cacheTtlSeconds * 1000,
+          });
+        }
+        return suggestion;
+      })
+      .finally(() => {
+        this.inFlight.delete(key);
+      });
+
+    this.inFlight.set(key, task);
+    return task;
+  }
+
+  private async generate(product: Product): Promise<AISuggestion> {
+    let content: string;
     try {
-      raw = await this.callOllama(prompt);
+      content = await this.callProvider(this.buildPrompt(product));
     } catch (err) {
-      this.logger.warn({ err, productId: product.id }, 'Ollama suggestion failed');
-      if (err instanceof Error && err.message.includes('Ollama returned')) {
-        throw upstreamUnavailable(err.message);
-      }
-      throw upstreamUnavailable('Ollama is unreachable. Start Ollama and ensure the model is pulled.');
+      if (err instanceof AppError) throw err;
+      this.logger.warn({ err, handle: product.handle }, 'AI provider request failed');
+      throw upstreamUnavailable('AI provider is unreachable. Please try again later.');
     }
 
     let parsed: RawSuggestion;
     try {
-      parsed = extractJson(typeof raw === 'string' ? raw : JSON.stringify(raw)) as RawSuggestion;
+      parsed = extractJson(content) as RawSuggestion;
     } catch (err) {
-      this.logger.warn({ err, productId: product.id, raw }, 'Failed to parse Ollama JSON');
-      throw upstreamUnavailable('The model returned an unparseable response. Try again.');
+      this.logger.warn(
+        { err, handle: product.handle, response: content.slice(0, 500) },
+        'Failed to parse AI JSON',
+      );
+      throw upstreamUnavailable('The AI model returned an unparseable response. Try again.');
     }
-
-    const now = new Date().toISOString();
-    const model = this.config.ai.ollama.model;
-
-    const ingredients = toSuggestedField(parsed.ingredients);
-    const allergens = toSuggestedField(parsed.allergens);
-    const nutrition = toSuggestedField(parsed.nutrition);
-    const origin = toSuggestedField(parsed.origin);
-    const preparation = toSuggestedField(parsed.preparation);
 
     const disclaimer =
       'AI-generated suggestion — not a verified fact. Ingredients and allergens are ' +
@@ -118,13 +141,13 @@ export class AiService {
       title: product.title,
       verified: false,
       needsReview: true,
-      suggestedAt: now,
-      model,
-      ingredients,
-      allergens,
-      nutrition,
-      origin,
-      preparation,
+      suggestedAt: new Date().toISOString(),
+      model: this.config.ai.model,
+      ingredients: toSuggestedField(parsed.ingredients),
+      allergens: toSuggestedField(parsed.allergens),
+      nutrition: toSuggestedField(parsed.nutrition),
+      origin: toSuggestedField(parsed.origin),
+      preparation: toSuggestedField(parsed.preparation),
       disclaimer,
     };
   }
@@ -135,24 +158,25 @@ export class AiService {
     if (meta.ingredients) fields.push(`Existing ingredients: ${meta.ingredients.value}`);
     if (meta.allergens) fields.push(`Existing allergens: ${meta.allergens.value}`);
     if (meta.nutrition) fields.push(`Existing nutrition: ${meta.nutrition.value}`);
-    if (meta.origin) fields.push(`Existing origin: ${meta.origin}`);
-    if (meta.preparation) fields.push(`Existing preparation: ${meta.preparation}`);
+    if (meta.origin) fields.push(`Existing origin: ${meta.origin.value}`);
+    if (meta.preparation) fields.push(`Existing preparation: ${meta.preparation.value}`);
     const existing = fields.length > 0 ? fields.join('\n') : 'No existing metafield values found.';
 
-    return `You are a careful food-label assistant. Suggest ingredient, allergen, nutrition, origin, and preparation values for the product below.
+    return `Suggest food-label values for the product below.
 
 Product title: ${product.title}
 Product handle: ${product.handle}
+Product description: ${product.description}
 
 Existing metafield values (may be empty or incomplete):
 ${existing}
 
 Rules:
-- Suggest values only from what is plausible for this type of product. Do not invent specific brands or batch codes.
-- For allergens, be conservative: only list major allergens that are plausibly present (e.g. milk, eggs, nuts, gluten, soy, sesame, sulphites). When unsure, list "unspecified" rather than guessing.
+- Suggest values only from what is plausible for this type of product. Do not invent brands or batch codes.
+- For allergens, be conservative: list only major allergens plausibly present (milk, eggs, nuts, gluten, soy, sesame, sulphites). When unsure, use "unspecified".
 - confidence must be a number between 0 and 1.
-- rationale must be a short sentence explaining the suggestion.
-- Output ONLY a single JSON object, no markdown fences, no extra text.
+- rationale must be one short sentence.
+- Return ONLY a single JSON object, no markdown fences, no extra text.
 
 Required JSON shape:
 {
@@ -164,33 +188,53 @@ Required JSON shape:
 }`;
   }
 
-  private async callOllama(prompt: string): Promise<string> {
-    const baseUrl = this.config.ai.ollama.baseUrl;
-    const model = this.config.ai.ollama.model;
-    const temperature = this.config.ai.ollama.temperature;
+  private async callProvider(prompt: string): Promise<string> {
+    const { apiKey, baseUrl, model, temperature } = this.config.ai;
+    if (!apiKey) {
+      throw featureDisabled('AI suggestions are disabled. Set AI_API_KEY to enable them.');
+    }
 
-    const body: OllamaGenerateRequest = {
+    const body: ChatCompletionRequest = {
       model,
-      prompt,
-      stream: false,
       temperature,
-      format: 'json',
+      response_format: { type: 'json_object' },
+      max_tokens: 800,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a careful food-label assistant. You only output the requested JSON object. ' +
+            'You never claim that a suggestion is a verified fact.',
+        },
+        { role: 'user', content: prompt },
+      ],
     };
 
-    this.logger.debug({ model, baseUrl }, 'calling ollama generate');
-
-    const res = await fetch(`${baseUrl}/api/generate`, {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(20_000),
     });
 
     if (!res.ok) {
-      throw new Error(`Ollama returned ${res.status}`);
+      if (res.status === 401 || res.status === 403) {
+        throw upstreamUnavailable('AI API key was rejected. Check AI_API_KEY.');
+      }
+      if (res.status === 429) {
+        throw upstreamUnavailable('AI provider rate limit reached. Please try again later.');
+      }
+      throw upstreamUnavailable(`AI provider returned ${res.status}.`);
     }
 
-    const data: OllamaGenerateResponse = (await res.json()) as OllamaGenerateResponse;
-    return data.response;
+    const data = (await res.json()) as ChatCompletionResponse;
+    const content = data.choices?.[0]?.message?.content;
+    if (typeof content !== 'string' || !content.trim()) {
+      throw new Error('AI provider returned no content');
+    }
+    return content;
   }
 }
