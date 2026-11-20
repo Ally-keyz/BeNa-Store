@@ -161,7 +161,7 @@ export interface CartLine {
     availableForSale: boolean;
     price: Money;
     image: ProductImage | null;
-    product: { id: string; handle: string; title: string; url: string };
+    product: { id: string; handle: string; title: string; description: string; url: string };
     selectedOptions: SelectedOption[];
   } | null;
 }

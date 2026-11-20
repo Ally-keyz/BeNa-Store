@@ -150,6 +150,7 @@ export const CART_FRAGMENT = /* GraphQL */ `
                 id
                 handle
                 title
+                description
                 onlineStoreUrl
               }
             }
