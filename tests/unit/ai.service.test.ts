@@ -10,7 +10,7 @@ const product = fixtureProducts[0]!;
 function modelPayload(overrides: Record<string, unknown> = {}) {
   return {
     ingredients: { value: 'Coffee beans', confidence: 0.9, rationale: 'Plausible from the title.' },
-    allergens: { value: 'unspecified', confidence: 0.4, rationale: 'Not declared.' },
+    allergens: { value: 'Contains fish', confidence: 0.4, rationale: 'Listed in the product description.' },
     nutrition: { value: 'Per 100 g: 2 kcal', confidence: 0.6, rationale: 'Typical for coffee.' },
     origin: { value: 'Rwanda', confidence: 0.8, rationale: 'Named in the title.' },
     preparation: { value: 'Brew with hot water', confidence: 0.7, rationale: 'Coffee product.' },
@@ -71,6 +71,25 @@ describe('AiService', () => {
     expect(request.max_tokens).toBeUndefined();
     expect(request.messages[1].content).toContain('Existing origin: Rwanda');
     expect(request.messages[1].content).not.toContain('[object Object]');
+  });
+
+  it('drops placeholder AI values instead of showing unspecified facts', async () => {
+    stubFetch(
+      200,
+      modelPayload({
+        allergens: { value: 'unspecified', confidence: 0.1, rationale: 'No data.' },
+        nutrition: { value: 'N/A', confidence: 0.1, rationale: 'No data.' },
+        origin: { value: 'Unknown', confidence: 0.1, rationale: 'No data.' },
+      }),
+    );
+    const service = new AiService(testConfig({ AI_API_KEY: 'test-key' }), logger);
+
+    const result = await service.suggest(product);
+
+    expect(result.allergens).toBeNull();
+    expect(result.nutrition).toBeNull();
+    expect(result.origin).toBeNull();
+    expect(result.ingredients?.value).toBe('Coffee beans');
   });
 
   it('caches results per product and bypasses the cache on refresh', async () => {

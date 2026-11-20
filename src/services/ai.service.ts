@@ -22,6 +22,30 @@ function oneLine(value: string, maxLength = 300): string {
   return value.replace(/\s+/g, ' ').trim().slice(0, maxLength);
 }
 
+const PLACEHOLDER_FACT_VALUES = new Set([
+  '-',
+  'n/a',
+  'na',
+  'none',
+  'null',
+  'unknown',
+  'unspecified',
+  'not specified',
+  'not available',
+  'not provided',
+  'not supplied',
+  'no data',
+  'no information',
+]);
+
+function normalizeSuggestedValue(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().replace(/\s+/g, ' ');
+  if (!trimmed) return null;
+  const normalized = trimmed.toLowerCase().replace(/[.!]+$/, '');
+  return PLACEHOLDER_FACT_VALUES.has(normalized) ? null : trimmed;
+}
+
 interface ChatCompletionResponse {
   choices?: Array<{ message?: { content?: string } }>;
 }
@@ -47,7 +71,7 @@ function clampConfidence(value: unknown): number {
 
 function toSuggestedField(raw: RawSuggestion[keyof RawSuggestion] | undefined): AISuggestedField | null {
   if (!raw) return null;
-  const value = typeof raw.value === 'string' && raw.value.trim().length > 0 ? raw.value.trim() : null;
+  const value = normalizeSuggestedValue(raw.value);
   if (!value) return null;
   return {
     value,
@@ -182,8 +206,10 @@ Existing metafield values (may be empty or incomplete):
 ${existing}
 
 Rules:
+- Treat the product title and description as the primary evidence. If the description explicitly states an ingredient or allergen, extract it exactly instead of guessing.
 - Suggest values only from what is plausible for this type of product. Do not invent brands or batch codes.
-- For allergens, be conservative: list only major allergens plausibly present (milk, eggs, nuts, gluten, soy, sesame, sulphites). When unsure, use "unspecified".
+- For allergens, list major allergens plausibly present (milk, eggs, fish, shellfish, peanuts, tree nuts, gluten, soy, sesame, sulphites).
+- When no reliable value can be inferred, set "value" to null. Never use placeholder words such as "unspecified", "unknown", "n/a", "none" or "not provided".
 - confidence must be a number between 0 and 1.
 - rationale must be one short sentence.
 - Return ONLY a single JSON object, no markdown fences, no extra text.

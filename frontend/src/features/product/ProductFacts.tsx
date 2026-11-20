@@ -20,32 +20,103 @@ function FactRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function FoodFacts({ metafields }: { metafields: ProductMetafields }) {
+const PLACEHOLDER_FACT_VALUES = new Set([
+  '-',
+  'n/a',
+  'na',
+  'none',
+  'null',
+  'unknown',
+  'unspecified',
+  'not specified',
+  'not available',
+  'not provided',
+  'not supplied',
+  'no data',
+  'no information',
+]);
+
+function cleanFactValue(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim().replace(/\s+/g, ' ');
+  if (!trimmed) return null;
+  const normalized = trimmed.toLowerCase().replace(/[.!]+$/, '');
+  return PLACEHOLDER_FACT_VALUES.has(normalized) ? null : trimmed;
+}
+
+function AiNote() {
   const { t } = useTranslation();
-  const ingredients = decodeMetafield(metafields.ingredients);
-  const nutrition = decodeMetafield(metafields.nutrition);
-  const origin = decodeMetafield(metafields.origin);
+  return <p className="mt-2 text-[11px] leading-5 text-neutral-500">{t('productInfo.aiInlineNote')}</p>;
+}
+
+function AiNoData() {
+  const { t } = useTranslation();
+  return <p className="text-[13px] leading-6 text-neutral-600">{t('productInfo.aiNoData')}</p>;
+}
+
+function FoodFacts({
+  metafields,
+  aiSuggestion,
+}: {
+  metafields: ProductMetafields;
+  aiSuggestion: AISuggestion | null;
+}) {
+  const { t } = useTranslation();
+  if (!aiSuggestion) {
+    return (
+      <dl>
+        <FactRow
+          label={t('product.ingredients')}
+          value={decodeMetafield(metafields.ingredients) || t('productInfo.ingredientsUnavailable')}
+        />
+        <FactRow
+          label={t('productInfo.nutrition')}
+          value={decodeMetafield(metafields.nutrition) || t('productInfo.nutritionUnavailable')}
+        />
+        <FactRow
+          label={t('product.origin')}
+          value={decodeMetafield(metafields.origin) || t('productInfo.originUnavailable')}
+        />
+      </dl>
+    );
+  }
+
+  const ingredients = cleanFactValue(aiSuggestion.ingredients?.value);
+  const nutrition = cleanFactValue(aiSuggestion.nutrition?.value);
+  const origin = cleanFactValue(aiSuggestion.origin?.value);
+  if (!ingredients && !nutrition && !origin) return <AiNoData />;
 
   return (
-    <dl>
-      <FactRow
-        label={t('product.ingredients')}
-        value={ingredients || t('productInfo.ingredientsUnavailable')}
-      />
-      <FactRow
-        label={t('productInfo.nutrition')}
-        value={nutrition || t('productInfo.nutritionUnavailable')}
-      />
-      <FactRow
-        label={t('product.origin')}
-        value={origin || t('productInfo.originUnavailable')}
-      />
-    </dl>
+    <div>
+      <dl>
+        {ingredients && <FactRow label={t('product.ingredients')} value={ingredients} />}
+        {nutrition && <FactRow label={t('productInfo.nutrition')} value={nutrition} />}
+        {origin && <FactRow label={t('product.origin')} value={origin} />}
+      </dl>
+      <AiNote />
+    </div>
   );
 }
 
-function PreparationFacts({ metafields }: { metafields: ProductMetafields }) {
+function PreparationFacts({
+  metafields,
+  aiSuggestion,
+}: {
+  metafields: ProductMetafields;
+  aiSuggestion: AISuggestion | null;
+}) {
   const { t } = useTranslation();
+  if (aiSuggestion) {
+    const aiPreparation = cleanFactValue(aiSuggestion.preparation?.value);
+    if (!aiPreparation) return <AiNoData />;
+    return (
+      <div>
+        <p className="whitespace-pre-line text-[13px] leading-6 text-neutral-600">{aiPreparation}</p>
+        <AiNote />
+      </div>
+    );
+  }
+
   const lines = metafieldLines(metafields.preparation);
   if (lines.length === 0) {
     return <p className="text-[13px] leading-6 text-neutral-600">{t('productInfo.preparationUnavailable')}</p>;
@@ -70,6 +141,7 @@ export function ProductFacts({ product }: ProductFactsProps) {
   const allergens = decodeMetafield(product.metafields.allergens);
   const descriptionHtml = sanitizeHtml(product.descriptionHtml);
   const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
+  const aiAllergens = cleanFactValue(aiSuggestion?.allergens?.value);
 
   const fetchAiSuggestions = useCallback(async () => {
     try {
@@ -101,7 +173,18 @@ export function ProductFacts({ product }: ProductFactsProps) {
     {
       id: 'allergens',
       title: t('product.allergens'),
-      content: hasMetafield(product.metafields.allergens) ? (
+      content: aiSuggestion ? (
+        aiAllergens ? (
+          <div>
+            <p className="whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
+              {aiAllergens}
+            </p>
+            <AiNote />
+          </div>
+        ) : (
+          <AiNoData />
+        )
+      ) : hasMetafield(product.metafields.allergens) ? (
         <div>
           <p className="whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
             {allergens}
@@ -143,44 +226,13 @@ export function ProductFacts({ product }: ProductFactsProps) {
     {
       id: 'food',
       title: t('productInfo.foodTitle'),
-      content: <FoodFacts metafields={product.metafields} />,
+      content: <FoodFacts metafields={product.metafields} aiSuggestion={aiSuggestion} />,
     },
     {
       id: 'preparation',
       title: t('productInfo.preparationTitle'),
-      content: <PreparationFacts metafields={product.metafields} />,
+      content: <PreparationFacts metafields={product.metafields} aiSuggestion={aiSuggestion} />,
     },
-    ...(aiSuggestion ? [
-      {
-        id: 'ai-suggestions',
-        title: t('productInfo.aiSuggestionsTitle'),
-        content: (
-          <div className="space-y-2">
-            <p className="text-[12px] font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded px-3 py-2">
-              {t('productInfo.aiDisclaimer')}
-            </p>
-            {aiSuggestion.ingredients && (
-              <FactRow label={t('productInfo.aiIngredients')} value={aiSuggestion.ingredients.value} />
-            )}
-            {aiSuggestion.allergens && (
-              <FactRow label={t('productInfo.aiAllergens')} value={aiSuggestion.allergens.value} />
-            )}
-            {aiSuggestion.nutrition && (
-              <FactRow label={t('productInfo.aiNutrition')} value={aiSuggestion.nutrition.value} />
-            )}
-            {aiSuggestion.origin && (
-              <FactRow label={t('productInfo.aiOrigin')} value={aiSuggestion.origin.value} />
-            )}
-            {aiSuggestion.preparation && (
-              <FactRow label={t('productInfo.aiPreparation')} value={aiSuggestion.preparation.value} />
-            )}
-            <p className="text-[11px] leading-5 text-neutral-500">
-              {t('productInfo.aiNotVerified', { model: aiSuggestion.model, suggestedAt: aiSuggestion.suggestedAt })}
-            </p>
-          </div>
-        ),
-      },
-    ] : []),
   ];
 
   return (

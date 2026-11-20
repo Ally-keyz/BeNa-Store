@@ -68,7 +68,7 @@ describe('ProductFacts', () => {
     expect(within(list as HTMLElement).getByText('Stir before serving')).toBeVisible();
   });
 
-  it('shows the AI accordion with a localised warning when suggestions arrive', async () => {
+  it('uses AI values in the existing product fact sections when suggestions arrive', async () => {
     const user = userEvent.setup();
     const suggestion: AISuggestion = {
       productId: 'gid://shopify/Product/1',
@@ -79,20 +79,38 @@ describe('ProductFacts', () => {
       suggestedAt: '2026-11-20T10:00:00.000Z',
       model: 'test-model',
       ingredients: { value: 'Forest honey', confidence: 0.7, rationale: 'Title says honey.' },
-      allergens: null,
-      nutrition: null,
-      origin: null,
-      preparation: null,
+      allergens: { value: 'Tree nuts', confidence: 0.6, rationale: 'Possible trace.' },
+      nutrition: { value: 'unspecified', confidence: 0.4, rationale: 'No label data.' },
+      origin: { value: 'Rwanda', confidence: 0.8, rationale: 'Title says Rwanda.' },
+      preparation: { value: 'Warm gently before serving.', confidence: 0.5, rationale: 'Typical use.' },
       disclaimer: 'English fallback',
     };
     getAi.mockResolvedValue({ data: suggestion, meta: {} as never });
 
     render(<ProductFacts product={productFixture()} />);
 
-    await user.click(await screen.findByRole('button', { name: 'AI suggestions' }));
-    const region = screen.getByRole('region', { name: 'AI suggestions' });
-    expect(within(region).getByText('Forest honey')).toBeVisible();
-    expect(within(region).getByText(/not a verified fact/i)).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Allergens' }));
+    const allergensRegion = screen.getByRole('region', { name: 'Allergens' });
+    expect(await within(allergensRegion).findByText('Tree nuts')).toBeVisible();
+    expect(within(allergensRegion).queryByText(/No allergen declaration/i)).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Food information' }));
+    const foodRegion = screen.getByRole('region', { name: 'Food information' });
+    expect(await within(foodRegion).findByText('Forest honey')).toBeVisible();
+    expect(within(foodRegion).getByText('Rwanda')).toBeVisible();
+    expect(within(foodRegion).queryByText(/unspecified/i)).toBeNull();
+    expect(within(foodRegion).queryByText(/Ingredients have not been supplied/i)).toBeNull();
+    expect(within(foodRegion).queryByText(/Nutrition values have not been supplied/i)).toBeNull();
+    expect(within(foodRegion).queryByText(/Origin details have not been supplied/i)).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Preparation' }));
+    const preparationRegion = screen.getByRole('region', { name: 'Preparation' });
+    expect(await within(preparationRegion).findByText('Warm gently before serving.')).toBeVisible();
+    expect(within(preparationRegion).queryByText(/Preparation instructions have not been supplied/i)).toBeNull();
+
+    expect(screen.queryByRole('button', { name: 'AI suggestions' })).toBeNull();
+    expect(screen.getAllByText(/AI-generated suggestion/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('Golden honey from Rwandan beekeepers.')).toBeVisible();
     expect(getAi).toHaveBeenCalledWith('rwanda-honey');
   });
 

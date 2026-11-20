@@ -392,6 +392,8 @@ const en = {
     aiPreparation: 'Preparation (AI)',
     aiNotVerified:
       'AI-generated suggestion — not verified. Model: {{model}} · Generated: {{suggestedAt}}. Check packaging before publishing.',
+    aiInlineNote: 'AI-generated suggestion — check the packaging before use.',
+    aiNoData: 'AI could not find a reliable value from the available product information.',
     aiDisclaimer:
       'AI-generated suggestion — not a verified fact. Ingredients and allergens are suggestions only and must be checked against the product packaging before being published. This service does not modify shop data.',
   },
