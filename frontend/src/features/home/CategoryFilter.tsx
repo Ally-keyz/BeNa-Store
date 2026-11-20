@@ -1,30 +1,14 @@
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
 
 export const ALL_CATEGORIES = 'all';
 
-const CATEGORY_IMAGE = (id: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=640&q=80`;
-
 const FALLBACK = [
-  {
-    handle: 'coffee',
-    titleKey: 'nav.coffee',
-    image: CATEGORY_IMAGE('photo-1447933601403-0c6688de566e'),
-  },
-  {
-    handle: 'food',
-    titleKey: 'nav.food',
-    image: CATEGORY_IMAGE('photo-1542838132-92c53300491e'),
-  },
-  {
-    handle: 'crafts',
-    titleKey: 'nav.crafts',
-    image: CATEGORY_IMAGE('photo-1493106641515-6b5631de4bb9'),
-  },
+  { handle: 'coffee', titleKey: 'nav.coffee' },
+  { handle: 'food', titleKey: 'nav.food' },
+  { handle: 'crafts', titleKey: 'nav.crafts' },
 ] as const;
-
-const ALL_IMAGE = CATEGORY_IMAGE('photo-1607082348824-0a96f2a4b9da');
 
 interface CategoryFilterProps {
   value: string;
@@ -33,20 +17,14 @@ interface CategoryFilterProps {
   controls?: string;
 }
 
-/**
- * Image-backed category controls. Labels always come from i18n — never from
- * collection titles — so the "All / Coffee / Food / Crafts" row is correctly
- * translated and never shows backend or brand metadata.
- */
 export function CategoryFilter({ value, onChange, controls }: CategoryFilterProps) {
   const { t } = useTranslation();
 
   const options = [
-    { handle: ALL_CATEGORIES, label: t('home.filterAll'), image: ALL_IMAGE },
+    { handle: ALL_CATEGORIES, label: t('home.filterAll') },
     ...FALLBACK.map((fallback) => ({
       handle: fallback.handle as string,
       label: t(fallback.titleKey),
-      image: fallback.image,
     })),
   ];
 
@@ -59,27 +37,25 @@ export function CategoryFilter({ value, onChange, controls }: CategoryFilterProp
       {options.map((option) => {
         const active = option.handle === value;
         return (
-          <button
+          <motion.button
             key={option.handle}
             type="button"
             onClick={() => onChange(option.handle)}
             aria-pressed={active}
             aria-controls={controls}
-            style={{
-              backgroundImage: `linear-gradient(135deg, ${
-                active ? 'rgba(255,112,52,.82)' : 'rgba(13,11,10,.58)'
-              }, rgba(13,11,10,.78)), url("${option.image}")`,
-            }}
+            whileHover={{ y: -3, scale: 1.02 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 24 }}
             className={cn(
-              'relative inline-flex min-h-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-cover bg-center px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300',
-              'hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
+              'inline-flex min-h-10 shrink-0 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors',
+              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
               active
-                ? 'ring-2 ring-brand ring-offset-2 ring-offset-paper'
-                : 'ring-1 ring-black/5 hover:brightness-110',
+                ? 'bg-brand text-on-brand shadow-sm'
+                : 'bg-night text-white hover:bg-white/10',
             )}
           >
             {option.label}
-          </button>
+          </motion.button>
         );
       })}
     </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { PageSeo } from '@/features/seo/PageSeo';
@@ -99,11 +100,14 @@ export function CatalogPage() {
                 {PRICE_OPTIONS.map((option) => {
                   const active = priceFilter === option.value;
                   return (
-                    <button
+                    <motion.button
                       key={option.value}
                       type="button"
                       onClick={() => setPriceFilter(option.value)}
                       aria-pressed={active}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: 'spring', stiffness: 420, damping: 24 }}
                       className={cn(
                         'rounded-full px-4 py-2 text-[13px] font-medium transition-colors',
                         active
@@ -112,7 +116,7 @@ export function CatalogPage() {
                       )}
                     >
                       {t(option.labelKey)}
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>

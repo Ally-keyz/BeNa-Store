@@ -19,7 +19,7 @@ import {
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
 export interface ThemeContextValue {
-  /** Stored preference: light, dark, or system (the default). */
+  /** Stored preference: light (the default), dark, or system. */
   mode: ThemeMode;
   /** The palette currently rendered after resolving `system`. */
   theme: ResolvedTheme;
@@ -35,7 +35,7 @@ function systemPrefersDark(): boolean {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>(() => {
     const stored = readStorage(THEME_STORAGE_KEY);
-    return isThemeMode(stored) ? stored : 'system';
+    return isThemeMode(stored) ? stored : 'light';
   });
   const [prefersDark, setPrefersDark] = useState(systemPrefersDark);
 

@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { MotionConfig } from 'framer-motion';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { isApiError } from '@/api/errors';
@@ -39,18 +40,20 @@ export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
 
   return (
-    <ThemeProvider>
-      <HelmetProvider>
-        <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <ConsentProvider>
-              <MarketProvider>
-                <CartProvider>{children}</CartProvider>
-              </MarketProvider>
-            </ConsentProvider>
-          </ToastProvider>
-        </QueryClientProvider>
-      </HelmetProvider>
-    </ThemeProvider>
+    <MotionConfig reducedMotion="user">
+      <ThemeProvider>
+        <HelmetProvider>
+          <QueryClientProvider client={queryClient}>
+            <ToastProvider>
+              <ConsentProvider>
+                <MarketProvider>
+                  <CartProvider>{children}</CartProvider>
+                </MarketProvider>
+              </ConsentProvider>
+            </ToastProvider>
+          </QueryClientProvider>
+        </HelmetProvider>
+      </ThemeProvider>
+    </MotionConfig>
   );
 }

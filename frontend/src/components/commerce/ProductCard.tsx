@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ShoppingBag } from 'lucide-react';
@@ -73,7 +74,14 @@ export function ProductCard({ product, priority = false, className }: ProductCar
     'pointer-events-auto opacity-100 transition-opacity duration-200 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100';
 
   return (
-    <article className={cn('group flex h-full w-full flex-col', className)}>
+    <motion.article
+      className={cn('group flex h-full w-full flex-col', className)}
+      initial={{ opacity: 0, y: 26 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.12 }}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div className="relative">
         <Link
           to={productHref}
@@ -191,6 +199,6 @@ export function ProductCard({ product, priority = false, className }: ProductCar
           successMessage={t('productCard.notifySuccess')}
         />
       </Dialog>
-    </article>
+    </motion.article>
   );
 }

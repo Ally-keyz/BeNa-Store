@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Theme is driven by an explicit `.dark` class on <html> so users can pick
- * light, dark or system (the default) from the header. */
+ * light (the default), dark or system from the header. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Self-hosted variable fonts matching framer.com's typographic system:

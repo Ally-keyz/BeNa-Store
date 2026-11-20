@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Reveal } from '@/components/motion/Reveal';
 import { cn } from '@/lib/cn';
 
 export interface SectionHeadingProps {
@@ -22,7 +23,7 @@ export function SectionHeading({
   className,
 }: SectionHeadingProps) {
   return (
-    <div
+    <Reveal
       className={cn(
         'flex flex-wrap items-end justify-between gap-4',
         align === 'center' && 'justify-center text-center',
@@ -50,6 +51,6 @@ export function SectionHeading({
         ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
-    </div>
+    </Reveal>
   );
 }
