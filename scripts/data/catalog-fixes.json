@@ -1,0 +1,16 @@
+{
+  "_README": "Phase 2 catalog fixes. The owner-supplied 50-product snapshot (scripts/data/catalog-inventory.json) contains product titles but NO Shopify handles, and none of the earlier audit-fixture handles (coming-soon, coming-soon-1, agashya-juice-syrup) appear in it. To avoid writing to the wrong products, titleNormalizations and handleRedirects are intentionally empty. Run `npm run catalog:inventory` for read-only data-quality findings and safe title-normalization candidates. Add handle-keyed entries here only after the exact Shopify handles are confirmed. The script never changes prices; it only clears compare-at prices that are <= the current price.",
+  "titleNormalizations": [],
+  "handleRedirects": [],
+  "preparation": {
+    "handle": "agashya-juice-syrup",
+    "namespace": "custom",
+    "key": "preparation",
+    "type": "single_line_text_field",
+    "value": "PLACEHOLDER - owner-verified preparation copy required before publishing",
+    "candidateCopyNotForPublishing": "Agashya is a concentrate. The old listing said 'Mix it with 1.5L'; the liquid and serving directions are not verified. This product is also absent from the current 50-product snapshot.",
+    "requiresOwnerVerification": true,
+    "sourceLimitations": "No verified label copy available, and the product handle is not present in the owner-supplied snapshot.",
+    "reason": "Audit finding #12: preparation instructions were ambiguous. Kept blocked until verified copy and a confirmed handle exist."
+  }
+}

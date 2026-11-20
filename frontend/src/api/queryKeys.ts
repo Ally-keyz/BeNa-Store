@@ -33,6 +33,11 @@ export const queryKeys = {
     detail: (cartId: string | null) => ['cart', cartId] as const,
   },
   localization: (params: object = {}) => ['localization', params] as const,
+  facets: (params: object = {}) => ['catalog', 'facets', params] as const,
+  reviews: {
+    product: (handle: string, params: object = {}) =>
+      ['reviews', 'product', handle, params] as const,
+  },
   policies: ['policies'] as const,
   shipping: (params: object = {}) => ['shipping', params] as const,
   seo: {

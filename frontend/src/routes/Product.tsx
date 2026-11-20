@@ -6,6 +6,7 @@ import { PageSeo } from '@/features/seo/PageSeo';
 import { ProductFacts } from '@/features/product/ProductFacts';
 import { ProductGallery } from '@/features/product/ProductGallery';
 import { PurchasePanel } from '@/features/product/PurchasePanel';
+import { ProductReviews } from '@/features/product/ProductReviews';
 import { RelatedProducts } from '@/features/product/RelatedProducts';
 import { useProduct } from '@/hooks/useCatalog';
 import { useCart } from '@/context/CartContext';
@@ -143,6 +144,12 @@ export function ProductPage() {
               {t('product.addToCart')}
             </Button>
           </div>
+        </div>
+      ) : null}
+
+      {product ? (
+        <div className={pageContainer}>
+          <ProductReviews handle={product.handle} className="pb-12" />
         </div>
       ) : null}
 

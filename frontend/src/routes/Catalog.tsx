@@ -3,16 +3,18 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { PageSeo } from '@/features/seo/PageSeo';
-import { useInfiniteProducts } from '@/hooks/useCatalog';
+import { useCatalogFacets, useInfiniteProducts } from '@/hooks/useCatalog';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMarket } from '@/context/MarketContext';
 import { ProductGrid } from '@/components/commerce/ProductGrid';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ALL_CATEGORIES, CategoryFilter } from '@/features/home/CategoryFilter';
+import { CatalogFacets } from '@/features/catalog/CatalogFacets';
+import { EMPTY_FACETS, type SelectedFacets } from '@/features/catalog/facets';
 import { cn } from '@/lib/cn';
 import { pageContainer } from '@/lib/layout';
-import { getDefaultVariant, matchesProductCategory } from '@/lib/product';
+import { getDefaultVariant, matchesFacet, matchesProductCategory } from '@/lib/product';
 
 type PriceFilter = 'all' | 'cheap' | 'expensive' | 'other';
 
@@ -41,12 +43,18 @@ export function CatalogPage() {
   const { marketParams } = useMarket();
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
   const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
+  const [selectedFacets, setSelectedFacets] = useState<SelectedFacets>(EMPTY_FACETS);
 
   const query = useInfiniteProducts({ ...marketParams, first: 12, sortKey: 'CREATED_AT' });
+  const facetsQuery = useCatalogFacets(marketParams);
   const allProducts = query.data?.pages.flatMap((page) => page.items) ?? [];
   const products = allProducts.filter(
     (product) =>
-      matchesProductCategory(product, category) && matchesPrice(product, priceFilter),
+      matchesProductCategory(product, category) &&
+      matchesPrice(product, priceFilter) &&
+      (['brands', 'dietary', 'origins'] as const).every((group) =>
+        selectedFacets[group].every((value) => matchesFacet(product, group, value)),
+      ),
   );
   const pages = query.data?.pages ?? [];
   const hasNextPage = pages.at(-1)?.hasNextPage ?? false;
@@ -122,6 +130,13 @@ export function CatalogPage() {
               </div>
             </div>
           </div>
+
+          <CatalogFacets
+            facets={facetsQuery.data}
+            selected={selectedFacets}
+            onChange={setSelectedFacets}
+            loading={facetsQuery.isLoading}
+          />
 
           <div id="catalog-grid" className="mt-7">
             {query.isError ? (

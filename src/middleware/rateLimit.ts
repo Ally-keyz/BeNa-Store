@@ -44,6 +44,11 @@ export function rateLimiters(config: AppConfig) {
       limit: config.rateLimits.newsletterMax,
       handler: limitHandler('Too many subscription attempts. Please retry later.'),
     }),
+    withdrawal: rateLimit({
+      ...base,
+      limit: config.rateLimits.withdrawalMax,
+      handler: limitHandler('Too many withdrawal requests. Please retry later.'),
+    }),
     webhooks: rateLimit({
       ...base,
       limit: config.rateLimits.webhookMax,

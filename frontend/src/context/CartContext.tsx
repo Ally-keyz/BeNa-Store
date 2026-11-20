@@ -19,6 +19,7 @@ import {
 } from '@/api/endpoints';
 import { isApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { readStorage, writeStorage } from '@/lib/storage';
 import { useToast } from '@/components/ui/Toast';
 import type { Cart } from '@/types';
@@ -59,6 +60,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const track = useAnalytics();
   const [cartId, setCartId] = useState<string | null>(() => readStorage(CART_KEY));
   const [isUpdating, setIsUpdating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -137,6 +139,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }
         }
 
+        track('add_to_cart', { quantity });
+
         if (itemTitle) {
           toast({
             title: t('cart.addedTitle'),
@@ -155,7 +159,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsUpdating(false);
       }
     },
-    [cartId, commitCart, createWithLine, openCart, t, toast],
+    [cartId, commitCart, createWithLine, openCart, t, toast, track],
   );
 
   const updateLine = useCallback(

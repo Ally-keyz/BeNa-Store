@@ -178,6 +178,29 @@ const EnvSchema = z.object({
     ])
     .default('auto'),
   REVIEWS_API_TOKEN: optionalString,
+  /** Provider-agnostic JSON feed, e.g. https://reviews.example.com/{handle}.json */
+  REVIEWS_API_URL_TEMPLATE: optionalString,
+  REVIEWS_CACHE_TTL_SECONDS: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(0).max(86_400).default(3600),
+  ),
+
+  WITHDRAWAL_PROVIDER: z.enum(['mock', 'webhook']).default('mock'),
+  WITHDRAWAL_WEBHOOK_URL: optionalString,
+  WITHDRAWAL_WEBHOOK_SECRET: optionalString,
+  WITHDRAWAL_RATE_LIMIT_MAX: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(1).max(1000).default(5),
+  ),
+
+  FACETS_CACHE_TTL_SECONDS: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(0).max(86_400).default(300),
+  ),
+  FACETS_SCAN_LIMIT: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(1).max(1000).default(250),
+  ),
 
   // AI product-fact suggestions. One pretrained hosted model, no training and
   // no local runtime. Default provider is Groq's free tier; one API key is the
@@ -290,6 +313,7 @@ export interface AppConfig {
     globalMax: number;
     cartMax: number;
     newsletterMax: number;
+    withdrawalMax: number;
     webhookMax: number;
     authMax: number;
     aiMax: number;
@@ -307,7 +331,18 @@ export interface AppConfig {
     mailchimpListId: string | null;
     mailchimpServerPrefix: string | null;
   };
-  reviews: { provider: RawEnv['REVIEWS_PROVIDER']; apiToken: string | null };
+  reviews: {
+    provider: RawEnv['REVIEWS_PROVIDER'];
+    apiToken: string | null;
+    apiUrlTemplate: string | null;
+    cacheTtlSeconds: number;
+  };
+  withdrawal: {
+    provider: RawEnv['WITHDRAWAL_PROVIDER'];
+    webhookUrl: string | null;
+    webhookSecret: string | null;
+  };
+  facets: { cacheTtlSeconds: number; scanLimit: number };
   ai: {
     enabled: boolean;
     apiKey: string | null;
@@ -705,6 +740,7 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       globalMax: env.RATE_LIMIT_MAX,
       cartMax: env.CART_RATE_LIMIT_MAX,
       newsletterMax: env.NEWSLETTER_RATE_LIMIT_MAX,
+      withdrawalMax: env.WITHDRAWAL_RATE_LIMIT_MAX,
       webhookMax: env.WEBHOOK_RATE_LIMIT_MAX,
       authMax: env.AUTH_RATE_LIMIT_MAX,
       aiMax: env.AI_RATE_LIMIT_MAX,
@@ -722,7 +758,21 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       mailchimpListId: env.MAILCHIMP_LIST_ID ?? null,
       mailchimpServerPrefix: env.MAILCHIMP_SERVER_PREFIX ?? null,
     },
-    reviews: { provider: env.REVIEWS_PROVIDER, apiToken: env.REVIEWS_API_TOKEN ?? null },
+    reviews: {
+      provider: env.REVIEWS_PROVIDER,
+      apiToken: env.REVIEWS_API_TOKEN ?? null,
+      apiUrlTemplate: env.REVIEWS_API_URL_TEMPLATE ?? null,
+      cacheTtlSeconds: env.REVIEWS_CACHE_TTL_SECONDS,
+    },
+    withdrawal: {
+      provider: env.WITHDRAWAL_PROVIDER,
+      webhookUrl: env.WITHDRAWAL_WEBHOOK_URL ?? null,
+      webhookSecret: env.WITHDRAWAL_WEBHOOK_SECRET ?? null,
+    },
+    facets: {
+      cacheTtlSeconds: env.FACETS_CACHE_TTL_SECONDS,
+      scanLimit: env.FACETS_SCAN_LIMIT,
+    },
     ai: {
       enabled: env.AI_ENABLED && Boolean(env.AI_API_KEY),
       apiKey: env.AI_API_KEY ?? null,

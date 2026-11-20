@@ -180,6 +180,32 @@ export const newsletterBody = z.object({
   language: z.string().trim().length(2).optional(),
 });
 
+// ------------------------------------------------------------ withdrawal ---
+
+export const withdrawalBody = z.object({
+  orderNumber: z.string().trim().min(1).max(80),
+  email: z.email('A valid email address is required').max(254),
+  fullName: z.string().trim().min(2).max(160),
+  countryCode: z.string().trim().length(2).transform((value) => value.toUpperCase()).optional(),
+  orderedOn: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'orderedOn must be YYYY-MM-DD')
+    .optional(),
+  itemDescription: z.string().trim().max(500).optional(),
+  reason: z.string().trim().max(1000).optional(),
+  declaration: z.literal(true, {
+    error: 'You must confirm the withdrawal declaration before submitting.',
+  }),
+  language: z.string().trim().length(2).optional(),
+});
+
+// ---------------------------------------------------------- reviews/facets ---
+
+export const productReviewsParams = handleParams;
+export const productReviewsQuery = marketContextQuery.extend({ refresh: booleanQuery.optional() });
+export const catalogFacetsQuery = marketContextQuery.extend({ refresh: booleanQuery.optional() });
+
 // ---------------------------------------------------------- audit + seo ---
 
 export const auditCatalogQuery = marketContextQuery.extend({

@@ -12,6 +12,10 @@ import type {
   updateBuyerIdentityBody,
   updateCartLinesBody,
   updateDiscountCodesBody,
+  withdrawalBody,
+  catalogFacetsQuery,
+  productReviewsParams,
+  productReviewsQuery,
 } from '../schemas/requests';
 
 export function cartController(container: Container): Record<string, RequestHandler> {
@@ -139,6 +143,29 @@ export function communicationsController(container: Container): Record<string, R
     reviewsAssessment: asyncHandler(async (_req, res) => {
       const assessment = await container.services.reviews.assess();
       res.json(success(res, assessment, baseMeta(container)));
+    }),
+
+    productReviews: asyncHandler(async (_req, res) => {
+      const { params, query } = getValidated<{
+        params: z.infer<typeof productReviewsParams>;
+        query: z.infer<typeof productReviewsQuery>;
+      }>(res);
+      const reviews = await container.services.reviews.forProduct(params.handle, {
+        refresh: query.refresh,
+      });
+      res.json(success(res, reviews, baseMeta(container)));
+    }),
+
+    withdrawal: asyncHandler(async (_req, res) => {
+      const { body } = getValidated<{ body: z.infer<typeof withdrawalBody> }>(res);
+      const result = await container.services.withdrawal.submit(body);
+      sendCreated(res, result, baseMeta(container));
+    }),
+
+    facets: asyncHandler(async (_req, res) => {
+      const { query } = getValidated<{ query: z.infer<typeof catalogFacetsQuery> }>(res);
+      const facets = await container.services.facets.get(query, { refresh: query.refresh });
+      res.json(success(res, facets, baseMeta(container)));
     }),
   };
 }

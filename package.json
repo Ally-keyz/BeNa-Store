@@ -21,7 +21,11 @@
     "audit:report": "tsx scripts/audit-products.ts",
     "webhooks:register": "tsx scripts/register-webhooks.ts",
     "admin:token": "tsx scripts/mint-admin-token.ts",
-    "smoke": "tsx scripts/live-smoke.ts"
+    "smoke": "tsx scripts/live-smoke.ts",
+    "catalog:fixes": "tsx scripts/apply-catalog-fixes.ts",
+    "metafields:apply": "tsx scripts/apply-metafields.ts",
+    "sale-prices:export": "tsx scripts/export-sale-prices.ts",
+    "catalog:inventory": "tsx scripts/analyze-catalog-inventory.ts"
   },
   "dependencies": {
     "@socket.io/redis-adapter": "^8.3.0",

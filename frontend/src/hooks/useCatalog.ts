@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
+  getCatalogFacets,
   getCollection,
   getCollections,
   getProduct,
@@ -36,6 +37,16 @@ export function useProducts(params: ListProductsParams, enabled = true) {
     },
     staleTime: 60_000,
     enabled,
+  });
+}
+
+/** Catalog-derived filter options (audit #20). */
+export function useCatalogFacets(market: MarketParams) {
+  return useQuery({
+    queryKey: queryKeys.facets(market),
+    queryFn: async ({ signal }) => (await getCatalogFacets(market, { signal })).data,
+    staleTime: 5 * 60_000,
+    retry: 1,
   });
 }
 

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Product, ProductVariant } from '@/types';
-import { getAvailability, getDefaultVariant, getProductCategory, hasVariantChoice } from './product';
+import {
+  getAvailability,
+  getDefaultVariant,
+  getProductCategory,
+  hasVariantChoice,
+  matchesFacet,
+  toFacetValue,
+} from './product';
 
 function variant(overrides: Partial<ProductVariant> = {}): ProductVariant {
   return {
@@ -90,5 +97,27 @@ describe('product availability', () => {
     expect(getProductCategory(product({ productType: 'Food', tags: ['pantry'] }))).toBe('food');
     expect(getProductCategory(product({ tags: ['igiseke', 'basket'] }))).toBe('crafts');
     expect(getProductCategory(product())).toBe('other');
+  });
+});
+
+describe('catalog facets', () => {
+  it('normalizes facet values consistently', () => {
+    expect(toFacetValue('BeNa Origins')).toBe('bena-origins');
+    expect(toFacetValue('Gluten-Free')).toBe('gluten-free');
+    expect(toFacetValue('Rwanda!')).toBe('rwanda');
+  });
+
+  it('matches brand facets against the vendor', () => {
+    const item = product({ vendor: 'BeNa Origins' });
+    expect(matchesFacet(item, 'brands', 'bena-origins')).toBe(true);
+    expect(matchesFacet(item, 'brands', 'other-brand')).toBe(false);
+  });
+
+  it('matches dietary and origin facets against catalog text only', () => {
+    const item = product({ title: 'Rwandan Gluten-Free Coffee', tags: ['vegan'] });
+    expect(matchesFacet(item, 'dietary', 'gluten-free')).toBe(true);
+    expect(matchesFacet(item, 'dietary', 'vegan')).toBe(true);
+    expect(matchesFacet(item, 'origins', 'rwanda')).toBe(true);
+    expect(matchesFacet(item, 'dietary', 'halal')).toBe(false);
   });
 });

@@ -6,6 +6,7 @@ import { cn } from '@/lib/cn';
 import { Drawer } from '@/components/ui/Drawer';
 import { ThemeSegmented } from '@/components/ui/ThemeToggle';
 import { LanguageSwitch } from './LanguageSwitch';
+import { RegionSelector } from './RegionSelector';
 
 export interface MobileNavProps {
   open: boolean;
@@ -85,6 +86,12 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             {t('header.language')}
           </p>
           <LanguageSwitch size="md" className="mt-2.5" />
+        </div>
+        <div>
+          <p className="px-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
+            {t('remediation.regionLabel')}
+          </p>
+          <RegionSelector variant="full" className="mt-2.5 rounded-xl" />
         </div>
         <a
           href={`mailto:${BRAND.contactEmail}`}

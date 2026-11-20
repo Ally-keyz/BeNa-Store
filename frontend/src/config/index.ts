@@ -1,52 +1,41 @@
 /**
- * Single source of truth for brand identity, contact details and public URLs.
+ * Public, build-time configuration. No secrets may ever be added here.
  *
- * TODO(owner): confirm the values below. The logo reads "BeNa SheGrows Coffee"
- * while the store is "BeNa Origins"; the backend fixtures contain several
- * inconsistent business names/emails (audit finding #6). Until confirmed, all
- * pages read from this ONE module so a fix lands everywhere at once.
+ * Default identity values come from the owner-supplied store details. They are
+ * still overridable with VITE_* variables for deployments; never add secrets.
  */
+const publicEnv = import.meta.env;
 
-export const BRAND = {
-  /** Public-facing trading name. */
-  name: 'BeNa Origins',
-  /** Value on the logo; used only where the logo appears with its own text. */
-  logoName: 'BeNa SheGrows Coffee',
-  /** Legal entity name for Impressum/legal pages. TODO: confirm. */
-  legalName: 'BeNa Origins UG (haftungsbeschränkt)',
-  /** Single official contact email. TODO: confirm (fixtures use several). */
-  contactEmail: 'support@benaorigins.de',
-  /** Single official support/orders email. TODO: confirm. */
-  ordersEmail: 'support@benaorigins.de',
-  /** Physical address placeholders for the legal notice. TODO: real values. */
-  address: {
-    street: 'Musterstraße 1',
-    city: '00000 Berlin',
-    country: 'Deutschland',
-  },
-  slogan: 'Taste of Rwanda',
-  /** Social URLs. TODO: real values. */
-  social: {
-    instagram: 'https://instagram.com/benaorigins',
-    facebook: 'https://facebook.com/benaorigins',
-    tiktok: 'https://tiktok.com/@benaorigins',
-  },
-} as const;
+function read(name: string, fallback: string): string {
+  const value = publicEnv[name] as string | undefined;
+  return value?.trim() || fallback;
+}
 
 /** Public environment config (all values are safe to bundle). */
 export const env = {
-  /**
-   * Backend REST base. Empty string = same-origin (`/api/v1`), which the Vite
-   * dev proxy and any production reverse proxy forward to the backend.
-   */
-  apiBaseUrl: (import.meta.env.VITE_API_BASE_URL as string | undefined) || '/api/v1',
-  /** Socket.IO origin. Empty string = same-origin. */
-  socketUrl: (import.meta.env.VITE_SOCKET_URL as string | undefined) || '',
-  /** Canonical public site origin (SEO canonical/JSON-LD links). */
-  siteUrl: (import.meta.env.VITE_SITE_URL as string | undefined) || 'https://benaorigins.de',
+  apiBaseUrl: read('VITE_API_BASE_URL', '/api/v1'),
+  socketUrl: read('VITE_SOCKET_URL', ''),
+  siteUrl: read('VITE_SITE_URL', 'https://benaorigins.de'),
+};
+
+export const BRAND = {
+  name: read('VITE_BRAND_NAME', 'BeNa Origins'),
+  logoName: read('VITE_BRAND_LOGO_NAME', 'BeNa SheGrows Coffee'),
+  legalName: read('VITE_LEGAL_NAME', 'BeNa Store'),
+  contactEmail: read('VITE_CONTACT_EMAIL', 'store@benaorigins.de'),
+  ordersEmail: read('VITE_ORDERS_EMAIL', 'store@benaorigins.de'),
+  address: {
+    street: read('VITE_ADDRESS_STREET', 'Am Galgenköppel 4'),
+    city: read('VITE_ADDRESS_CITY', '34289 Zierenberg'),
+    country: read('VITE_ADDRESS_COUNTRY', 'Germany'),
+  },
+  slogan: read('VITE_BRAND_SLOGAN', 'Taste of Rwanda'),
+  social: {
+    instagram: read('VITE_SOCIAL_INSTAGRAM', 'https://www.instagram.com/'),
+    facebook: read('VITE_SOCIAL_FACEBOOK', 'https://www.facebook.com/'),
+  },
 } as const;
 
-/** True when the app is running in a local/dev build. */
-export const IS_DEV = import.meta.env.DEV;
+export const IS_DEV = publicEnv.DEV === true;
 
-export type { };
+export type {};

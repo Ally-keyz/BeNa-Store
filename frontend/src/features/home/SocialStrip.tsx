@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Facebook, Instagram, Music2 } from 'lucide-react';
+import { Facebook, Instagram } from 'lucide-react';
 import { BRAND } from '@/config';
 import { cn } from '@/lib/cn';
 import { contentContainer } from '@/lib/layout';
@@ -7,7 +7,6 @@ import { contentContainer } from '@/lib/layout';
 const SOCIALS = [
   { href: BRAND.social.instagram, label: 'Instagram', Icon: Instagram },
   { href: BRAND.social.facebook, label: 'Facebook', Icon: Facebook },
-  { href: BRAND.social.tiktok, label: 'TikTok', Icon: Music2 },
 ] as const;
 
 /** Thin strip directly under the hero, matching the reference layout. */

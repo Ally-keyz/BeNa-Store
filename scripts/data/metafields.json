@@ -1,0 +1,52 @@
+{
+  "_README": "PLACEHOLDER DATASET - NOT FOR PUBLICATION. The owner decided to rely on AI-generated product facts for now, so these values stay placeholders and `npm run metafields:apply` must NOT be used to publish them. Every value below is an explicit placeholder, not a verified fact. Only if the owner later obtains label-verified facts should each `value` be replaced and `status` changed from 'placeholder' to 'verified'; the apply script skips anything not marked verified. Do not invent nutrition, ingredients, allergens, origin or preparation claims. Namespace `custom`, keys nutrition/ingredients/allergens/origin/preparation and type `single_line_text_field` match the ProductMetafields definitions in scripts/apply-metafields.ts.",
+  "agashya-juice-syrup": {
+    "nutrition": { "namespace": "custom", "key": "nutrition", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified nutrition declaration required" },
+    "ingredients": { "namespace": "custom", "key": "ingredients", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified ingredient list required" },
+    "allergens": { "namespace": "custom", "key": "allergens", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified EU allergen declaration required" },
+    "origin": { "namespace": "custom", "key": "origin", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified country/region of origin required" },
+    "preparation": { "namespace": "custom", "key": "preparation", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified preparation instructions required" }
+  },
+  "blueband-margarine": {
+    "nutrition": { "namespace": "custom", "key": "nutrition", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified nutrition declaration required" },
+    "ingredients": { "namespace": "custom", "key": "ingredients", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified ingredient list required" },
+    "allergens": { "namespace": "custom", "key": "allergens", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified EU allergen declaration required" },
+    "origin": { "namespace": "custom", "key": "origin", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified country/region of origin required" },
+    "preparation": { "namespace": "custom", "key": "preparation", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified preparation instructions required" }
+  },
+  "coming-soon": {
+    "nutrition": { "namespace": "custom", "key": "nutrition", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified nutrition declaration required" },
+    "ingredients": { "namespace": "custom", "key": "ingredients", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified ingredient list required" },
+    "allergens": { "namespace": "custom", "key": "allergens", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified EU allergen declaration required" },
+    "origin": { "namespace": "custom", "key": "origin", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified country/region of origin required" },
+    "preparation": { "namespace": "custom", "key": "preparation", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified preparation instructions required" }
+  },
+  "akabanga-chill-oil": {
+    "nutrition": { "namespace": "custom", "key": "nutrition", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified nutrition declaration required" },
+    "ingredients": { "namespace": "custom", "key": "ingredients", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified ingredient list required" },
+    "allergens": { "namespace": "custom", "key": "allergens", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified EU allergen declaration required" },
+    "origin": { "namespace": "custom", "key": "origin", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified country/region of origin required" },
+    "preparation": { "namespace": "custom", "key": "preparation", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified preparation instructions required" }
+  },
+  "akarabo-biscuits": {
+    "nutrition": { "namespace": "custom", "key": "nutrition", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified nutrition declaration required" },
+    "ingredients": { "namespace": "custom", "key": "ingredients", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified ingredient list required" },
+    "allergens": { "namespace": "custom", "key": "allergens", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified EU allergen declaration required" },
+    "origin": { "namespace": "custom", "key": "origin", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified country/region of origin required" },
+    "preparation": { "namespace": "custom", "key": "preparation", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified preparation instructions required" }
+  },
+  "coming-soon-1": {
+    "nutrition": { "namespace": "custom", "key": "nutrition", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified nutrition declaration required" },
+    "ingredients": { "namespace": "custom", "key": "ingredients", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified ingredient list required" },
+    "allergens": { "namespace": "custom", "key": "allergens", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified EU allergen declaration required" },
+    "origin": { "namespace": "custom", "key": "origin", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified country/region of origin required" },
+    "preparation": { "namespace": "custom", "key": "preparation", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified preparation instructions required" }
+  },
+  "rwanda-coffee-250g": {
+    "nutrition": { "namespace": "custom", "key": "nutrition", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified nutrition declaration required" },
+    "ingredients": { "namespace": "custom", "key": "ingredients", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified ingredient list required" },
+    "allergens": { "namespace": "custom", "key": "allergens", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified EU allergen declaration required" },
+    "origin": { "namespace": "custom", "key": "origin", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified country/region of origin required" },
+    "preparation": { "namespace": "custom", "key": "preparation", "type": "single_line_text_field", "status": "placeholder", "value": "PLACEHOLDER - owner-verified preparation instructions required" }
+  }
+}

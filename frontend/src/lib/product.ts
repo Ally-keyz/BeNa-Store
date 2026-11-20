@@ -70,3 +70,39 @@ export function matchesProductCategory(product: Product, category: string): bool
   if (category === 'all') return true;
   return getProductCategory(product) === category;
 }
+
+/** Normalize a facet label/value the same way the backend facet service does. */
+export function toFacetValue(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+}
+
+/** Text searched by catalog-derived dietary/origin facets. */
+export function productFacetText(product: Product): string {
+  return [
+    product.title,
+    product.productType,
+    product.vendor,
+    product.tags.join(' '),
+    product.description,
+    product.metafields?.origin?.value,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+export type FacetGroup = 'brands' | 'dietary' | 'origins';
+
+/** Match a selected facet value against a product without inventing metadata. */
+export function matchesFacet(product: Product, group: FacetGroup, value: string): boolean {
+  const normalized = toFacetValue(value);
+  if (!normalized) return true;
+  if (group === 'brands') return toFacetValue(product.vendor) === normalized;
+  return productFacetText(product)
+    .replace(/[^a-z0-9]+/g, ' ')
+    .includes(normalized.replace(/-/g, ' '));
+}

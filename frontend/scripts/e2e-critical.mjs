@@ -259,6 +259,53 @@ async function run() {
       }
       if (apiPath === '/policies' && method === 'GET') return json(ok(fixturePolicies));
       if (apiPath === '/shipping' && method === 'GET') return json(ok(shipping));
+      if (apiPath === '/catalog/facets' && method === 'GET') {
+        return json(
+          ok({
+            categories: [
+              { value: 'coffee', label: 'Coffee', count: fixtureProducts.length },
+            ],
+            brands: [
+              { value: 'bena-origins', label: 'Bena Origins', count: fixtureProducts.length },
+            ],
+            dietary: [],
+            origins: [{ value: 'rwanda', label: 'Rwanda', count: fixtureProducts.length }],
+            scannedProducts: fixtureProducts.length,
+            truncated: false,
+            checkedAt: NOW,
+          }),
+        );
+      }
+
+      const reviewMatch = apiPath.match(/^\/reviews\/product\/([^/]+)$/);
+      if (reviewMatch && method === 'GET') {
+        return json(
+          ok({
+            handle: decodeURIComponent(reviewMatch[1]),
+            status: 'not_configured',
+            source: null,
+            reviews: [],
+            summary: { count: 0, averageRating: null },
+            simulated: true,
+            message: 'No review feed is configured.',
+            checkedAt: NOW,
+          }),
+        );
+      }
+
+      if (apiPath === '/withdrawals' && method === 'POST') {
+        return json(
+          ok({
+            reference: 'WD-E2E-000001',
+            status: 'simulated',
+            provider: 'mock',
+            receivedAt: NOW,
+            simulated: true,
+            message: 'Simulated receipt.',
+          }),
+          201,
+        );
+      }
 
       if (apiPath === '/products' && method === 'GET') return json(ok(fixtureProducts, true));
       if (apiPath === '/collections' && method === 'GET') {
@@ -380,6 +427,11 @@ async function run() {
         return json(ok({ subscribed: true, simulated: true }));
       }
 
+      if (apiPath.startsWith('/ai/suggestions/') && method === 'GET') {
+        const unavailable = fail('SERVICE_UNAVAILABLE', 'AI suggestions are disabled in e2e.', 503);
+        return json(unavailable.body, unavailable.status);
+      }
+
       unmockedCalls.push(`${method} ${apiPath}`);
       const failure = fail('NOT_FOUND', `Unmocked API request: ${method} ${apiPath}`);
       return json(failure.body, failure.status);
@@ -400,6 +452,7 @@ async function run() {
 
       const language = page.getByRole('group', { name: 'Language', exact: true });
       await language.getByRole('button', { name: 'English', exact: true }).waitFor();
+      await page.getByLabel('Region and currency', { exact: true }).waitFor();
 
       // The appearance control defaults to system and can force dark mode.
       const appearance = page.getByRole('button', { name: 'Appearance', exact: true });
@@ -432,6 +485,15 @@ async function run() {
         .click();
       await page.getByRole('heading', { name: 'Rwandan products, all in one place' }).waitFor();
       await page.locator('main').getByRole('link', { name: 'Rwanda Coffee 250g' }).waitFor();
+      assert.ok(
+        apiCalls.some((call) => call === 'GET /catalog/facets'),
+        'Expected catalog facets to be loaded from the backend.',
+      );
+      const facetBrand = page.getByRole('button', { name: /Bena Origins/ });
+      await facetBrand.waitFor();
+      await facetBrand.click();
+      assert.equal(await facetBrand.getAttribute('aria-pressed'), 'true');
+      await page.getByRole('button', { name: 'Clear filters' }).click();
 
       await page.getByRole('button', { name: 'Search', exact: true }).click();
       const dialog = page.getByRole('dialog');
@@ -444,6 +506,11 @@ async function run() {
     await step('product detail adds to cart and exposes checkout handoff only', async () => {
       await page.locator('main').getByRole('link', { name: 'Rwanda Coffee 250g' }).click();
       await page.getByRole('heading', { name: 'Rwanda Coffee 250g' }).waitFor();
+      await page.getByRole('heading', { name: 'Customer reviews' }).waitFor();
+      assert.ok(
+        apiCalls.some((call) => call.startsWith('GET /reviews/product/')),
+        'Expected genuine product reviews to be read from the backend.',
+      );
       await page.getByTestId('add-to-cart').click();
       // Adding no longer hijacks the page with the cart drawer; the top-centre
       // notification offers an explicit "View cart" action instead.
@@ -480,6 +547,22 @@ async function run() {
       await page.getByText('This item is not available to add to the cart yet.').waitFor();
       assert.equal(await page.getByTestId('add-to-cart').count(), 0);
       await page.getByRole('link', { name: 'Ask about availability' }).waitFor();
+    });
+
+    await step('withdrawal form submits through the backend and shows a reference', async () => {
+      await page.goto(`${ORIGIN}/legal/withdrawal`, { waitUntil: 'domcontentloaded' });
+      await page.getByRole('heading', { name: 'Withdrawal declaration' }).waitFor();
+      await page.getByLabel('Order number').fill('E2E-1001');
+      await page.getByLabel('Email address used for the order').fill('shopper@example.invalid');
+      await page.getByLabel('Full name').fill('Test Shopper');
+      await page.getByLabel('Order date').fill('2026-11-01');
+      await page.getByRole('checkbox', { name: /I confirm that I am withdrawing/ }).check();
+      await page.getByRole('button', { name: 'Submit withdrawal' }).click();
+      await page.getByText(/WD-E2E-000001/).waitFor();
+      assert.ok(
+        apiCalls.some((call) => call === 'POST /withdrawals'),
+        'Expected the withdrawal declaration to be sent to the backend.',
+      );
     });
 
     assert.equal(checkoutUrlRequested, false, 'The checkout URL must never be requested by e2e.');

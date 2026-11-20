@@ -71,11 +71,11 @@ Scale:
 
 ## 5. Logo treatment
 
-- Source file: `src/assets/logo.webp` (copied from the provided `Logo-Final.webp`; referenced by import only).
-- Placed on white in the header at `36px` on mobile and `40px` from the `sm` breakpoint upward.
-- `object-contain` preserves the original proportions.
+- Source files: `src/assets/logo_new.png` (imported by the header and `BrandLogo`) and the identical `public/logo_new.png` (referenced directly by the About page).
+- The current logo is a square 500×500 image; `object-contain` shows all of it without cropping.
+- Placed on white in the header in a `44px` tile beside the typographic `BeNa Origins` wordmark; `BrandLogo` uses `36px` on mobile and `40px` from the `sm` breakpoint upward.
 - Never recolor, crop, stretch, rotate, place on a dark background, or derive UI colors from the artwork.
-- The logo's own wording (`BeNa SheGrows Coffee`) and the trading name (`BeNa Origins`) stay separate in `src/config/index.ts` until the owner confirms one brand name.
+- The artwork's own wording and the trading name (`BeNa Origins`) stay separate in `src/config/index.ts` until the owner confirms one brand name.
 
 ## 6. Layout and scale
 

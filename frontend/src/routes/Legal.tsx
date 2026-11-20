@@ -4,6 +4,7 @@ import { BRAND } from '@/config';
 import type { PolicyBundle } from '@/types';
 import { PageSeo } from '@/features/seo/PageSeo';
 import { PolicyDocument } from '@/features/policies/PolicyDocument';
+import { WithdrawalForm } from '@/features/policies/WithdrawalForm';
 import { usePolicies } from '@/hooks/useContent';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { pageContainer, sectionSpacing } from '@/lib/layout';
@@ -18,7 +19,7 @@ interface LegalPageConfig {
 const LEGAL_PAGES: Record<string, LegalPageConfig> = {
   impressum: { titleKey: 'legal.titleImpressum', policyKey: 'legalNotice', placeholder: true },
   privacy: { titleKey: 'legal.titlePrivacy', policyKey: 'privacy' },
-  withdrawal: { titleKey: 'legal.titleWithdrawal', placeholder: true },
+  withdrawal: { titleKey: 'legal.titleWithdrawal' },
   terms: { titleKey: 'legal.titleTerms', policyKey: 'termsOfService' },
   refund: { titleKey: 'legal.titleRefund', policyKey: 'refund' },
   shipping: { titleKey: 'legal.titleShipping', policyKey: 'shipping' },
@@ -34,14 +35,17 @@ export function LegalPage() {
 
   const title = t(config.titleKey);
   const policy = config.policyKey ? policies.data?.policies[config.policyKey] : null;
-  const robots = config.placeholder || !policy ? 'noindex,follow' : 'index,follow';
+  const isWithdrawal = page === 'withdrawal';
+  const placeholder = Boolean(config.placeholder);
+  const robots = placeholder || (!isWithdrawal && !policy) ? 'noindex,follow' : 'index,follow';
+  const description = isWithdrawal ? t('remediation.withdrawalIntro') : t('legal.placeholderBody');
 
   return (
     <>
       <PageSeo
         fallback={{
-          title: `${title} — BeNa Origins`,
-          description: t('legal.placeholderBody'),
+          title: `${title} — ${BRAND.name}`,
+          description,
           path: `/legal/${page}`,
           robots,
         }}
@@ -88,12 +92,31 @@ export function LegalPage() {
             </div>
           ) : null}
 
-          <PolicyDocument
-            policy={policy}
-            title={title}
-            fallback={t('legal.contentUnavailable')}
-            placeholder={config.placeholder}
-          />
+          {isWithdrawal ? (
+            <article className="mx-auto min-w-0 max-w-[760px]">
+              <h1 className="break-words text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight">
+                {title}
+              </h1>
+              <p className="mt-6 break-words text-[15px] leading-7 text-neutral-600">
+                {t('remediation.withdrawalIntro')}
+              </p>
+              <div className="mt-8 rounded-card border border-terra-100 bg-surface p-4 sm:p-8">
+                <h2 className="text-lg font-semibold text-ink">
+                  {t('remediation.withdrawalFormTitle')}
+                </h2>
+                <div className="mt-5">
+                  <WithdrawalForm />
+                </div>
+              </div>
+            </article>
+          ) : (
+            <PolicyDocument
+              policy={policy}
+              title={title}
+              fallback={t('legal.contentUnavailable')}
+              placeholder={placeholder}
+            />
+          )}
         </div>
       </div>
     </>

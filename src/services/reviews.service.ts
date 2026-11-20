@@ -1,7 +1,31 @@
 import type { Logger } from 'pino';
+import { z } from 'zod';
 import type { AppConfig } from '../config/env';
-import type { CommerceClient, ReviewProviderAssessment } from '../types/domain';
+import type {
+  CommerceClient,
+  ProductReview,
+  ProductReviewsResult,
+  ReviewProviderAssessment,
+} from '../types/domain';
 import { truncate } from '../utils/html';
+
+const providerReviewSchema = z.object({
+  id: z.union([z.string(), z.number()]),
+  author: z.string().min(1).max(160),
+  rating: z.coerce.number().min(1).max(5),
+  title: z.string().max(200).optional(),
+  body: z.string().max(4000).optional(),
+  text: z.string().max(4000).optional(),
+  comment: z.string().max(4000).optional(),
+  createdAt: z.string().max(80).optional(),
+  date: z.string().max(80).optional(),
+  verifiedPurchase: z.boolean().optional(),
+});
+
+const providerPayloadSchema = z.object({
+  source: z.string().max(120).optional(),
+  reviews: z.array(providerReviewSchema).max(100).default([]),
+});
 
 interface ProviderSignature {
   key: string;
@@ -81,12 +105,108 @@ const ALTERNATIVES = [
  * review content and does not build review UI.
  */
 export class ReviewsService {
+  private readonly productCache = new Map<string, { expiresAt: number; value: ProductReviewsResult }>();
+
   constructor(
     private readonly client: CommerceClient,
     private readonly config: AppConfig,
     private readonly logger: Logger,
     private readonly fetchImpl: typeof fetch = fetch,
   ) {}
+
+  /**
+   * Reads genuine reviews from a configured provider feed. Returns an empty,
+   * explicitly labelled result when no feed is configured — never fake data.
+   */
+  async forProduct(
+    handle: string,
+    options: { refresh?: boolean } = {},
+  ): Promise<ProductReviewsResult> {
+    const checkedAt = new Date().toISOString();
+    const empty = (status: ProductReviewsResult['status'], message: string, source: string | null = null) => ({
+      handle,
+      status,
+      source,
+      reviews: [] as ProductReview[],
+      summary: { count: 0, averageRating: null },
+      simulated: true,
+      message,
+      checkedAt,
+    });
+
+    const template = this.config.reviews.apiUrlTemplate;
+    if (!template || this.config.reviews.provider === 'none') {
+      return empty(
+        'not_configured',
+        'No review feed is configured. Set REVIEWS_API_URL_TEMPLATE to surface genuine reviews.',
+      );
+    }
+
+    const cacheKey = handle.toLowerCase();
+    const cached = this.productCache.get(cacheKey);
+    if (!options.refresh && cached && cached.expiresAt > Date.now()) return cached.value;
+
+    let url: URL;
+    try {
+      url = new URL(
+        template
+          .replaceAll('{handle}', encodeURIComponent(handle))
+          .replaceAll('{HANDLE}', encodeURIComponent(handle)),
+      );
+      if (!/^https?:$/.test(url.protocol)) throw new Error('protocol');
+    } catch {
+      return empty('unavailable', 'REVIEWS_API_URL_TEMPLATE is not a valid HTTP(S) URL.');
+    }
+
+    try {
+      const response = await this.fetchImpl(url, {
+        headers: { Accept: 'application/json', 'User-Agent': 'BeNaOriginsBackend/0.1 (reviews; read-only)' },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) {
+        return empty('unavailable', `Review feed responded with HTTP ${response.status}.`);
+      }
+      const parsed = providerPayloadSchema.parse(await response.json());
+      const reviews: ProductReview[] = parsed.reviews.map((review) => ({
+        id: String(review.id),
+        author: review.author,
+        rating: Math.round(review.rating * 10) / 10,
+        title: review.title,
+        body: review.body ?? review.text ?? review.comment ?? '',
+        createdAt: review.createdAt ?? review.date ?? checkedAt,
+        verifiedPurchase: review.verifiedPurchase,
+      }));
+      const averageRating = reviews.length
+        ? Math.round((reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length) * 10) / 10
+        : null;
+      const value: ProductReviewsResult = {
+        handle,
+        status: 'available',
+        source: parsed.source ?? url.origin,
+        reviews,
+        summary: { count: reviews.length, averageRating },
+        simulated: false,
+        message:
+          reviews.length === 0
+            ? 'The configured review feed returned no reviews for this product.'
+            : 'Genuine reviews from the configured provider feed.',
+        checkedAt,
+      };
+      if (this.config.reviews.cacheTtlSeconds > 0) {
+        this.productCache.set(cacheKey, {
+          expiresAt: Date.now() + this.config.reviews.cacheTtlSeconds * 1000,
+          value,
+        });
+      }
+      return value;
+    } catch (error) {
+      this.logger.warn(
+        { handle, error: error instanceof Error ? error.message : 'unknown' },
+        'review feed read failed',
+      );
+      return empty('unavailable', 'The configured review feed could not be read.');
+    }
+  }
 
   async assess(): Promise<ReviewProviderAssessment> {
     const override = this.config.reviews.provider;
@@ -209,12 +329,12 @@ export class ReviewsService {
         recommendedApproach: integration.approach,
         requiredCredentials: integration.credentials,
         endpointsToAddLater: [
-          'GET /api/v1/reviews/product/:handle — aggregate rating + recent reviews',
           'GET /api/v1/reviews/summary — catalog-level rating coverage',
         ],
         notes: [
           ...integration.notes,
           'Detection cannot prove reviews are active, published or genuine. Confirm in Shopify Admin > Apps and sales channels.',
+          'Product reviews are read from REVIEWS_API_URL_TEMPLATE; no ratings are invented.',
         ],
       },
       alternatives: ALTERNATIVES,

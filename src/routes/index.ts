@@ -12,6 +12,7 @@ import {
   aiSuggestQuery,
   auditCatalogQuery,
   auditProductParams,
+  catalogFacetsQuery,
   collectionDetailQuery,
   createCartBody,
   listCollectionsQuery,
@@ -19,6 +20,8 @@ import {
   localizationQuery,
   newsletterBody,
   productByHandle,
+  productReviewsParams,
+  productReviewsQuery,
   removeCartLinesBody,
   searchQuery,
   shippingQuery,
@@ -27,6 +30,7 @@ import {
   updateBuyerIdentityBody,
   updateCartLinesBody,
   updateDiscountCodesBody,
+  withdrawalBody,
 } from '../schemas/requests';
 import {
   cartIdParams,
@@ -132,6 +136,11 @@ export function createApiRouter(
   router.get('/localization', validate({ query: localizationQuery }), content.localization);
   router.get('/shipping', validate({ query: shippingQuery }), content.shipping);
   router.get('/policies', validate({ query: emptyQuery }), content.policies);
+  router.get(
+    '/catalog/facets',
+    validate({ query: catalogFacetsQuery }),
+    comms.facets,
+  );
 
   // -------------------------------------------------------- communications ---
   router.post(
@@ -145,6 +154,18 @@ export function createApiRouter(
     adminGuard,
     validate({ query: emptyQuery }),
     comms.reviewsAssessment,
+  );
+  router.get(
+    '/reviews/product/:handle',
+    validate({ params: productReviewsParams, query: productReviewsQuery }),
+    comms.productReviews,
+  );
+  router.post(
+    '/withdrawals',
+    limiters.withdrawal,
+    trustedOrigin,
+    validate({ body: withdrawalBody }),
+    comms.withdrawal,
   );
 
   // -------------------------------------------------------- authentication ---

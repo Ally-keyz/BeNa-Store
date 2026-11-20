@@ -2,11 +2,13 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react';
 import { readStorage, writeStorage } from '@/lib/storage';
+import { setAnalyticsEnabled } from '@/lib/analytics';
 
 const CONSENT_KEY = 'bena.consent.v1';
 const CONSENT_VERSION = 1;
@@ -58,6 +60,11 @@ function readConsent(): ConsentRecord | null {
 export function ConsentProvider({ children }: { children: ReactNode }) {
   const [consent, setConsent] = useState<ConsentRecord | null>(() => readConsent());
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+
+  useEffect(() => {
+    setAnalyticsEnabled(consent?.categories.analytics ?? false);
+    return () => setAnalyticsEnabled(false);
+  }, [consent]);
 
   const saveConsent = useCallback(
     (categories: Pick<ConsentCategories, 'analytics' | 'marketing'>) => {

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/cn';
 import { BRAND } from '@/config';
-import logoUrl from '@/assets/logo.webp';
+import logoUrl from '@/assets/logo_new.png';
 
 /**
- * The supplied logo is shown untouched on a white background.
- * Its own wording ("BeNa SheGrows Coffee") differs from the store name
- * ("BeNa Origins"); the naming decision is flagged in the deliverables.
+ * The current logo is shown untouched on a white background.
+ * Its artwork wording may differ from the store name ("BeNa Origins");
+ * the naming decision is flagged in the deliverables.
  */
 export function BrandLogo({ className }: { className?: string }) {
   return (
@@ -18,9 +18,9 @@ export function BrandLogo({ className }: { className?: string }) {
       <img
         src={logoUrl}
         alt=""
-        width={37}
+        width={40}
         height={40}
-        className="h-9 w-auto object-contain sm:h-10"
+        className="h-9 w-9 object-contain sm:h-10 sm:w-10"
         loading="eager"
       />
     </Link>

@@ -9,22 +9,16 @@ import { usePrefersReducedMotion } from '@/hooks/useMediaQuery';
 import { useMarket } from '@/context/MarketContext';
 import { useProducts } from '@/hooks/useCatalog';
 import { formatMoney } from '@/lib/money';
-import { getDefaultVariant, getPrimaryImage } from '@/lib/product';
+import { getAvailability, getDefaultVariant, getPrimaryImage } from '@/lib/product';
 import { stripHtml } from '@/lib/sanitize';
 import type { Product } from '@/types';
 import { HERO_FALLBACK_IMAGES, HERO_SLIDES, type HeroCarouselSlide } from './slides';
 
 const AUTOPLAY_MS = 7000;
 const SWIPE_THRESHOLD = 40;
-const HERO_PRIORITY_HANDLES = ['coming-soon-8'];
-
 function isExcludedFromHero(product: Product): boolean {
-  return /sosoma/i.test(`${product.handle} ${product.title}`);
-}
-
-function heroPriority(product: Product): number {
-  const index = HERO_PRIORITY_HANDLES.indexOf(product.handle);
-  return index === -1 ? HERO_PRIORITY_HANDLES.length : index;
+  const text = `${product.handle} ${product.title}`;
+  return /sosoma/i.test(text) || getAvailability(product) !== 'available';
 }
 
 const controlButton =
@@ -38,7 +32,6 @@ const controlMotion = {
 function productSlides(products: Product[], t: (key: string, options?: Record<string, unknown>) => string, locale: string): HeroCarouselSlide[] {
   return products
     .filter((product) => !isExcludedFromHero(product))
-    .sort((a, b) => heroPriority(a) - heroPriority(b))
     .filter((product) => {
       const url = getPrimaryImage(product)?.url;
       return Boolean(url) && !url?.includes('fixtures.invalid');

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { StorefrontSocketBridge } from '@/app/StorefrontSocketBridge';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { CartDrawer } from '@/components/commerce/CartDrawer';
 import { PageTransition } from '@/components/motion/PageTransition';
 import { ScrollProgress } from '@/components/motion/ScrollProgress';
@@ -20,6 +21,16 @@ function ScrollToTop() {
   return null;
 }
 
+/** Page views only enter the analytics sink after explicit consent. */
+function AnalyticsPageView() {
+  const { pathname } = useLocation();
+  const track = useAnalytics();
+  useEffect(() => {
+    track('page_view', { path: pathname });
+  }, [pathname, track]);
+  return null;
+}
+
 export function RootLayout() {
   const { t } = useTranslation();
 
@@ -28,6 +39,7 @@ export function RootLayout() {
       <ScrollProgress />
       <OpeningScreen />
       <ScrollToTop />
+      <AnalyticsPageView />
       <StorefrontSocketBridge />
 
       <div className="relative z-10 flex flex-1 flex-col">

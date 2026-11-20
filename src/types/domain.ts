@@ -515,3 +515,59 @@ export interface ReviewProviderAssessment {
   checkedAt: string;
   dataSource: DataSource;
 }
+
+/** Electronic withdrawal request (audit #1). No legal conclusion is implied. */
+export interface WithdrawalSubmission {
+  orderNumber: string;
+  email: string;
+  fullName: string;
+  countryCode?: string;
+  orderedOn?: string;
+  itemDescription?: string;
+  reason?: string;
+  /** Shopper confirms the declaration shown next to the submit button. */
+  declaration: true;
+  language?: string;
+}
+
+export interface WithdrawalResult {
+  reference: string;
+  status: 'received' | 'simulated';
+  provider: string;
+  receivedAt: string;
+  message: string;
+  simulated: boolean;
+}
+
+/** Genuine review data from a configured provider (audit #19). */
+export interface ProductReview {
+  id: string;
+  author: string;
+  rating: number;
+  title?: string;
+  body: string;
+  createdAt: string;
+  verifiedPurchase?: boolean;
+}
+
+export interface ProductReviewsResult {
+  handle: string;
+  status: 'available' | 'not_configured' | 'unavailable';
+  source: string | null;
+  reviews: ProductReview[];
+  summary: { count: number; averageRating: number | null };
+  simulated: boolean;
+  message: string;
+  checkedAt: string;
+}
+
+/** Facets derived from catalog data for the storefront (audit #20). */
+export interface CatalogFacets {
+  categories: Array<{ value: string; label: string; count: number }>;
+  brands: Array<{ value: string; label: string; count: number }>;
+  dietary: Array<{ value: string; label: string; count: number }>;
+  origins: Array<{ value: string; label: string; count: number }>;
+  scannedProducts: number;
+  truncated: boolean;
+  checkedAt: string;
+}

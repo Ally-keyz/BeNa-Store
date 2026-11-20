@@ -6,13 +6,14 @@ import { BRAND } from '@/config';
 import { cn } from '@/lib/cn';
 import { pageContainer } from '@/lib/layout';
 import { useCart } from '@/context/CartContext';
-import logoUrl from '@/assets/logo.webp';
+import logoUrl from '@/assets/logo_new.png';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileNav } from './MobileNav';
 import { LanguageSwitch } from './LanguageSwitch';
+import { RegionSelector } from './RegionSelector';
 
 const DESKTOP_LINKS = [
   { href: '/', labelKey: 'nav.home', end: true },
@@ -33,9 +34,8 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
 }
 
 /**
- * The logo artwork is a full lock-up with baked-in lettering, which turns to
- * mush at navbar size. The tile shows only the emblem (woman, coffee branch,
- * hills) and pairs it with a crisp typographic wordmark instead.
+ * The current logo is a square image. It is shown in full beside a crisp
+ * typographic wordmark so the artwork stays legible at navbar size.
  */
 function BrandMark() {
   return (
@@ -44,13 +44,13 @@ function BrandMark() {
       aria-label={`${BRAND.name} — home`}
       className="group inline-flex items-center gap-2.5 rounded-full focus-visible:outline-offset-4 sm:gap-3"
     >
-      <span className="relative block h-11 w-14 shrink-0 overflow-hidden bg-white  transition-shadow duration-300 ">
+      <span className="relative block h-11 w-11 shrink-0 overflow-hidden bg-white transition-shadow duration-300">
         <img
           src={logoUrl}
           alt=""
-          width={56}
+          width={44}
           height={44}
-          className="absolute left-1/2 top-0 h-[92px] w-auto max-w-none -translate-x-1/2"
+          className="h-full w-full object-contain"
           loading="eager"
         />
       </span>
@@ -109,7 +109,7 @@ export function Header() {
 
           <nav
             aria-label={t('a11y.mainNav')}
-            className="hidden lg:flex lg:flex-1 lg:justify-center xl:absolute xl:left-1/2 xl:top-1/2 xl:flex-none xl:-translate-x-1/2 xl:-translate-y-1/2"
+            className="hidden lg:flex lg:flex-1 lg:justify-center"
           >
             <ul className="flex items-center gap-0.5 rounded-full p-1">
               {DESKTOP_LINKS.map((link) => (
@@ -141,6 +141,7 @@ export function Header() {
 
             <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitch className="hidden sm:inline-flex" />
+            <RegionSelector className="hidden xl:inline-flex" />
 
             <button
               type="button"

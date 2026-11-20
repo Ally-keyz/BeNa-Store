@@ -513,3 +513,61 @@ export interface ReviewProviderAssessment {
   checkedAt: string;
   dataSource: DataSource;
 }
+
+export interface WithdrawalSubmission {
+  orderNumber: string;
+  email: string;
+  fullName: string;
+  countryCode?: string;
+  orderedOn?: string;
+  itemDescription?: string;
+  reason?: string;
+  declaration: true;
+  language?: string;
+}
+
+export interface WithdrawalResult {
+  reference: string;
+  status: 'received' | 'simulated';
+  provider: string;
+  receivedAt: string;
+  message: string;
+  simulated: boolean;
+}
+
+export interface ProductReview {
+  id: string;
+  author: string;
+  rating: number;
+  title?: string;
+  body: string;
+  createdAt: string;
+  verifiedPurchase?: boolean;
+}
+
+export interface ProductReviewsResult {
+  handle: string;
+  status: 'available' | 'not_configured' | 'unavailable';
+  source: string | null;
+  reviews: ProductReview[];
+  summary: { count: number; averageRating: number | null };
+  simulated: boolean;
+  message: string;
+  checkedAt: string;
+}
+
+export interface CatalogFacetValue {
+  value: string;
+  label: string;
+  count: number;
+}
+
+export interface CatalogFacets {
+  categories: CatalogFacetValue[];
+  brands: CatalogFacetValue[];
+  dietary: CatalogFacetValue[];
+  origins: CatalogFacetValue[];
+  scannedProducts: number;
+  truncated: boolean;
+  checkedAt: string;
+}

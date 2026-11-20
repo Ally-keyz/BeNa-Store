@@ -13,6 +13,10 @@ import type {
   Cart,
   RobotsData,
   SitemapData,
+  CatalogFacets,
+  ProductReviewsResult,
+  WithdrawalResult,
+  WithdrawalSubmission,
 } from '@/types';
 import type { AuthSessionStatus } from '@/types/auth';
 import type { ShippingInfo } from '@/types/audit';
@@ -236,6 +240,33 @@ export function getShipping(
 
 export function getPolicies(): Promise<ApiResult<PolicyBundle>> {
   return apiRequest<PolicyBundle>('/policies');
+}
+
+export function getCatalogFacets(
+  params: MarketParams & { refresh?: boolean } = {},
+  options?: Pick<RequestOptions, 'signal'>,
+): Promise<ApiResult<CatalogFacets>> {
+  return apiRequest<CatalogFacets>('/catalog/facets', {
+    query: { country: params.country, language: params.language, refresh: params.refresh },
+    signal: options?.signal,
+  });
+}
+
+export function getProductReviews(
+  handle: string,
+  params: MarketParams & { refresh?: boolean } = {},
+  options?: Pick<RequestOptions, 'signal'>,
+): Promise<ApiResult<ProductReviewsResult>> {
+  return apiRequest<ProductReviewsResult>(`/reviews/product/${enc(handle)}`, {
+    query: { country: params.country, language: params.language, refresh: params.refresh },
+    signal: options?.signal,
+  });
+}
+
+export function submitWithdrawal(
+  input: WithdrawalSubmission,
+): Promise<ApiResult<WithdrawalResult>> {
+  return apiRequest<WithdrawalResult>('/withdrawals', { method: 'POST', body: input });
 }
 
 export function subscribeNewsletter(input: {
