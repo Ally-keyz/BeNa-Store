@@ -207,8 +207,9 @@ ${existing}
 
 Rules:
 - Treat the product title and description as the primary evidence. If the description explicitly states an ingredient or allergen, extract it exactly instead of guessing.
+- Copy values after labels such as "Ingredients:", "Allergen:" or "Allergen information:" from the description when present.
 - Suggest values only from what is plausible for this type of product. Do not invent brands or batch codes.
-- For allergens, list major allergens plausibly present (milk, eggs, fish, shellfish, peanuts, tree nuts, gluten, soy, sesame, sulphites).
+- For allergens, list major allergens plausibly present (milk, eggs, fish, shellfish, peanuts, tree nuts, gluten, mustard, celery, soy, sesame, sulphites).
 - When no reliable value can be inferred, set "value" to null. Never use placeholder words such as "unspecified", "unknown", "n/a", "none" or "not provided".
 - confidence must be a number between 0 and 1.
 - rationale must be one short sentence.
