@@ -35,26 +35,30 @@ function AddressesPanel() {
       <h2 className="text-lg font-semibold text-ink">{t('account.addressesTitle')}</h2>
       <p className="mt-1 text-[13px] leading-6 text-neutral-600">{t('account.addressesBody')}</p>
       {addresses.length === 0 ? (
-        <p className="mt-5 rounded-card border border-terra-100 bg-terra-50/70 p-6 text-[14px] text-neutral-600">
+        <p className="mt-5 break-words rounded-card border border-terra-100 bg-terra-50/70 p-4 text-[14px] text-neutral-600 sm:p-6">
           {t('account.addressesEmpty')}
         </p>
       ) : (
         <ul className="mt-5 grid gap-4 sm:grid-cols-2">
           {addresses.map((address) => (
-            <li key={address.id} className="rounded-card border border-terra-100 bg-surface p-5 sm:p-6">
-              <div className="flex items-start justify-between gap-3">
-                <p className="font-medium text-ink">{address.name || t('account.addressesTitle')}</p>
+            <li key={address.id} className="min-w-0 rounded-card border border-terra-100 bg-surface p-4 sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <p className="min-w-0 break-words font-medium text-ink">
+                  {address.name || t('account.addressesTitle')}
+                </p>
                 {address.id === defaultAddressId ? (
                   <Badge tone="neutral">{t('account.defaultBadge')}</Badge>
                 ) : null}
               </div>
-              <address className="mt-3 space-y-0.5 text-[13px] not-italic leading-6 text-neutral-600">
+              <address className="mt-3 min-w-0 space-y-0.5 break-words text-[13px] not-italic leading-6 text-neutral-600">
                 {address.formatted.filter(Boolean).map((line, index) => (
-                  <p key={`${address.id}-${index}`}>{line}</p>
+                  <p key={`${address.id}-${index}`} className="break-words">
+                    {line}
+                  </p>
                 ))}
               </address>
               {address.phoneNumber ? (
-                <p className="mt-3 text-[13px] text-neutral-600">{address.phoneNumber}</p>
+                <p className="mt-3 break-words text-[13px] text-neutral-600">{address.phoneNumber}</p>
               ) : null}
             </li>
           ))}
@@ -66,7 +70,7 @@ function AddressesPanel() {
         onLoadMore={() => void query.fetchNextPage()}
         label={t('catalog.loadMore')}
         loadingLabel={t('common.loading')}
-        className="mt-8 flex justify-center"
+        className="mt-8 flex flex-wrap justify-center gap-2"
       />
     </section>
   );
@@ -95,8 +99,8 @@ export function AddressesPage() {
           label={t('a11y.breadcrumb')}
           className="pt-6"
         />
-        <div className={`${sectionSpacing} pt-8 sm:pt-10`}>
-          <h1 className="text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight">
+        <div className={`${sectionSpacing} pt-6 sm:pt-10`}>
+          <h1 className="break-words text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight">
             {t('account.addressesTitle')}
           </h1>
           <div className="mt-8 max-w-[860px]">

@@ -33,9 +33,9 @@ export function CollectionCard({ collection, priority = false }: CollectionCardP
       </div>
       <div className="mt-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-[15px] font-medium text-ink">{collection.title}</h3>
+          <h3 className="break-words text-[15px] font-medium text-ink">{collection.title}</h3>
           {description ? (
-            <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-neutral-600">{description}</p>
+            <p className="mt-1 line-clamp-2 break-words text-[13px] leading-5 text-neutral-600">{description}</p>
           ) : null}
         </div>
         <ArrowUpRight

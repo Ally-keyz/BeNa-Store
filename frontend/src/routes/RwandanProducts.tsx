@@ -4,7 +4,7 @@ import { HeroCarousel } from '@/features/home/HeroCarousel';
 import { FeaturedProducts } from '@/features/home/FeaturedProducts';
 import { useCollection } from '@/hooks/useCatalog';
 import { useMarket } from '@/context/MarketContext';
-import { heroContainer, pageContainer } from '@/lib/layout';
+import { pageContainer } from '@/lib/layout';
 
 const HERO_CATEGORIES = ['coffee', 'food', 'crafts'] as const;
 
@@ -43,7 +43,7 @@ export function RwandanProductsPage() {
         }}
       />
 
-      <div className={heroContainer}>
+      <div className="mx-auto w-full max-w-6xl sm:px-6 lg:px-8">
         <div className="pt-4 sm:pt-6">
           <HeroCarousel products={heroProducts} />
         </div>

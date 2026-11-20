@@ -71,10 +71,13 @@ export function AccountGate({ children, returnTo }: AccountGateProps) {
 
   if (isError) {
     return (
-      <div role="alert" className="rounded-card border border-terra-100 bg-terra-50 p-6">
-        <p className="font-medium text-ink">{t('account.sessionErrorTitle')}</p>
-        <p className="mt-1 text-[13px] leading-6 text-neutral-600">{t('account.sessionErrorBody')}</p>
-        <Link to="/catalog" className={`${buttonVariants({ variant: 'secondary', size: 'sm' })} mt-4`}>
+      <div role="alert" className="rounded-card border border-terra-100 bg-terra-50 p-4 sm:p-6">
+        <p className="break-words font-medium text-ink">{t('account.sessionErrorTitle')}</p>
+        <p className="mt-1 break-words text-[13px] leading-6 text-neutral-600">{t('account.sessionErrorBody')}</p>
+        <Link
+          to="/catalog"
+          className={`${buttonVariants({ variant: 'secondary', size: 'sm' })} mt-4 min-h-11 sm:min-h-9`}
+        >
           {t('account.guestCheckout')}
         </Link>
       </div>
@@ -83,13 +86,13 @@ export function AccountGate({ children, returnTo }: AccountGateProps) {
 
   if (!enabled) {
     return (
-      <div className="rounded-card border border-terra-100 bg-terra-50 p-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-terra-700">
+      <div className="rounded-card border border-terra-100 bg-terra-50 p-4 sm:p-6">
+        <p className="break-words text-[11px] font-semibold uppercase tracking-[0.16em] text-terra-700">
           {t('errors.FEATURE_DISABLED')}
         </p>
-        <p className="mt-2 text-lg font-semibold text-ink">{t('account.disabledTitle')}</p>
-        <p className="mt-1 text-[13px] leading-6 text-neutral-600">{t('account.disabledBody')}</p>
-        <Link to="/catalog" className={`${buttonVariants({ size: 'sm' })} mt-5`}>
+        <p className="mt-2 break-words text-lg font-semibold text-ink">{t('account.disabledTitle')}</p>
+        <p className="mt-1 break-words text-[13px] leading-6 text-neutral-600">{t('account.disabledBody')}</p>
+        <Link to="/catalog" className={`${buttonVariants({ size: 'sm' })} mt-5 min-h-11 sm:min-h-9`}>
           {t('account.guestCheckout')}
         </Link>
       </div>
@@ -98,13 +101,13 @@ export function AccountGate({ children, returnTo }: AccountGateProps) {
 
   if (!authenticated) {
     return (
-      <div className="mx-auto max-w-xl rounded-card border border-terra-100 bg-terra-50 p-6 text-center sm:p-8">
-        <h2 className="text-xl font-semibold">{t('account.signInTitle')}</h2>
-        <p className="mt-2 text-[13px] leading-6 text-neutral-600">{t('account.signInBody')}</p>
-        <a href={loginUrl} className={`${buttonVariants({ size: 'sm' })} mt-5`}>
+      <div className="mx-auto max-w-xl rounded-card border border-terra-100 bg-terra-50 p-4 text-center sm:p-8">
+        <h2 className="break-words text-xl font-semibold">{t('account.signInTitle')}</h2>
+        <p className="mt-2 break-words text-[13px] leading-6 text-neutral-600">{t('account.signInBody')}</p>
+        <a href={loginUrl} className={`${buttonVariants({ size: 'sm' })} mt-5 min-h-11 sm:min-h-9`}>
           {t('account.signInAction')}
         </a>
-        <p className="mt-4 text-[12px] text-neutral-600">{t('account.cartNote')}</p>
+        <p className="mt-4 break-words text-[12px] text-neutral-600">{t('account.cartNote')}</p>
       </div>
     );
   }
@@ -112,14 +115,20 @@ export function AccountGate({ children, returnTo }: AccountGateProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-terra-100 pb-5">
-        <div className="text-[13px] text-neutral-600">
+        <div className="min-w-0 break-words text-[13px] text-neutral-600">
           {customer?.displayName || customer?.email ? (
             <span className="font-medium text-ink">{customer?.displayName || customer?.email}</span>
           ) : (
             <span>{t('account.title')}</span>
           )}
         </div>
-        <Button variant="secondary" size="sm" onClick={() => void onLogout()} loading={loggingOut}>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="min-h-11 shrink-0 sm:min-h-9"
+          onClick={() => void onLogout()}
+          loading={loggingOut}
+        >
           {t('account.logout')}
         </Button>
       </div>

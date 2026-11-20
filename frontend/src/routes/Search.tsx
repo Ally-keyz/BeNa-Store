@@ -51,7 +51,7 @@ export function SearchPage() {
           className="pt-6"
         />
         <div className={`${sectionSpacing} pt-8 sm:pt-10`}>
-          <h1 className="text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight">
+          <h1 className="break-words text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight [overflow-wrap:anywhere]">
             {queryText ? t('search.resultsFor', { query: queryText }) : t('search.promptTitle')}
           </h1>
           <form onSubmit={onSubmit} className="mt-6 flex max-w-xl flex-col gap-3 sm:flex-row sm:items-end">
@@ -80,7 +80,7 @@ export function SearchPage() {
                 onRetry={() => void query.refetch()}
               />
             ) : products.length === 0 && !query.isLoading ? (
-              <div className="rounded-card bg-terra-50 p-8">
+              <div className="rounded-card bg-terra-50 p-6 sm:p-8">
                 <p className="font-medium text-ink">{t('search.emptyTitle')}</p>
                 <p className="mt-1 text-[13px] text-neutral-600">{t('search.emptyBody')}</p>
               </div>

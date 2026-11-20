@@ -20,7 +20,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
     <div className={cn('w-full', className)}>
       <label
         htmlFor={inputId}
-        className="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg py-1.5 text-sm text-ink"
+        className="flex min-h-11 min-w-0 cursor-pointer items-start gap-3 rounded-lg py-1.5 text-sm text-ink"
       >
         <input
           ref={ref}
@@ -31,17 +31,17 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-terra-300 accent-brand"
           {...rest}
         />
-        <span className="flex-1">
-          <span className="block leading-6">{label}</span>
+        <span className="min-w-0 flex-1 break-words hyphens-auto">
+          <span className="block break-words leading-6">{label}</span>
           {description ? (
-            <span id={descriptionId} className="mt-0.5 block text-[13px] leading-5 text-neutral-600">
+            <span id={descriptionId} className="mt-0.5 block break-words text-[13px] leading-5 text-neutral-600">
               {description}
             </span>
           ) : null}
         </span>
       </label>
       {error ? (
-        <p id={errorId} className="mt-1 text-[13px] font-medium text-terra-700">
+        <p id={errorId} className="mt-1 break-words text-[13px] font-medium text-terra-700">
           {error}
         </p>
       ) : null}

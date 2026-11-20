@@ -54,10 +54,10 @@ export function CollectionPage() {
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
               {t('collections.eyebrow')}
             </p>
-            <h1 className="mt-2 text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight">{title}</h1>
+            <h1 className="mt-2 break-words text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight [overflow-wrap:anywhere]">{title}</h1>
             {collection?.description ? (
               <div
-                className="mt-3 text-[15px] leading-7 text-neutral-600"
+                className="mt-3 max-w-full overflow-x-auto text-[15px] leading-7 text-neutral-600"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(collection.description) }}
               />
             ) : (
@@ -79,7 +79,7 @@ export function CollectionPage() {
                 onRetry={() => void query.refetch()}
               />
             ) : products.length === 0 && !query.isLoading ? (
-              <div className="rounded-card bg-terra-50 p-8">
+              <div className="rounded-card bg-terra-50 p-6 sm:p-8">
                 <p className="font-medium text-ink">{t('collection.emptyTitle')}</p>
                 <p className="mt-1 text-[13px] text-neutral-600">{t('collection.emptyBody')}</p>
               </div>

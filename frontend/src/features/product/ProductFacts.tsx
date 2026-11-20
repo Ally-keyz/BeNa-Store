@@ -15,7 +15,7 @@ function FactRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1 border-b border-terra-100 py-2 last:border-0 sm:grid-cols-[140px_1fr]">
       <dt className="text-[12px] font-medium text-ink">{label}</dt>
-      <dd className="whitespace-pre-line text-[12px] leading-5 text-neutral-600">{value}</dd>
+      <dd className="break-words whitespace-pre-line text-[12px] leading-5 text-neutral-600">{value}</dd>
     </div>
   );
 }
@@ -203,7 +203,7 @@ export function ProductFacts({ product }: ProductFactsProps) {
       defaultOpen: true,
       content: descriptionHtml ? (
         <div
-          className="prose-body text-[14px] leading-7 text-neutral-600"
+          className="prose-body max-w-full overflow-x-auto text-[14px] leading-7 text-neutral-600"
           dangerouslySetInnerHTML={{ __html: descriptionHtml }}
         />
       ) : (

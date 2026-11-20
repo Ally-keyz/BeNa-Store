@@ -2,14 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#ff7034" />
     <script>
       (function () {
         try {
           var stored = localStorage.getItem('bena.theme');
-          var mode = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+          var mode = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'light';
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var dark = mode === 'dark' || (mode === 'system' && prefersDark);
           if (dark) document.documentElement.classList.add('dark');

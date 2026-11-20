@@ -46,7 +46,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
       <div className="grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
         {images.length > 1 ? (
           <div
-            className="order-2 flex gap-2 overflow-x-auto pb-1 sm:order-1 sm:max-h-[min(64vh,580px)] sm:flex-col sm:overflow-x-hidden sm:overflow-y-auto sm:pb-0"
+            className="order-2 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 sm:order-1 sm:max-h-[min(64vh,580px)] sm:flex-col sm:snap-none sm:overflow-x-hidden sm:overflow-y-auto sm:pb-0"
             role="group"
             aria-label={product.title}
           >
@@ -58,13 +58,13 @@ export function ProductGallery({ product }: ProductGalleryProps) {
                 aria-label={labelFor(index)}
                 aria-pressed={active === index}
                 className={cn(
-                  'h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-terra-50 transition-all',
+                  'h-16 w-16 shrink-0 snap-start overflow-hidden rounded-xl bg-terra-50 transition-all',
                   active === index
                     ? 'ring-2 ring-brand ring-offset-2'
                     : 'opacity-70 hover:opacity-100',
                 )}
               >
-                <ProductImage image={image} alt="" sizes="64px" />
+                <ProductImage image={image} alt="" sizes="64px" className="h-full w-full object-contain p-1" />
               </button>
             ))}
           </div>
@@ -76,7 +76,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
           type="button"
           onClick={openLightbox}
           aria-label={t('productInfo.openImage', { number: active + 1 })}
-          className="group relative order-1 flex h-[min(64vh,580px)] w-full items-center justify-center overflow-hidden rounded-2xl bg-terra-50 sm:order-2"
+          className="group relative order-1 flex h-[min(44dvh,420px)] w-full items-center justify-center overflow-hidden rounded-2xl bg-terra-50 p-3 sm:order-2 sm:h-[min(64vh,580px)] sm:p-4"
         >
           {activeImage ? (
             <ProductImage
@@ -84,6 +84,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
               alt={activeImage.altText || labelFor(active)}
               sizes="(min-width: 1024px) 55vw, 100vw"
               priority
+              className="h-full w-full object-contain"
             />
           ) : (
             <PlaceholderImage label={t('hero.placeholderLabel')} />

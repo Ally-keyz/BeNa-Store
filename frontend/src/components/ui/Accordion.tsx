@@ -48,9 +48,9 @@ export function Accordion({ items, allowMultiple = false, className }: Accordion
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggle(item.id)}
-                className="flex w-full items-center justify-between gap-4 py-4 text-left text-[15px] font-medium text-ink transition-colors hover:text-terra-700"
+                className="flex min-h-11 w-full items-center justify-between gap-3 py-4 text-left text-[15px] font-medium text-ink transition-colors hover:text-terra-700"
               >
-                {item.title}
+                <span className="min-w-0 break-words hyphens-auto">{item.title}</span>
                 <ChevronDown
                   aria-hidden="true"
                   className={cn(
@@ -65,7 +65,7 @@ export function Accordion({ items, allowMultiple = false, className }: Accordion
               role="region"
               aria-labelledby={buttonId}
               hidden={!isOpen}
-              className="pb-5 pr-6 text-sm leading-6 text-neutral-700"
+              className="min-w-0 break-words pb-5 pr-4 text-sm leading-6 text-neutral-700 hyphens-auto [&_a]:break-all"
             >
               {item.content}
             </div>

@@ -26,7 +26,7 @@ export function SocialStrip() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${label} — ${t('a11y.externalLink')}`}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-terra-200 text-terra-800 transition-colors hover:border-terra-900 hover:bg-terra-50"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-terra-200 text-terra-800 transition-colors hover:border-terra-900 hover:bg-terra-50 sm:h-9 sm:w-9"
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </a>

@@ -14,19 +14,28 @@ export interface CartSummaryProps {
   compact?: boolean;
 }
 
-/** Order review and Shopify-hosted checkout handoff. No payment form is rendered. */
-export function CartSummary({ cart, compact = false }: CartSummaryProps) {
-  const { t } = useTranslation();
+export function useCartSummary(cart: Cart) {
   const { formatLocale } = useMarket();
-  const { applyDiscount, isUpdating } = useCart();
-  const { toast } = useToast();
-  const [code, setCode] = useState('');
-
   const subtotal = formatMoney(cart.cost.subtotalAmount, { locale: formatLocale });
   const canCheckout =
     cart.lines.length > 0 &&
     cart.checkout.hostedBy === 'shopify' &&
     Boolean(cart.checkoutUrl);
+
+  const onCheckout = () => {
+    if (canCheckout) window.location.assign(cart.checkoutUrl);
+  };
+
+  return { subtotal, canCheckout, onCheckout };
+}
+
+/** Order review and Shopify-hosted checkout handoff. No payment form is rendered. */
+export function CartSummary({ cart, compact = false }: CartSummaryProps) {
+  const { t } = useTranslation();
+  const { applyDiscount, isUpdating } = useCart();
+  const { toast } = useToast();
+  const [code, setCode] = useState('');
+  const { subtotal, canCheckout, onCheckout } = useCartSummary(cart);
 
   const onDiscount = async (event: FormEvent) => {
     event.preventDefault();
@@ -39,11 +48,6 @@ export function CartSummary({ cart, compact = false }: CartSummaryProps) {
     } catch {
       toast({ title: t('cart.discountError'), variant: 'error' });
     }
-  };
-
-  const onCheckout = () => {
-    // The URL comes from the backend cart response. Never construct it here.
-    if (canCheckout) window.location.assign(cart.checkoutUrl);
   };
 
   return (

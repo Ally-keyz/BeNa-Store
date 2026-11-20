@@ -23,8 +23,14 @@ export function Pagination({
 }: PaginationProps) {
   if (!hasNextPage) return null;
   return (
-    <div className={className ?? 'mt-10 flex justify-center'}>
-      <Button variant="secondary" onClick={onLoadMore} loading={loading} aria-live="polite">
+    <div className={className ?? 'mt-10 flex flex-wrap justify-center gap-2'}>
+      <Button
+        variant="secondary"
+        className="max-w-full break-words"
+        onClick={onLoadMore}
+        loading={loading}
+        aria-live="polite"
+      >
         {loading ? loadingLabel : label}
       </Button>
     </div>

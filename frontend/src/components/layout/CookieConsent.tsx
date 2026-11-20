@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Cookie } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -17,6 +17,7 @@ import { Dialog } from '@/components/ui/Dialog';
  */
 export function CookieConsent() {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   const { toast } = useToast();
   const {
     hasDecided,
@@ -31,6 +32,7 @@ export function CookieConsent() {
 
   const [draftAnalytics, setDraftAnalytics] = useState(analytics);
   const [draftMarketing, setDraftMarketing] = useState(marketing);
+  const hasMobileActionBar = pathname === '/cart' || pathname.startsWith('/products/');
 
   useEffect(() => {
     if (!isPreferencesOpen) return;
@@ -58,7 +60,12 @@ export function CookieConsent() {
       {!hasDecided && !isPreferencesOpen ? (
         <section
           aria-label={t('cookie.title')}
-          className="fixed inset-x-0 bottom-0 z-[70] p-3 sm:p-4"
+          className={cn(
+            'fixed inset-x-0 z-[70] p-3 sm:p-4 lg:bottom-[env(safe-area-inset-bottom)]',
+            hasMobileActionBar
+              ? 'bottom-[calc(9rem+env(safe-area-inset-bottom))]'
+              : 'bottom-[calc(4.5rem+env(safe-area-inset-bottom))]',
+          )}
         >
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 rounded-2xl border border-terra-100 bg-surface p-4 sm:p-5">
             <div className="flex items-start gap-3">

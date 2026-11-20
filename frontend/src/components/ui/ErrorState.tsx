@@ -16,17 +16,22 @@ export function ErrorState({ title, body, retryLabel, onRetry, className }: Erro
     <div
       role="alert"
       className={cn(
-        'rounded-card border border-terra-100 bg-terra-50/70 p-6 sm:p-8',
+        'rounded-card border border-terra-100 bg-terra-50/70 p-4 sm:p-8',
         className,
       )}
     >
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-terra-700" aria-hidden="true" />
-        <div>
+        <div className="min-w-0 break-words">
           <p className="font-medium text-ink">{title}</p>
-          {body ? <p className="mt-1 text-sm text-neutral-600">{body}</p> : null}
+          {body ? <p className="mt-1 break-words text-sm text-neutral-600">{body}</p> : null}
           {retryLabel && onRetry ? (
-            <Button variant="secondary" size="sm" className="mt-4" onClick={onRetry}>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="mt-4 min-h-11 max-w-full break-words sm:min-h-9"
+              onClick={onRetry}
+            >
               {retryLabel}
             </Button>
           ) : null}

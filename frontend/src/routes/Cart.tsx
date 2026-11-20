@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { Cart } from '@/types';
 import { PageSeo } from '@/features/seo/PageSeo';
 import { CartLines } from '@/components/commerce/CartLines';
-import { CartSummary } from '@/components/commerce/CartSummary';
+import { CartSummary, useCartSummary } from '@/components/commerce/CartSummary';
 import { useShipping } from '@/hooks/useContent';
 import { useCart } from '@/context/CartContext';
 import { useMarket } from '@/context/MarketContext';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { buttonVariants } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { pageContainer, sectionSpacing } from '@/lib/layout';
 
@@ -20,6 +21,33 @@ import { pageContainer, sectionSpacing } from '@/lib/layout';
 const unify =
   '[&_button]:rounded-full [&_a]:rounded-full ' +
   '[&_input]:rounded-2xl [&_div.rounded-full]:rounded-2xl [&_img]:rounded-2xl';
+
+function MobileCheckoutBar({ cart }: { cart: Cart }) {
+  const { t } = useTranslation();
+  const { subtotal, canCheckout, onCheckout } = useCartSummary(cart);
+
+  return (
+    <div className="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-[60] border-t border-terra-100 bg-surface/95 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur lg:hidden">
+      <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-neutral-500">
+            {t('cart.subtotal')}
+          </p>
+          <p className="tabular truncate text-lg font-semibold text-ink">{subtotal}</p>
+        </div>
+        <Button
+          size="md"
+          onClick={onCheckout}
+          disabled={!canCheckout}
+          data-testid="mobile-checkout"
+          className="shrink-0"
+        >
+          {t('cart.checkout')}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function CartPage() {
   const { t } = useTranslation();
@@ -42,7 +70,7 @@ export function CartPage() {
         }}
       />
 
-      <div className={pageContainer}>
+      <div className={`${pageContainer} pb-40 lg:pb-0`}>
         <Breadcrumbs
           items={[{ label: t('nav.home'), href: '/' }, { label: t('cart.title') }]}
           label={t('a11y.breadcrumb')}
@@ -91,7 +119,7 @@ export function CartPage() {
                 </div>
 
                 <aside className="space-y-6 lg:sticky lg:top-24">
-                  <div className="rounded-2xl border border-neutral-200 bg-surface p-5">
+                  <div className="rounded-2xl border border-neutral-200 bg-surface p-4 sm:p-5">
                     <CartSummary cart={cart} />
                   </div>
 
@@ -107,6 +135,8 @@ export function CartPage() {
           )}
         </div>
       </div>
+
+      {cart && cart.lines.length > 0 ? <MobileCheckoutBar cart={cart} /> : null}
     </>
   );
 }

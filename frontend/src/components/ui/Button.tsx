@@ -18,7 +18,7 @@ export function buttonVariants({
   fullWidth = false,
 }: ButtonVariantOptions = {}): string {
   return cn(
-    'inline-flex items-center justify-center gap-2 rounded-full font-medium',
+    'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full font-medium',
     'transition-colors duration-200 ease-out',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
     'disabled:pointer-events-none disabled:opacity-50',

@@ -40,7 +40,7 @@ export function Dialog({
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[80] flex items-end justify-center p-4 sm:items-center">
+    <div className="fixed inset-0 z-[80] flex items-end justify-center p-4 pb-[calc(1rem_+_env(safe-area-inset-bottom))] pt-[calc(1rem_+_env(safe-area-inset-top))] sm:items-center">
       <div
         className="animate-fade-in absolute inset-0 bg-night/50"
         onClick={stableClose}
@@ -53,7 +53,7 @@ export function Dialog({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         className={cn(
-          'animate-dialog-in relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-surface p-6 sm:p-8',
+          'animate-dialog-in relative z-10 max-h-[calc(90dvh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] w-full max-w-lg overflow-y-auto rounded-2xl bg-surface p-6 sm:p-8',
           className,
         )}
       >
@@ -71,7 +71,7 @@ export function Dialog({
           <button
             type="button"
             onClick={stableClose}
-            className="-m-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-terra-50 hover:text-ink"
+            className="-m-2 inline-flex h-11 w-11 items-center justify-center rounded-full text-neutral-600 hover:bg-terra-50 hover:text-ink"
             aria-label={closeLabel}
           >
             <X className="h-4 w-4" aria-hidden="true" />

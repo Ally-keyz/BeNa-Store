@@ -18,28 +18,32 @@ export function Breadcrumbs({ items, label = 'Breadcrumb', className }: Breadcru
       aria-label={label}
       className={cn(
         'text-[13px] text-neutral-600',
-        // The breadcrumb is the page indicator: keep only a hairline of space
-        // between it and whatever section follows on every page.
-        '[&+*]:!pt-[3px]',
+        '[&+*]:!pt-4 sm:[&+*]:!pt-6',
         className,
       )}
     >
-      <ol className="flex flex-wrap items-center gap-1.5">
+      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
-            <li key={`${item.label}-${index}`} className="flex items-center gap-1.5">
+            <li key={`${item.label}-${index}`} className="flex min-w-0 items-center gap-1.5">
               {index > 0 ? (
                 <span aria-hidden="true" className="text-neutral-400">
                   /
                 </span>
               ) : null}
               {item.href && !isLast ? (
-                <Link to={item.href} className="rounded-sm hover:text-ink hover:underline">
+                <Link
+                  to={item.href}
+                  className="inline-flex min-h-11 items-center rounded-sm break-words hover:text-ink hover:underline"
+                >
                   {item.label}
                 </Link>
               ) : (
-                <span aria-current={isLast ? 'page' : undefined} className={isLast ? 'text-ink' : undefined}>
+                <span
+                  aria-current={isLast ? 'page' : undefined}
+                  className={cn('inline-flex min-h-11 items-center break-words', isLast && 'text-ink')}
+                >
                   {item.label}
                 </span>
               )}

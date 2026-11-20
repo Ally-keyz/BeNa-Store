@@ -21,7 +21,7 @@ export function ProductGrid({
 }: ProductGridProps) {
   const { t } = useTranslation();
   const classes = cn(
-    'grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6',
+    'grid grid-cols-2 gap-x-2 gap-y-7 sm:gap-x-4 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6',
     className,
   );
 

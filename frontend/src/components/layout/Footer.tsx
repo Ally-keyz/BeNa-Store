@@ -50,7 +50,7 @@ export function Footer() {
 
   return (
     <footer className="mt-16 bg-night text-white">
-      <div className={cn(pageContainer, 'grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-16')}>
+      <div className={cn(pageContainer, 'grid gap-8 py-12 sm:gap-10 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-16')}>
         <div className="max-w-sm">
           <p className="font-display text-xl font-semibold tracking-tight">{BRAND.name}</p>
           <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white/50">
@@ -73,7 +73,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${label} — ${t('a11y.externalLink')}`}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
                 >
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </a>
@@ -92,7 +92,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="rounded-sm text-sm text-white/75 transition-colors hover:text-white"
+                    className="inline-flex min-h-11 items-center rounded-sm text-sm text-white/75 transition-colors hover:text-white"
                   >
                     {t(link.key)}
                   </Link>
@@ -115,7 +115,7 @@ export function Footer() {
             <button
               type="button"
               onClick={openPreferences}
-              className="rounded-sm underline underline-offset-2 hover:text-white"
+              className="inline-flex min-h-11 items-center rounded-sm underline underline-offset-2 hover:text-white"
             >
               {t('footer.cookieSettings')}
             </button>

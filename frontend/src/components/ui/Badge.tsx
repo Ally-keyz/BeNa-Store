@@ -16,15 +16,17 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 /** Small pill badge — 24px tall, 11px text, used for Sale/Coming soon/Sold out. */
-export function Badge({ tone = 'neutral', className, ...rest }: BadgeProps) {
+export function Badge({ tone = 'neutral', className, children, ...rest }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium tracking-wide',
+        'inline-flex min-h-6 max-w-full items-center rounded-full px-2.5 py-0.5 text-left text-[11px] font-medium tracking-wide',
         tones[tone],
         className,
       )}
       {...rest}
-    />
+    >
+      <span className="min-w-0 break-words">{children}</span>
+    </span>
   );
 }

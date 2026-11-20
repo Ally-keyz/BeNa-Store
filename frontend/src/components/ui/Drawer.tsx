@@ -51,7 +51,7 @@ export function Drawer({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          'relative z-10 flex h-full w-full max-w-[420px] flex-col bg-surface',
+          'relative z-10 flex h-full w-full max-w-[420px] flex-col bg-surface pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]',
           side === 'right' ? 'animate-drawer-in-right' : 'animate-drawer-in-left',
           className,
         )}
@@ -63,7 +63,7 @@ export function Drawer({
           <button
             type="button"
             onClick={stableClose}
-            className="-m-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-terra-50 hover:text-ink"
+            className="-m-2 inline-flex h-11 w-11 items-center justify-center rounded-full text-neutral-600 hover:bg-terra-50 hover:text-ink"
             aria-label={closeLabel}
           >
             <X className="h-4 w-4" aria-hidden="true" />

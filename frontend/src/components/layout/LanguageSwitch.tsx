@@ -39,7 +39,7 @@ export function LanguageSwitch({ className, size = 'sm' }: LanguageSwitchProps) 
             onClick={() => setLanguage(code)}
             className={cn(
               'inline-flex items-center justify-center gap-1.5 rounded-full font-medium transition-colors duration-200',
-              size === 'sm' ? 'h-8 px-2.5 text-[13px]' : 'h-9 px-3 text-[13px]',
+              size === 'sm' ? 'h-11 px-2.5 text-[13px]' : 'h-11 px-3 text-[13px]',
               active
                 ? 'bg-brand text-on-brand shadow-[0_1px_2px_rgba(13,11,10,0.12)]'
                 : 'text-neutral-600 hover:bg-neutral-100 hover:text-ink',

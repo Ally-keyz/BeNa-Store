@@ -5,7 +5,6 @@ import { SocialStrip } from '@/features/home/SocialStrip';
 import { FeaturedProducts } from '@/features/home/FeaturedProducts';
 import { TrustBand } from '@/features/home/TrustBand';
 import { NewsletterSection } from '@/features/home/NewsletterSection';
-import { heroContainer } from '@/lib/layout';
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -15,7 +14,7 @@ export function HomePage() {
     <>
       <Seo title="BeNa Origins — Rwandan products, coffee & crafts" description={description} path="/" />
       <div className="pt-4 sm:pt-6">
-        <div className={heroContainer}>
+        <div className="mx-auto w-full max-w-6xl sm:px-6 lg:px-8">
           <HeroCarousel />
         </div>
       </div>

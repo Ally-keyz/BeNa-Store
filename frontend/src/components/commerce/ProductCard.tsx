@@ -69,9 +69,31 @@ export function ProductCard({ product, priority = false, className }: ProductCar
     }
   };
 
-  // On small screens the action stays visible; on desktop it appears on hover/focus.
-  const actionVisibility =
-    'pointer-events-auto opacity-100 transition-opacity duration-200 lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100';
+  const action = sellable ? (
+    multiVariant ? (
+      <Link
+        to={productHref}
+        className={cn(
+          buttonVariants({ variant: 'primary', size: 'sm', fullWidth: true }),
+          'min-h-11 lg:min-h-9',
+        )}
+      >
+        {t('productCard.chooseOptions')}
+        <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+      </Link>
+    ) : (
+      <Button
+        size="sm"
+        fullWidth
+        loading={isAdding}
+        onClick={handleAdd}
+        className="min-h-11 lg:min-h-9"
+      >
+        {!isAdding ? <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> : null}
+        {t('productCard.quickAdd')}
+      </Button>
+    )
+  ) : null;
 
   return (
     <motion.article
@@ -79,7 +101,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
       initial={{ opacity: 0, y: 26 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.12 }}
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -3 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="relative">
@@ -110,66 +132,50 @@ export function ProductCard({ product, priority = false, className }: ProductCar
           ) : null}
         </div>
 
-        {sellable ? (
-          <div className={cn('absolute inset-x-3 bottom-3 z-10', actionVisibility)}>
-            {multiVariant ? (
-              <Link
-                to={productHref}
-                className={buttonVariants({ variant: 'primary', size: 'sm', fullWidth: true })}
-              >
-                {t('productCard.chooseOptions')}
-                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
-            ) : (
-              <Button
-                size="sm"
-                fullWidth
-                loading={isAdding}
-                onClick={handleAdd}
-              >
-                {!isAdding ? <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> : null}
-                {t('productCard.quickAdd')}
-              </Button>
-            )}
+        {action ? (
+          <div className="absolute inset-x-3 bottom-3 z-10 hidden transition-opacity duration-200 lg:block lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
+            {action}
           </div>
         ) : null}
       </div>
 
-        <div className="flex min-h-0 flex-1 flex-col pt-2.5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <h3 className="line-clamp-2 text-base font-medium leading-snug text-ink sm:text-[15px]">
-                <Link to={productHref} className="rounded-sm hover:text-terra-700">
-                  {title}
-                </Link>
-              </h3>
-              {description ? (
-                <p className="line-clamp-1 mt-1 text-[13px] leading-4 text-neutral-600 sm:text-[12px]">
-                  {description}
-                </p>
-              ) : null}
-            </div>
-            <div className="shrink-0 text-right">
-              <span className="tabular block text-[18px] font-bold text-terra-700">
-                {formatMoney(price, { locale: formatLocale }) || t('productCard.priceUnavailable')}
-              </span>
-              {onSale && compareAt ? (
-                <span className="tabular mt-0.5 block text-[14px] text-terra-600 line-through font-medium">
-                  {formatMoney(compareAt, { locale: formatLocale })}
-                </span>
-              ) : null}
-            </div>
+      {action ? <div className="mt-3 lg:hidden">{action}</div> : null}
+
+      <div className="flex min-h-0 flex-1 flex-col pt-2.5">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 break-words text-base font-medium leading-snug text-ink sm:text-[15px]">
+              <Link to={productHref} className="rounded-sm hover:text-terra-700">
+                {title}
+              </Link>
+            </h3>
+            {description ? (
+              <p className="line-clamp-1 mt-1 break-words text-[13px] leading-4 text-neutral-600 sm:text-[12px]">
+                {description}
+              </p>
+            ) : null}
           </div>
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 sm:block sm:shrink-0 sm:text-right">
+            <span className="tabular block break-words text-[18px] font-bold text-terra-700">
+              {formatMoney(price, { locale: formatLocale }) || t('productCard.priceUnavailable')}
+            </span>
+            {onSale && compareAt ? (
+              <span className="tabular mt-0.5 block text-[14px] font-medium text-terra-600 line-through">
+                {formatMoney(compareAt, { locale: formatLocale })}
+              </span>
+            ) : null}
+          </div>
+        </div>
 
         {unitPrice ? (
-          <p className="tabular mt-1 text-[12px] text-neutral-600">
+          <p className="tabular mt-1 break-words text-[12px] text-neutral-600">
             <span className="sr-only">{t('productCard.unitPriceLabel')}: </span>
             {unitPrice}
           </p>
         ) : null}
 
         {availability === 'coming-soon' ? (
-          <Button variant="secondary" size="sm" fullWidth className="mt-3.5" onClick={() => setNotifyOpen(true)}>
+          <Button variant="secondary" size="sm" fullWidth className="mt-3.5 min-h-11 lg:min-h-9" onClick={() => setNotifyOpen(true)}>
             {t('productCard.notifyMe')}
           </Button>
         ) : null}
@@ -179,7 +185,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
             size="sm"
             fullWidth
             disabled
-            className="mt-3.5 !border-neutral-200 !bg-neutral-100 !text-neutral-500 disabled:!opacity-100"
+            className="mt-3.5 min-h-11 !border-neutral-200 !bg-neutral-100 !text-neutral-500 disabled:!opacity-100 lg:min-h-9"
           >
             {t('common.soldOut')}
           </Button>

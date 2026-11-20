@@ -52,20 +52,20 @@ export function LegalPage() {
           label={t('a11y.breadcrumb')}
           className="pt-6"
         />
-        <div className={`${sectionSpacing} pt-8 sm:pt-10`}>
+        <div className={`${sectionSpacing} pt-6 sm:pt-10`}>
           {page === 'impressum' ? (
-            <div className="mx-auto mb-8 max-w-[760px] rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
-              <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-terra-700">
+            <div className="mx-auto mb-8 min-w-0 max-w-[760px] rounded-card border border-terra-100 bg-surface p-4 sm:p-8">
+              <h2 className="break-words text-[13px] font-semibold uppercase tracking-[0.14em] text-terra-700">
                 {t('legal.companyTitle')}
               </h2>
               <dl className="mt-4 space-y-3 text-[14px] leading-6 text-neutral-600">
-                <div>
-                  <dt className="font-medium text-ink">{t('legal.companyTitle')}</dt>
-                  <dd>{BRAND.legalName}</dd>
+                <div className="min-w-0">
+                  <dt className="break-words font-medium text-ink">{t('legal.companyTitle')}</dt>
+                  <dd className="break-words">{BRAND.legalName}</dd>
                 </div>
-                <div>
-                  <dt className="font-medium text-ink">{t('legal.addressTitle')}</dt>
-                  <dd>
+                <div className="min-w-0">
+                  <dt className="break-words font-medium text-ink">{t('legal.addressTitle')}</dt>
+                  <dd className="break-words">
                     {BRAND.address.street}
                     <br />
                     {BRAND.address.city}
@@ -73,9 +73,9 @@ export function LegalPage() {
                     {BRAND.address.country}
                   </dd>
                 </div>
-                <div>
-                  <dt className="font-medium text-ink">{t('legal.contactTitle')}</dt>
-                  <dd>
+                <div className="min-w-0">
+                  <dt className="break-words font-medium text-ink">{t('legal.contactTitle')}</dt>
+                  <dd className="break-all">
                     <a
                       href={`mailto:${BRAND.contactEmail}`}
                       className="rounded-sm text-terra-800 underline underline-offset-4 hover:text-ink"

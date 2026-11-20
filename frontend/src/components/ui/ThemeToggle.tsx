@@ -43,7 +43,7 @@ export function ThemeToggle({ className }: { className?: string }) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('theme.label')}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-ink"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-ink"
       >
         <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
       </button>
@@ -67,7 +67,7 @@ export function ThemeToggle({ className }: { className?: string }) {
                   setOpen(false);
                 }}
                 className={cn(
-                  'flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors',
+                  'flex min-h-11 w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors',
                   active
                     ? 'bg-terra-50 text-ink'
                     : 'text-neutral-600 hover:bg-neutral-100 hover:text-ink',
@@ -108,7 +108,7 @@ export function ThemeSegmented({ className }: { className?: string }) {
             aria-pressed={active}
             onClick={() => setMode(option)}
             className={cn(
-              'inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full text-[12.5px] font-medium transition-colors',
+              'inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full text-[12.5px] font-medium transition-colors',
               active
                 ? 'bg-brand text-on-brand shadow-[0_1px_2px_rgba(13,11,10,0.12)]'
                 : 'text-neutral-600 hover:bg-neutral-100 hover:text-ink',

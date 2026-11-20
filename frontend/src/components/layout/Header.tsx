@@ -10,6 +10,7 @@ import logoUrl from '@/assets/logo.webp';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { MobileBottomNav } from './MobileBottomNav';
 import { MobileNav } from './MobileNav';
 import { LanguageSwitch } from './LanguageSwitch';
 
@@ -84,7 +85,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-neutral-200/70 bg-paper/85 backdrop-blur-xl supports-[backdrop-filter]:bg-paper/75">
+      <header className="sticky top-0 z-50 border-b border-neutral-200/70 bg-paper/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl supports-[backdrop-filter]:bg-paper/75">
 
         <div
           className={cn(
@@ -96,7 +97,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="-ml-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition-colors hover:bg-neutral-100 lg:hidden"
+              className="-ml-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink transition-colors hover:bg-neutral-100 lg:hidden"
               aria-label={t('a11y.openMenu')}
             >
               <span className="sr-only">{t('a11y.openMenu')}</span>
@@ -132,7 +133,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-ink"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-ink"
               aria-label={t('common.search')}
             >
               <Search className="h-[19px] w-[19px]" aria-hidden="true" />
@@ -144,7 +145,7 @@ export function Header() {
             <button
               type="button"
               onClick={openCart}
-              className="relative inline-flex h-10 items-center gap-2 rounded-full border border-neutral-200/80 bg-surface pl-3 pr-3 text-ink transition-colors hover:bg-neutral-100 sm:pl-3.5 sm:pr-2.5"
+              className="relative inline-flex h-11 items-center gap-2 rounded-full border border-neutral-200/80 bg-surface pl-3 pr-3 text-ink transition-colors hover:bg-neutral-100 sm:pl-3.5 sm:pr-2.5"
               aria-label={cartLabel}
             >
               <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -162,6 +163,7 @@ export function Header() {
       </header>
 
       <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileBottomNav onMenu={() => setMenuOpen(true)} onSearch={() => setSearchOpen(true)} />
 
       <Dialog
         open={searchOpen}
@@ -182,11 +184,11 @@ export function Header() {
               autoComplete="off"
               autoFocus
               containerClassName="flex-1"
-              className="h-10 border-0 bg-transparent px-3 text-[13.5px] focus-visible:border-0"
+               className="h-11 border-0 bg-transparent px-3 text-base focus-visible:border-0"
             />
             <button
               type="submit"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand transition-colors hover:bg-brand-dark"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand transition-colors hover:bg-brand-dark"
               aria-label={t('header.searchSubmit')}
             >
               <Search className="h-4 w-4" aria-hidden="true" />

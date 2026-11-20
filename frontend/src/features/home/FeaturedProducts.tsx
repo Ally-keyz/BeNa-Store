@@ -15,8 +15,8 @@ import { matchesProductCategory } from '@/lib/product';
 import { errorMessageKey, isApiError } from '@/api/errors';
 import { ALL_CATEGORIES, CategoryFilter } from './CategoryFilter';
 
-const GRID = 'grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-4 md:grid-cols-3 lg:gap-x-6';
-const PANEL = 'rounded-3xl border border-terra-100 bg-terra-50/70 p-6';
+const GRID = 'grid grid-cols-2 gap-x-2 gap-y-7 sm:gap-x-4 sm:gap-y-8 md:grid-cols-3 lg:gap-x-6';
+const PANEL = 'rounded-3xl border border-terra-100 bg-terra-50/70 p-4 sm:p-6';
 
 function ProductSkeleton() {
   return (

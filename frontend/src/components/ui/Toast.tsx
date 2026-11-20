@@ -74,7 +74,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed inset-x-0 top-3 z-[100] flex flex-col items-center gap-2 px-3 sm:top-5"
+        className="pointer-events-none fixed inset-x-0 top-[calc(0.75rem_+_env(safe-area-inset-top))] z-[100] flex flex-col items-center gap-2 px-3 sm:top-[calc(1.25rem_+_env(safe-area-inset-top))]"
       >
         {items.map((item) => {
           const variant = item.variant ?? 'default';
@@ -85,7 +85,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={item.id}
               role="status"
-              className="animate-toast-in pointer-events-auto relative flex w-full max-w-md items-start gap-3 overflow-hidden rounded-2xl border border-neutral-200/80 bg-surface/95 p-3.5 pr-11 shadow-[0_24px_70px_-24px_rgba(13,11,10,0.55)] backdrop-blur-xl"
+                className="animate-toast-in pointer-events-auto relative flex w-full max-w-md items-start gap-3 overflow-hidden rounded-2xl border border-neutral-200/80 bg-surface/95 p-3.5 pr-12 shadow-[0_24px_70px_-24px_rgba(13,11,10,0.55)] backdrop-blur-xl"
             >
               <span
                 className={cn(
@@ -125,7 +125,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => dismiss(item.id)}
-                className="absolute right-1.5 top-1.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-terra-50 hover:text-ink"
+                className="absolute right-0.5 top-0.5 inline-flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-terra-50 hover:text-ink"
                 aria-label={t('common.close')}
               >
                 <X className="h-3.5 w-3.5" aria-hidden="true" />

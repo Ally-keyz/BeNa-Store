@@ -29,8 +29,8 @@ export function AccountLoginPage() {
           label={t('a11y.breadcrumb')}
           className="pt-6"
         />
-        <div className={`${sectionSpacing} pt-8 sm:pt-10`}>
-          <div className="max-w-2xl">
+        <div className={`${sectionSpacing} pt-6 sm:pt-10`}>
+          <div className="min-w-0 max-w-2xl">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
               {t('account.eyebrow')}
             </p>
@@ -40,9 +40,12 @@ export function AccountLoginPage() {
           </div>
           <div className="mt-8 max-w-[860px]">
             <AccountGate returnTo="/account">
-              <div className="rounded-card border border-terra-100 bg-terra-50/70 p-6">
-                <p className="text-[14px] leading-7 text-neutral-600">{t('account.body')}</p>
-                <Link to="/account" className={`${buttonVariants({ size: 'sm' })} mt-5`}>
+              <div className="min-w-0 rounded-card border border-terra-100 bg-terra-50/70 p-4 sm:p-6">
+                <p className="break-words text-[14px] leading-7 text-neutral-600">{t('account.body')}</p>
+                <Link
+                  to="/account"
+                  className={`${buttonVariants({ size: 'sm' })} mt-5 min-h-11 sm:min-h-9`}
+                >
                   {t('account.title')}
                 </Link>
               </div>

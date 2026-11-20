@@ -34,26 +34,26 @@ export function FaqPage() {
           label={t('a11y.breadcrumb')}
           className="pt-6"
         />
-        <div className={`${sectionSpacing} pt-8 sm:pt-10`}>
-          <div className="max-w-2xl">
+        <div className={`${sectionSpacing} pt-6 sm:pt-10`}>
+          <div className="min-w-0 max-w-2xl">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
               {t('faq.eyebrow')}
             </p>
             <h1 className="mt-2 text-[clamp(28px,3.2vw,44px)] font-semibold tracking-tight">
               {t('faq.title')}
             </h1>
-            <p className="mt-4 text-[15px] leading-7 text-neutral-600">{t('faq.body')}</p>
+            <p className="mt-4 break-words text-[15px] leading-7 text-neutral-600">{t('faq.body')}</p>
           </div>
 
-          <div className="mt-10 max-w-[860px]">
+          <div className="mt-8 max-w-[860px] sm:mt-10">
             <Accordion items={items} />
           </div>
 
-          <p className="mt-8 max-w-[860px] text-[13px] leading-6 text-neutral-600">
+          <p className="mt-8 max-w-[860px] break-words text-[13px] leading-6 text-neutral-600">
             {t('faq.contactAnswer')}{' '}
             <Link
               to="/contact"
-              className="rounded-sm font-medium text-terra-800 underline underline-offset-4 hover:text-ink"
+              className="break-words rounded-sm font-medium text-terra-800 underline underline-offset-4 hover:text-ink"
             >
               {t('nav.contact')}
             </Link>

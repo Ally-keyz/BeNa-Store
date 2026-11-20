@@ -29,37 +29,40 @@ function ProfilePanel() {
   const defaultAddress = profile.defaultAddress?.formatted.filter(Boolean).join(', ') || '';
 
   return (
-    <section aria-label={t('account.profileTitle')} className="rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
-      <h2 className="text-lg font-semibold text-ink">{t('account.profileTitle')}</h2>
+    <section
+      aria-label={t('account.profileTitle')}
+      className="min-w-0 rounded-card border border-terra-100 bg-surface p-4 sm:p-8"
+    >
+      <h2 className="break-words text-lg font-semibold text-ink">{t('account.profileTitle')}</h2>
       <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-        <div>
-          <dt className="text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+        <div className="min-w-0">
+          <dt className="break-words text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
             {t('account.nameLabel')}
           </dt>
-          <dd className="mt-1 text-[14px] text-ink">{profile.displayName}</dd>
+          <dd className="mt-1 break-words text-[14px] text-ink">{profile.displayName}</dd>
         </div>
-        <div>
-          <dt className="text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+        <div className="min-w-0">
+          <dt className="break-words text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
             {t('account.emailLabel')}
           </dt>
-          <dd className="mt-1 text-[14px] text-ink">{profile.email ?? '—'}</dd>
+          <dd className="mt-1 break-all text-[14px] text-ink">{profile.email ?? '—'}</dd>
         </div>
-        <div>
-          <dt className="text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+        <div className="min-w-0">
+          <dt className="break-words text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
             {t('account.phoneLabel')}
           </dt>
-          <dd className="mt-1 text-[14px] text-ink">{profile.phone ?? '—'}</dd>
+          <dd className="mt-1 break-words text-[14px] text-ink">{profile.phone ?? '—'}</dd>
         </div>
-        <div>
-          <dt className="text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+        <div className="min-w-0">
+          <dt className="break-words text-[12px] font-medium uppercase tracking-[0.12em] text-neutral-500">
             {t('account.defaultAddressTitle')}
           </dt>
-          <dd className="mt-1 text-[14px] leading-6 text-ink">
+          <dd className="mt-1 break-words text-[14px] leading-6 text-ink">
             {defaultAddress || t('account.noDefaultAddress')}
           </dd>
         </div>
       </dl>
-      <p className="mt-6 text-[12px] text-neutral-500">
+      <p className="mt-6 break-words text-[12px] text-neutral-500">
         {new Intl.DateTimeFormat(formatLocale).format(new Date())}
       </p>
     </section>
@@ -85,8 +88,8 @@ export function AccountPage() {
           label={t('a11y.breadcrumb')}
           className="pt-6"
         />
-        <div className={`${sectionSpacing} pt-8 sm:pt-10`}>
-          <div className="max-w-2xl">
+        <div className={`${sectionSpacing} pt-6 sm:pt-10`}>
+          <div className="min-w-0 max-w-2xl">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
               {t('account.eyebrow')}
             </p>

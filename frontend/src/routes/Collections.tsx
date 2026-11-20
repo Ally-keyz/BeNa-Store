@@ -48,7 +48,7 @@ export function CollectionsPage() {
               onRetry={() => void query.refetch()}
             />
           ) : query.isLoading ? (
-            <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6" aria-busy="true">
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6" aria-busy="true">
               {Array.from({ length: 4 }, (_, index) => (
                 <div key={index}>
                   <Skeleton className="aspect-square w-full rounded-card" />
@@ -65,7 +65,7 @@ export function CollectionsPage() {
               </Link>
             </div>
           ) : (
-            <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
+            <div className="mt-8 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
               {collections.map((collection, index) => (
                 <CollectionCard key={collection.id} collection={collection} priority={index < 4} />
               ))}

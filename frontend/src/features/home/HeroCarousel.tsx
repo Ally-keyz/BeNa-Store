@@ -28,7 +28,7 @@ function heroPriority(product: Product): number {
 }
 
 const controlButton =
-  'inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/35 text-white backdrop-blur-sm transition-colors hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
+  'inline-flex h-11 w-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-white/35 text-white backdrop-blur-sm transition-colors hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
 
 const controlMotion = {
   whileHover: { scale: 1.08 },
@@ -158,7 +158,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
       aria-roledescription="carousel"
       aria-label={t('a11y.carouselLabel')}
       className={cn(
-        'relative isolate h-[390px] w-full overflow-hidden rounded-4xl bg-night text-white sm:h-[clamp(370px,39vw,450px)]',
+        'relative isolate h-[clamp(350px,60dvh,460px)] w-full overflow-hidden rounded-none bg-night text-white sm:h-[clamp(370px,39vw,450px)] sm:rounded-4xl',
         className,
       )}
       onMouseEnter={() => setPointerPaused(true)}
@@ -197,23 +197,23 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={`copy-${slide.key}`}
-              className="max-w-xl"
+              className="min-w-0 max-w-xl"
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
-                {slide.meta ? <Sparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" /> : null}
+              <p className="flex items-center gap-2 break-words text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+                {slide.meta ? <Sparkles className="h-3.5 w-3.5 shrink-0 text-brand" aria-hidden="true" /> : null}
                 {slide.eyebrow}
               </p>
-              <h1 className="mt-3 line-clamp-3 max-w-[17ch] font-display text-[clamp(28px,3.6vw,44px)] font-semibold leading-[1.04] tracking-tight">
+              <h1 className="mt-2 line-clamp-3 max-w-none break-words font-display text-[clamp(24px,7vw,30px)] font-semibold leading-[1.04] tracking-tight [overflow-wrap:anywhere] sm:mt-3 sm:max-w-[17ch] sm:text-[clamp(28px,3.6vw,44px)]">
                 {slide.title}
               </h1>
-              <p className="mt-3 line-clamp-2 max-w-md text-sm leading-6 text-white/80 sm:text-[15px]">
+              <p className="mt-2 line-clamp-2 max-w-md break-words text-sm leading-6 text-white/80 sm:mt-3 sm:text-[15px]">
                 {slide.subtitle}
               </p>
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="mt-4 flex flex-wrap items-center gap-3 sm:mt-5">
                 <Link
                   to={slide.href}
                   className={cn(
@@ -224,7 +224,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
                   {slide.cta}
                 </Link>
                 {slide.meta ? (
-                  <span className="rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold tabular-nums backdrop-blur-sm">
+                  <span className="max-w-full break-words rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold tabular-nums backdrop-blur-sm">
                     {slide.meta}
                   </span>
                 ) : null}
@@ -232,13 +232,13 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-5 flex items-center justify-between gap-4 border-t border-white/20 pt-3">
-            <div className="flex items-center gap-4">
-              <span className="text-sm tabular-nums text-white/80" aria-hidden="true">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-white/20 pt-3 sm:mt-5 sm:flex-nowrap sm:gap-4">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+              <span className="shrink-0 text-sm tabular-nums text-white/80" aria-hidden="true">
                 {String(index + 1).padStart(2, '0')}
                 <span className="text-white/45"> / {String(total).padStart(2, '0')}</span>
               </span>
-              <div className="flex items-center">
+              <div className="hidden items-center sm:flex">
                 {slides.map((item, itemIndex) => (
                   <motion.button
                     key={item.key}
@@ -247,7 +247,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
                     aria-label={t('a11y.goToSlide', { number: itemIndex + 1 })}
                     aria-current={itemIndex === index ? 'true' : undefined}
                     {...controlMotion}
-                    className="group flex h-8 items-center px-1 focus-visible:outline-none"
+                    className="group flex h-11 w-11 shrink-0 items-center justify-center px-1 focus-visible:outline-none sm:h-8 sm:w-8"
                   >
                     <span
                       aria-hidden="true"
@@ -263,7 +263,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               {!reducedMotion && total > 1 ? (
                 <motion.button
                   type="button"

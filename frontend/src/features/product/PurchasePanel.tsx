@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MessageCircleQuestion, RotateCcw, Truck } from 'lucide-react';
@@ -16,14 +15,23 @@ export interface PurchasePanelProps {
   product: Product;
   variant: ProductVariant | null;
   onVariantChange: (variant: ProductVariant) => void;
+  quantity: number;
+  onQuantityChange: (quantity: number) => void;
+  onAdd: () => void;
 }
 
 /** Price, options, quantity and purchase cues. No payment UI is rendered. */
-export function PurchasePanel({ product, variant, onVariantChange }: PurchasePanelProps) {
+export function PurchasePanel({
+  product,
+  variant,
+  onVariantChange,
+  quantity,
+  onQuantityChange,
+  onAdd,
+}: PurchasePanelProps) {
   const { t } = useTranslation();
-  const { country, formatLocale } = useMarket();
-  const { addItem, isUpdating } = useCart();
-  const [quantity, setQuantity] = useState(1);
+  const { formatLocale } = useMarket();
+  const { isUpdating } = useCart();
 
   const availability = getAvailability(product);
   const price = variant?.price ?? product.priceRange.minVariantPrice;
@@ -37,21 +45,6 @@ export function PurchasePanel({ product, variant, onVariantChange }: PurchasePan
       ? { amount: (toAmount(price) * quantity).toFixed(2), currencyCode: price.currencyCode }
       : null;
   const canBuy = availability === 'available' && Boolean(variant?.availableForSale);
-
-  const onAdd = async () => {
-    if (!variant || !canBuy) return;
-    try {
-      await addItem({
-        merchandiseId: variant.id,
-        quantity,
-        countryCode: country,
-        itemTitle: product.title,
-        errorMessage: t('productInfo.addError'),
-      });
-    } catch {
-      // The toast already explains the failure.
-    }
-  };
 
   const availabilityCopy =
     availability === 'coming-soon'
@@ -91,7 +84,7 @@ export function PurchasePanel({ product, variant, onVariantChange }: PurchasePan
               <p className="mb-1.5 text-sm font-medium text-ink">{t('common.quantity')}</p>
               <QuantityStepper
                 value={quantity}
-                onChange={setQuantity}
+                onChange={onQuantityChange}
                 label={t('productInfo.quantityLabel', { title: product.title })}
                 disabled={isUpdating}
               />
@@ -99,7 +92,7 @@ export function PurchasePanel({ product, variant, onVariantChange }: PurchasePan
             <Button
               size="lg"
               className="min-w-[180px] flex-1"
-              onClick={() => void onAdd()}
+              onClick={onAdd}
               loading={isUpdating}
               data-testid="add-to-cart"
             >
@@ -109,7 +102,7 @@ export function PurchasePanel({ product, variant, onVariantChange }: PurchasePan
           <p className="text-[12px] text-neutral-600">{t('product.shippingNote')}</p>
         </>
       ) : (
-        <div className="rounded-card border border-terra-100 bg-terra-50 p-5">
+        <div className="rounded-card border border-terra-100 bg-terra-50 p-4 sm:p-5">
           <p className="font-medium text-ink">
             {availability === 'coming-soon' ? t('productInfo.comingSoonTitle') : t('productInfo.soldOutTitle')}
           </p>

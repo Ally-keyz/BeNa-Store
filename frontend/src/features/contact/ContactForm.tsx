@@ -56,12 +56,12 @@ export function ContactForm() {
   };
 
   return (
-    <div className="rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
-      <h2 className="text-xl font-semibold">{t('contact.formTitle')}</h2>
-      <p className="mt-2 text-[13px] leading-6 text-neutral-600">{t('contact.mailtoNote')}</p>
+    <div className="rounded-card border border-terra-100 bg-surface p-4 sm:p-6">
+      <h2 className="break-words text-xl font-semibold">{t('contact.formTitle')}</h2>
+      <p className="mt-2 break-words text-[13px] leading-6 text-neutral-600">{t('contact.mailtoNote')}</p>
 
-      <form onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="mt-6 space-y-5">
-        <div className="grid gap-5 sm:grid-cols-2">
+      <form onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="mt-5 space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Input
             label={t('contact.nameLabel')}
             autoComplete="name"
@@ -90,10 +90,12 @@ export function ContactForm() {
           {...register('message')}
         />
 
-        <Button type="submit">{t('contact.submit')}</Button>
+        <Button type="submit" className="w-full sm:w-auto">
+          {t('contact.submit')}
+        </Button>
 
         {submitted ? (
-          <div role="status" className="rounded-card bg-terra-50 p-4 text-[13px] leading-6 text-terra-900">
+          <div role="status" className="break-words rounded-card bg-terra-50 p-4 text-[13px] leading-6 text-terra-900">
             <p className="font-medium">{t('contact.preparedTitle')}</p>
             <p className="mt-1">{t('contact.preparedBody')}</p>
           </div>

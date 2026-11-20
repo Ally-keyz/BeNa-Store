@@ -24,7 +24,7 @@ export function RootLayout() {
   const { t } = useTranslation();
 
   return (
-    <div className="relative flex min-h-screen flex-col">
+    <div className="relative flex min-h-dvh flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <ScrollProgress />
       <OpeningScreen />
       <ScrollToTop />
@@ -33,7 +33,7 @@ export function RootLayout() {
       <div className="relative z-10 flex flex-1 flex-col">
         <a
           href="#main-content"
-          className="fixed left-4 top-3 z-[110] -translate-y-[200%] rounded-full bg-brand px-5 py-2.5 text-sm font-medium transition-transform focus:translate-y-0"
+          className="fixed left-4 top-[calc(0.75rem+env(safe-area-inset-top))] z-[110] -translate-y-[200%] rounded-full bg-brand px-5 py-2.5 text-sm font-medium transition-transform focus:translate-y-0"
         >
           {t('a11y.skipToContent')}
         </a>

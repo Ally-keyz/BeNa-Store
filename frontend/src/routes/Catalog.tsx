@@ -88,14 +88,14 @@ export function CatalogPage() {
               <CategoryFilter value={category} onChange={setCategory} controls="catalog-grid" />
             </div>
 
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
-              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-500">
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <span className="hidden text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-500 sm:inline">
                 {t('catalog.priceLabel')}
               </span>
               <div
                 role="group"
                 aria-label={t('catalog.priceLabel')}
-                className="inline-flex flex-wrap items-center gap-0.5 rounded-full border border-terra-200 bg-surface p-1.5"
+                className="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto bg-surface px-4 py-1.5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:snap-none sm:overflow-visible sm:rounded-full sm:border sm:border-terra-200 sm:px-1.5 sm:py-1.5 [&::-webkit-scrollbar]:hidden"
               >
                 {PRICE_OPTIONS.map((option) => {
                   const active = priceFilter === option.value;
@@ -109,7 +109,7 @@ export function CatalogPage() {
                       whileTap={{ scale: 0.95 }}
                       transition={{ type: 'spring', stiffness: 420, damping: 24 }}
                       className={cn(
-                        'rounded-full px-4 py-2 text-[13px] font-medium transition-colors',
+                        'min-h-11 shrink-0 snap-start whitespace-nowrap rounded-full border-0 px-4 py-2 text-[13px] font-medium transition-colors sm:min-h-0',
                         active
                           ? 'bg-brand text-on-brand shadow-sm'
                           : 'text-neutral-600 hover:bg-terra-50 hover:text-ink',

@@ -23,7 +23,7 @@ export function RelatedProducts({ product }: RelatedProductsProps) {
   if (!related.length) return null;
 
   return (
-    <section className="border-t border-terra-100 py-12 sm:py-16" aria-labelledby="related-products">
+    <section className="border-t border-terra-100 py-12 pb-24 sm:py-16 sm:pb-24 lg:pb-16" aria-labelledby="related-products">
       <div className={contentContainer}>
         <SectionHeading
           eyebrow={t('product.relatedEyebrow')}
