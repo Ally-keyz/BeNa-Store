@@ -29,7 +29,7 @@ function ProfilePanel() {
   const defaultAddress = profile.defaultAddress?.formatted.filter(Boolean).join(', ') || '';
 
   return (
-    <section aria-label={t('account.profileTitle')} className="rounded-card border border-terra-100 bg-white p-6 sm:p-8">
+    <section aria-label={t('account.profileTitle')} className="rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
       <h2 className="text-lg font-semibold text-ink">{t('account.profileTitle')}</h2>
       <dl className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>

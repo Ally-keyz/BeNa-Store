@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MessageCircleQuestion, RotateCcw, Truck } from 'lucide-react';
 import type { Product, ProductVariant } from '@/types';
 import { BRAND } from '@/config';
-import { formatMoney, formatUnitPrice, isOnSale } from '@/lib/money';
+import { formatMoney, formatUnitPrice, isOnSale, toAmount } from '@/lib/money';
 import { getAvailability } from '@/lib/product';
 import { useCart } from '@/context/CartContext';
 import { useMarket } from '@/context/MarketContext';
@@ -22,7 +22,7 @@ export interface PurchasePanelProps {
 export function PurchasePanel({ product, variant, onVariantChange }: PurchasePanelProps) {
   const { t } = useTranslation();
   const { country, formatLocale } = useMarket();
-  const { addItem, openCart, isUpdating } = useCart();
+  const { addItem, isUpdating } = useCart();
   const [quantity, setQuantity] = useState(1);
 
   const availability = getAvailability(product);
@@ -32,6 +32,10 @@ export function PurchasePanel({ product, variant, onVariantChange }: PurchasePan
     locale: formatLocale,
   });
   const onSale = isOnSale(price, compareAt);
+  const totalAmount =
+    price && quantity > 1
+      ? { amount: (toAmount(price) * quantity).toFixed(2), currencyCode: price.currencyCode }
+      : null;
   const canBuy = availability === 'available' && Boolean(variant?.availableForSale);
 
   const onAdd = async () => {
@@ -41,10 +45,9 @@ export function PurchasePanel({ product, variant, onVariantChange }: PurchasePan
         merchandiseId: variant.id,
         quantity,
         countryCode: country,
-        successMessage: t('productInfo.added', { title: product.title }),
+        itemTitle: product.title,
         errorMessage: t('productInfo.addError'),
       });
-      openCart();
     } catch {
       // The toast already explains the failure.
     }
@@ -70,6 +73,11 @@ export function PurchasePanel({ product, variant, onVariantChange }: PurchasePan
           ) : null}
         </div>
         {unitPrice ? <p className="mt-1 text-[13px] text-neutral-600">{unitPrice}</p> : null}
+        {totalAmount ? (
+          <p className="mt-1 tabular text-[20px] font-bold text-terra-700">
+            {t('productInfo.total')}: {formatMoney(totalAmount, { locale: formatLocale })}
+          </p>
+        ) : null}
         {!price ? <p className="mt-1 text-[13px] text-neutral-600">{t('productInfo.priceUnavailable')}</p> : null}
         <p className="mt-2 text-[13px] text-neutral-600">{t('product.taxesNote')}</p>
       </div>

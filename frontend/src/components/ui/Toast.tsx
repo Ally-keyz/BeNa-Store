@@ -7,15 +7,24 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { cn } from '@/lib/cn';
+import { buttonVariants } from './Button';
 
 export type ToastVariant = 'default' | 'success' | 'error';
+
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
 
 export interface ToastOptions {
   title: string;
   description?: string;
   variant?: ToastVariant;
   durationMs?: number;
+  action?: ToastAction;
 }
 
 interface ToastItem extends ToastOptions {
@@ -29,13 +38,18 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const iconFor = (variant: ToastVariant) => {
-  if (variant === 'success') return <CheckCircle2 className="h-4 w-4 text-terra-700" aria-hidden="true" />;
-  if (variant === 'error') return <AlertCircle className="h-4 w-4 text-terra-700" aria-hidden="true" />;
-  return <Info className="h-4 w-4 text-terra-700" aria-hidden="true" />;
+  if (variant === 'success') return CheckCircle2;
+  if (variant === 'error') return AlertCircle;
+  return Info;
 };
 
-/** App-wide toast queue. The live region is polite so screen readers announce updates. */
+/**
+ * App-wide toast queue. Toasts drop in from the top centre so confirmations
+ * (especially "added to cart") are visible without covering the page action.
+ * The live region is polite so screen readers announce updates.
+ */
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [items, setItems] = useState<ToastItem[]>([]);
   const idRef = useRef(0);
 
@@ -60,30 +74,71 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4 sm:bottom-6 sm:items-end sm:px-6"
+        className="pointer-events-none fixed inset-x-0 top-3 z-[100] flex flex-col items-center gap-2 px-3 sm:top-5"
       >
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="animate-dialog-in pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border border-terra-100 bg-white p-4"
-          >
-            <span className="mt-0.5">{iconFor(item.variant ?? 'default')}</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-ink">{item.title}</p>
-              {item.description ? (
-                <p className="mt-0.5 text-[13px] leading-5 text-neutral-600">{item.description}</p>
-              ) : null}
-            </div>
-            <button
-              type="button"
-              onClick={() => dismiss(item.id)}
-              className="-m-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-neutral-500 hover:bg-terra-50 hover:text-ink"
-              aria-label="Close"
+        {items.map((item) => {
+          const variant = item.variant ?? 'default';
+          const Icon = iconFor(variant);
+          const duration = item.durationMs ?? 4500;
+
+          return (
+            <div
+              key={item.id}
+              role="status"
+              className="animate-toast-in pointer-events-auto relative flex w-full max-w-md items-start gap-3 overflow-hidden rounded-2xl border border-neutral-200/80 bg-surface/95 p-3.5 pr-11 shadow-[0_24px_70px_-24px_rgba(13,11,10,0.55)] backdrop-blur-xl"
             >
-              <X className="h-3.5 w-3.5" aria-hidden="true" />
-            </button>
-          </div>
-        ))}
+              <span
+                className={cn(
+                  'mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                  variant === 'error'
+                    ? 'bg-terra-100 text-terra-700'
+                    : 'bg-terra-50 text-terra-700',
+                )}
+              >
+                <Icon className="h-4 w-4" aria-hidden="true" />
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold leading-5 text-ink">{item.title}</p>
+                {item.description ? (
+                  <p className="mt-0.5 text-[13px] leading-5 text-neutral-600">
+                    {item.description}
+                  </p>
+                ) : null}
+                {item.action ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      dismiss(item.id);
+                      item.action?.onClick();
+                    }}
+                    className={cn(
+                      buttonVariants({ size: 'sm' }),
+                      'mt-2.5 h-8 rounded-full px-3.5 text-[12.5px]',
+                    )}
+                  >
+                    {item.action.label}
+                  </button>
+                ) : null}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => dismiss(item.id)}
+                className="absolute right-1.5 top-1.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-terra-50 hover:text-ink"
+                aria-label={t('common.close')}
+              >
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+
+              <span
+                aria-hidden="true"
+                className="animate-toast-progress absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand/80"
+                style={{ animationDuration: `${duration}ms` }}
+              />
+            </div>
+          );
+        })}
       </div>
     </ToastContext.Provider>
   );

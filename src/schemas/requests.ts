@@ -192,3 +192,9 @@ export const auditProductParams = handleParams.merge(marketContextQuery);
 export const sitemapQuery = z.object({
   limit: z.coerce.number().int().min(1).max(1000).default(250),
 });
+
+// ---------------------------------------------------------------- ai ----
+
+export const aiSuggestParams = handleParams.extend({
+  refresh: booleanQuery.optional(),
+});

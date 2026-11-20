@@ -9,6 +9,7 @@ import { useCart } from '@/context/CartContext';
 import logoUrl from '@/assets/logo.webp';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { MobileNav } from './MobileNav';
 import { LanguageSwitch } from './LanguageSwitch';
 
@@ -25,8 +26,8 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
   return cn(
     'inline-flex items-center gap-2 whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-medium tracking-[-0.005em] transition-colors duration-200 xl:px-3.5',
     isActive
-      ? 'bg-white text-black font-semibold'
-      : 'text-zinc-800 hover:bg-white/70 hover:text-ink',
+      ? 'bg-neutral-100 font-semibold text-ink'
+      : 'text-neutral-700 hover:bg-neutral-100 hover:text-ink',
   );
 }
 
@@ -83,7 +84,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-neutral-200/70 bg-white/85 backdrop-blur-xl supports-[backdrop-filter]:bg-white/75">
+      <header className="sticky top-0 z-50 border-b border-neutral-200/70 bg-paper/85 backdrop-blur-xl supports-[backdrop-filter]:bg-paper/75">
 
         <div
           className={cn(
@@ -137,19 +138,20 @@ export function Header() {
               <Search className="h-[19px] w-[19px]" aria-hidden="true" />
             </button>
 
+            <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitch className="hidden sm:inline-flex" />
 
             <button
               type="button"
               onClick={openCart}
-              className="relative inline-flex h-10 items-center gap-2 rounded-full bg-white pl-3 pr-3 text-white transition-colors hover:bg-neutral-800 sm:pl-3.5 sm:pr-2.5"
+              className="relative inline-flex h-10 items-center gap-2 rounded-full border border-neutral-200/80 bg-surface pl-3 pr-3 text-ink transition-colors hover:bg-neutral-100 sm:pl-3.5 sm:pr-2.5"
               aria-label={cartLabel}
             >
-              <ShoppingBag className="h-[18px] text-ink w-[18px]" aria-hidden="true" />
+              <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />
               {itemCount > 0 ? (
                 <span
                   aria-hidden="true"
-                  className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-semibold leading-none text-ink"
+                  className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-semibold leading-none text-on-brand"
                 >
                   {itemCount > 99 ? '99+' : itemCount}
                 </span>
@@ -184,7 +186,7 @@ export function Header() {
             />
             <button
               type="submit"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-ink transition-colors hover:bg-brand-dark"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand transition-colors hover:bg-brand-dark"
               aria-label={t('header.searchSubmit')}
             >
               <Search className="h-4 w-4" aria-hidden="true" />

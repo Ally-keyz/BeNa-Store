@@ -65,7 +65,7 @@ export function ShippingPage() {
             </div>
           ) : (
             <div className="mt-10 grid gap-8 lg:grid-cols-2 lg:gap-12">
-              <section className="rounded-card border border-terra-100 bg-white p-6 sm:p-8">
+              <section className="rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-ink">{t('shipping.marketsTitle')}</h2>
                 <p className="mt-1 text-[13px] leading-6 text-neutral-600">
                   {t('shipping.marketsBody')}
@@ -92,7 +92,7 @@ export function ShippingPage() {
                 </p>
               </section>
 
-              <section className="rounded-card border border-terra-100 bg-white p-6 sm:p-8">
+              <section className="rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-ink">{t('shipping.rateTitle')}</h2>
                 <p className="mt-1 text-[13px] leading-6 text-neutral-600">{t('shipping.rateBody')}</p>
                 {rateExamples.length || euroAmounts.length ? (
@@ -112,7 +112,7 @@ export function ShippingPage() {
           )}
 
           {cart && deliveryGroups.length ? (
-            <section className="mt-10 rounded-card border border-terra-100 bg-white p-6 sm:p-8">
+            <section className="mt-10 rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
               <h2 className="text-lg font-semibold text-ink">{t('shipping.cartTitle')}</h2>
               <p className="mt-1 text-[13px] leading-6 text-neutral-600">{t('shipping.cartBody')}</p>
               <div className="mt-5 grid gap-6 sm:grid-cols-2">

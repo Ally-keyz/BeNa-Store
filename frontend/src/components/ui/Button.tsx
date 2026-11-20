@@ -22,9 +22,9 @@ export function buttonVariants({
     'transition-colors duration-200 ease-out',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
     'disabled:pointer-events-none disabled:opacity-50',
-    variant === 'primary' && 'bg-brand text-ink hover:bg-brand-dark',
+    variant === 'primary' && 'bg-brand text-on-brand hover:bg-brand-dark',
     variant === 'secondary' &&
-      'border border-brand bg-white text-terra-800 hover:bg-terra-50',
+      'border border-brand bg-surface text-terra-800 hover:bg-terra-50',
     variant === 'ghost' && 'text-ink hover:bg-terra-50',
     size === 'sm' && 'h-9 px-4 text-[13px]',
     size === 'md' && 'h-11 px-5 text-sm',

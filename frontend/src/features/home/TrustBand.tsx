@@ -16,7 +16,7 @@ export function TrustBand() {
       <div className={`${contentContainer} grid gap-6 py-10 sm:grid-cols-3 sm:gap-8 sm:py-12`}>
         {ITEMS.map(({ key, Icon }) => (
           <div key={key} className="flex gap-4">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-terra-800">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-terra-800">
               <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
             </span>
             <div>

@@ -1,8 +1,11 @@
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Product, ProductMetafields } from '@/types';
+import type { Product, ProductMetafields, AISuggestion } from '@/types';
 import { decodeMetafield, hasMetafield, metafieldLines } from '@/lib/metafields';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { Accordion, type AccordionItem } from '@/components/ui/Accordion';
+import { getAiSuggestions } from '@/api/endpoints';
+import { isApiError } from '@/api/errors';
 
 export interface ProductFactsProps {
   product: Product;
@@ -66,6 +69,23 @@ export function ProductFacts({ product }: ProductFactsProps) {
   const { t } = useTranslation();
   const allergens = decodeMetafield(product.metafields.allergens);
   const descriptionHtml = sanitizeHtml(product.descriptionHtml);
+  const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
+
+  const fetchAiSuggestions = useCallback(async () => {
+    try {
+      const result = await getAiSuggestions(product.handle);
+      setAiSuggestion(result.data);
+    } catch (err) {
+      if (isApiError(err) && (err.status === 401 || err.status === 403 || err.status === 503)) {
+        setAiSuggestion(null);
+      }
+    }
+  }, [product.handle]);
+
+  useEffect(() => {
+    fetchAiSuggestions();
+  }, [fetchAiSuggestions]);
+
   const specs = [
     product.vendor ? { label: t('productInfo.specVendor'), value: product.vendor } : null,
     product.productType ? { label: t('productInfo.specType'), value: product.productType } : null,
@@ -130,6 +150,37 @@ export function ProductFacts({ product }: ProductFactsProps) {
       title: t('productInfo.preparationTitle'),
       content: <PreparationFacts metafields={product.metafields} />,
     },
+    ...(aiSuggestion ? [
+      {
+        id: 'ai-suggestions',
+        title: t('productInfo.aiSuggestionsTitle'),
+        content: (
+          <div className="space-y-2">
+            <p className="text-[12px] font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded px-3 py-2">
+              {aiSuggestion.disclaimer}
+            </p>
+            {aiSuggestion.ingredients && (
+              <FactRow label={t('productInfo.aiIngredients')} value={aiSuggestion.ingredients.value} />
+            )}
+            {aiSuggestion.allergens && (
+              <FactRow label={t('productInfo.aiAllergens')} value={aiSuggestion.allergens.value} />
+            )}
+            {aiSuggestion.nutrition && (
+              <FactRow label={t('productInfo.aiNutrition')} value={aiSuggestion.nutrition.value} />
+            )}
+            {aiSuggestion.origin && (
+              <FactRow label={t('productInfo.aiOrigin')} value={aiSuggestion.origin.value} />
+            )}
+            {aiSuggestion.preparation && (
+              <FactRow label={t('productInfo.aiPreparation')} value={aiSuggestion.preparation.value} />
+            )}
+            <p className="text-[11px] leading-5 text-neutral-500">
+              {t('productInfo.aiNotVerified', { model: aiSuggestion.model, suggestedAt: aiSuggestion.suggestedAt })}
+            </p>
+          </div>
+        ),
+      },
+    ] : []),
   ];
 
   return (

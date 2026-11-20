@@ -71,7 +71,7 @@ export function CategoryFilter({ value, onChange, controls }: CategoryFilterProp
               }, rgba(13,11,10,.78)), url("${option.image}")`,
             }}
             className={cn(
-              'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-cover bg-center px-4 py-2 text-[13px] font-semibold text-white shadow-sm transition-all duration-300',
+              'relative inline-flex min-h-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-cover bg-center px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300',
               'hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
               active
                 ? 'ring-2 ring-brand ring-offset-2 ring-offset-paper'

@@ -74,6 +74,45 @@ export interface ProductMetafields {
   preparation: MetafieldValue | null;
 }
 
+/** A single AI-suggested field value. Never treated as verified fact. */
+export interface AISuggestedField {
+  value: string;
+  /** 0-1 confidence from the model; low confidence means "unsure". */
+  confidence: number;
+  /** Short rationale explaining why the model suggested this. */
+  rationale: string;
+}
+
+/** AI-generated ingredient/allergen suggestions for a product.
+ *
+ * Safety contract:
+ * - These are suggestions only, never authoritative facts.
+ * - `verified` is false until a human owner reviews and approves.
+ * - Allergen suggestions carry extra caution: they must not be published
+ *   without verification against the product packaging.
+ * - Suggestions are generated on demand and are not persisted to Shopify.
+ */
+export interface AISuggestion {
+  productId: string;
+  handle: string;
+  title: string;
+  /** True only after an owner has reviewed and approved the suggestion. */
+  verified: boolean;
+  /** True when the suggestion still awaits owner review. */
+  needsReview: boolean;
+  /** When the suggestion was generated. */
+  suggestedAt: string;
+  /** Model used to generate the suggestion. */
+  model: string;
+  ingredients: AISuggestedField | null;
+  allergens: AISuggestedField | null;
+  nutrition: AISuggestedField | null;
+  origin: AISuggestedField | null;
+  preparation: AISuggestedField | null;
+  /** Human-readable safety notice shown alongside the suggestion. */
+  disclaimer: string;
+}
+
 export interface SeoFields {
   title: string | null;
   description: string | null;

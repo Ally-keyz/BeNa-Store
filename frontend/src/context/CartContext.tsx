@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   addCartLines,
@@ -28,6 +29,9 @@ export interface AddItemOptions {
   merchandiseId: string;
   quantity?: number;
   countryCode?: string;
+  /** Product name used by the "added to cart" notification. */
+  itemTitle?: string;
+  /** Optional fallback message when no product title is available. */
   successMessage?: string;
   errorMessage?: string;
 }
@@ -52,11 +56,15 @@ export interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [cartId, setCartId] = useState<string | null>(() => readStorage(CART_KEY));
   const [isUpdating, setIsUpdating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  const openCart = useCallback(() => setIsOpen(true), []);
+  const closeCart = useCallback(() => setIsOpen(false), []);
 
   const persistCartId = useCallback((next: string | null) => {
     setCartId(next);
@@ -104,7 +112,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const addItem = useCallback(
-    async ({ merchandiseId, quantity = 1, countryCode, successMessage, errorMessage }: AddItemOptions) => {
+    async ({
+      merchandiseId,
+      quantity = 1,
+      countryCode,
+      itemTitle,
+      successMessage,
+      errorMessage,
+    }: AddItemOptions) => {
       setIsUpdating(true);
       try {
         if (!cartId) {
@@ -121,7 +136,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
             }
           }
         }
-        if (successMessage) toast({ title: successMessage, variant: 'success' });
+
+        if (itemTitle) {
+          toast({
+            title: t('cart.addedTitle'),
+            description: t('cart.addedBody', { title: itemTitle }),
+            variant: 'success',
+            action: { label: t('cart.viewCartButton'), onClick: openCart },
+            durationMs: 6000,
+          });
+        } else if (successMessage) {
+          toast({ title: successMessage, variant: 'success' });
+        }
       } catch (error) {
         if (errorMessage) toast({ title: errorMessage, variant: 'error' });
         throw error;
@@ -129,7 +155,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsUpdating(false);
       }
     },
-    [cartId, commitCart, createWithLine, toast],
+    [cartId, commitCart, createWithLine, openCart, t, toast],
   );
 
   const updateLine = useCallback(
@@ -208,8 +234,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       isLoading: cartQuery.isLoading,
       isUpdating,
       isOpen,
-      openCart: () => setIsOpen(true),
-      closeCart: () => setIsOpen(false),
+      openCart,
+      closeCart,
       addItem,
       updateLine,
       removeLine,
@@ -219,7 +245,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         void cartQuery.refetch();
       },
     }),
-    [cartQuery, isUpdating, isOpen, addItem, updateLine, removeLine, applyDiscount, setBuyerIdentity],
+    [
+      cartQuery,
+      isUpdating,
+      isOpen,
+      openCart,
+      closeCart,
+      addItem,
+      updateLine,
+      removeLine,
+      applyDiscount,
+      setBuyerIdentity,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -140,7 +140,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
       aria-roledescription="carousel"
       aria-label={t('a11y.carouselLabel')}
       className={cn(
-        'relative isolate h-[390px] w-full overflow-hidden rounded-4xl bg-ink text-white sm:h-[clamp(370px,39vw,450px)]',
+        'relative isolate h-[390px] w-full overflow-hidden rounded-4xl bg-night text-white sm:h-[clamp(370px,39vw,450px)]',
         className,
       )}
       onMouseEnter={() => setPointerPaused(true)}
@@ -163,7 +163,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-ink/90 via-ink/35 to-ink/5 sm:bg-gradient-to-r sm:from-ink/85 sm:via-ink/30 sm:to-transparent"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-night/90 via-night/35 to-night/5 sm:bg-gradient-to-r sm:from-night/85 sm:via-night/30 sm:to-transparent"
       />
 
       <div className="flex h-full flex-col justify-end px-5 pb-5 sm:px-8 sm:pb-8 lg:px-0 lg:pb-10">
@@ -184,7 +184,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
                 to={slide.href}
                 className={cn(
                   buttonVariants({ size: 'md' }),
-                  'rounded-full bg-brand px-6 text-ink hover:bg-white hover:text-ink',
+                  'rounded-full bg-brand px-6 text-on-brand hover:bg-white hover:text-night',
                 )}
               >
                 {slide.cta}
@@ -216,7 +216,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
                     <span
                       aria-hidden="true"
                       className={cn(
-                        'block h-0.5 rounded-full transition-all duration-500 group-focus-visible:ring-2 group-focus-visible:ring-white group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-ink',
+                        'block h-0.5 rounded-full transition-all duration-500 group-focus-visible:ring-2 group-focus-visible:ring-white group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-night',
                         itemIndex === index
                           ? 'w-10 bg-brand'
                           : 'w-5 bg-white/40 group-hover:bg-white/70',

@@ -4,6 +4,7 @@ import { ChevronRight, Mail } from 'lucide-react';
 import { BRAND } from '@/config';
 import { cn } from '@/lib/cn';
 import { Drawer } from '@/components/ui/Drawer';
+import { ThemeSegmented } from '@/components/ui/ThemeToggle';
 import { LanguageSwitch } from './LanguageSwitch';
 
 export interface MobileNavProps {
@@ -73,6 +74,12 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       </nav>
 
       <div className="mt-8 space-y-5 border-t border-terra-100 pt-5">
+        <div>
+          <p className="px-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
+            {t('theme.label')}
+          </p>
+          <ThemeSegmented className="mt-2.5" />
+        </div>
         <div>
           <p className="px-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
             {t('header.language')}

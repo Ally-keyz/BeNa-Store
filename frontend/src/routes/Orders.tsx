@@ -42,7 +42,7 @@ function OrdersPanel() {
       ) : (
         <ul className="mt-5 space-y-4">
           {orders.map((order) => (
-            <li key={order.id} className="rounded-card border border-terra-100 bg-white p-5 sm:p-6">
+            <li key={order.id} className="rounded-card border border-terra-100 bg-surface p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-medium text-ink">{t('account.orderNumber', { number: order.number })}</p>

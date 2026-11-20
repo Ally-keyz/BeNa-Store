@@ -54,7 +54,7 @@ export function LegalPage() {
         />
         <div className={`${sectionSpacing} pt-8 sm:pt-10`}>
           {page === 'impressum' ? (
-            <div className="mx-auto mb-8 max-w-[760px] rounded-card border border-terra-100 bg-white p-6 sm:p-8">
+            <div className="mx-auto mb-8 max-w-[760px] rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
               <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-terra-700">
                 {t('legal.companyTitle')}
               </h2>

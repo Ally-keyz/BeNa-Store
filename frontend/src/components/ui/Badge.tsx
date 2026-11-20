@@ -5,8 +5,8 @@ export type BadgeTone = 'neutral' | 'sale' | 'soon' | 'soldout' | 'outline';
 
 const tones: Record<BadgeTone, string> = {
   neutral: 'bg-terra-100 text-terra-900',
-  sale: 'bg-brand text-ink',
-  soon: 'border border-terra-200 bg-white text-terra-900',
+  sale: 'bg-brand text-on-brand',
+  soon: 'border border-terra-200 bg-surface text-terra-900',
   soldout: 'bg-neutral-100 text-neutral-700',
   outline: 'border border-terra-200 text-terra-900',
 };

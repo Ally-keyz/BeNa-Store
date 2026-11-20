@@ -1,10 +1,14 @@
 import { Router, type RequestHandler } from 'express';
 import type { Container } from '../container';
-import { validate } from '../middleware/validate';
+import { validate, getValidated } from '../middleware/validate';
 import { rateLimiters } from '../middleware/rateLimit';
 import { enforceTrustedOrigin } from '../middleware/enforceTrustedOrigin';
+import { asyncHandler } from '../utils/http';
+import { success } from '../utils/response';
+import { z } from 'zod';
 import {
   addCartLinesBody,
+  aiSuggestParams,
   auditCatalogQuery,
   auditProductParams,
   collectionDetailQuery,
@@ -30,6 +34,7 @@ import {
   marketContextQuery,
 } from '../schemas/common';
 import {
+  baseMeta,
   catalogController,
   insightsController,
 } from '../controllers/catalog.controller';
@@ -183,6 +188,22 @@ export function createApiRouter(
     adminGuard,
     validate({ params: auditProductParams, query: marketContextQuery }),
     insights.auditProduct,
+  );
+
+  // ---------------------------------------------------------------------- ai ---
+  router.get(
+    '/ai/suggestions/:handle',
+    adminGuard,
+    validate({ params: aiSuggestParams, query: marketContextQuery }),
+    asyncHandler(async (_req, res) => {
+      const { params, query } = getValidated<{
+        params: z.infer<typeof aiSuggestParams>;
+        query: z.infer<typeof marketContextQuery>;
+      }>(res);
+      const product = await container.services.products.byHandle(params.handle, query);
+      const suggestion = await container.services.ai.suggest(product);
+      res.json(success(res, suggestion, baseMeta(container)));
+    }),
   );
 
   // ------------------------------------------------------------------- seo ---

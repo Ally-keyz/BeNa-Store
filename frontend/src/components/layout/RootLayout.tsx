@@ -26,7 +26,7 @@ export function RootLayout() {
       <StorefrontSocketBridge />
       <a
         href="#main-content"
-        className="fixed left-4 top-3 z-[110] -translate-y-[200%] rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-ink transition-transform focus:translate-y-0"
+        className="fixed left-4 top-3 z-[110] -translate-y-[200%] rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-on-brand transition-transform focus:translate-y-0"
       >
         {t('a11y.skipToContent')}
       </a>

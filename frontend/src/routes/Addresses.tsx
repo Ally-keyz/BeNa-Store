@@ -41,7 +41,7 @@ function AddressesPanel() {
       ) : (
         <ul className="mt-5 grid gap-4 sm:grid-cols-2">
           {addresses.map((address) => (
-            <li key={address.id} className="rounded-card border border-terra-100 bg-white p-5 sm:p-6">
+            <li key={address.id} className="rounded-card border border-terra-100 bg-surface p-5 sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <p className="font-medium text-ink">{address.name || t('account.addressesTitle')}</p>
                 {address.id === defaultAddressId ? (

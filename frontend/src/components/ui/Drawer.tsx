@@ -41,7 +41,7 @@ export function Drawer({
   return createPortal(
     <div className={cn('fixed inset-0 z-[90]', side === 'right' ? 'flex justify-end' : 'flex justify-start')}>
       <div
-        className="animate-fade-in absolute inset-0 bg-ink/40"
+        className="animate-fade-in absolute inset-0 bg-night/50"
         onClick={stableClose}
         aria-hidden="true"
       />
@@ -51,7 +51,7 @@ export function Drawer({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          'relative z-10 flex h-full w-full max-w-[420px] flex-col bg-white',
+          'relative z-10 flex h-full w-full max-w-[420px] flex-col bg-surface',
           side === 'right' ? 'animate-drawer-in-right' : 'animate-drawer-in-left',
           className,
         )}

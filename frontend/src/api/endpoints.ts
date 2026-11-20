@@ -9,6 +9,7 @@ import type {
   PolicyBundle,
   PredictiveSearchResults,
   Product,
+  AISuggestion,
   Cart,
   RobotsData,
   SitemapData,
@@ -276,6 +277,12 @@ export function getSitemap(limit = 250): Promise<ApiResult<SitemapData>> {
 
 export function getRobots(): Promise<ApiResult<RobotsData>> {
   return apiRequest<RobotsData>('/seo/robots');
+}
+
+// ---------------------------------------------------------------------- ai ----
+
+export function getAiSuggestions(handle: string): Promise<ApiResult<AISuggestion>> {
+  return apiRequest<AISuggestion>(`/ai/suggestions/${enc(handle)}`);
 }
 
 // -------------------------------------------------------------------- auth ---

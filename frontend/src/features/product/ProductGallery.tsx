@@ -88,7 +88,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
           ) : (
             <PlaceholderImage label={t('hero.placeholderLabel')} />
           )}
-          <span className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm transition-transform group-hover:scale-105">
+          <span className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-night shadow-sm transition-transform group-hover:scale-105">
             <Maximize2 className="h-4 w-4" aria-hidden="true" />
           </span>
         </button>

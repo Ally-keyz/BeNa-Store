@@ -98,7 +98,7 @@ export function FeaturedProducts({
       className={cn(
         sectionSpacing,
         'pt-10 sm:pt-12 lg:pt-14',
-        variant === 'white' ? 'bg-white' : 'bg-transparent',
+        variant === 'white' ? 'bg-paper' : 'bg-transparent',
         className,
       )}
       aria-labelledby={titleId}
@@ -117,7 +117,7 @@ export function FeaturedProducts({
                   to="/catalog"
                   className={cn(
                     buttonVariants({ size: 'sm' }),
-                    'gap-1.5 rounded-full bg-brand px-5 text-ink hover:bg-brand-dark',
+                    'gap-1.5 rounded-full bg-brand px-5 text-on-brand hover:bg-brand-dark',
                   )}
                 >
                   {t('home.featuredCta')}
@@ -155,7 +155,7 @@ export function FeaturedProducts({
                   onClick={() => void query.refetch()}
                   className={cn(
                     buttonVariants({ size: 'sm' }),
-                    'mt-4 rounded-full bg-brand px-5 text-ink hover:bg-brand-dark',
+                    'mt-4 rounded-full bg-brand px-5 text-on-brand hover:bg-brand-dark',
                   )}
                 >
                   {t('common.retry')}

@@ -6,6 +6,7 @@ import type { Product } from '@/types';
 import { cn } from '@/lib/cn';
 import { formatMoney, formatUnitPrice, isOnSale } from '@/lib/money';
 import { getAvailability, getDefaultVariant, getPrimaryImage, hasVariantChoice } from '@/lib/product';
+import { stripHtml } from '@/lib/sanitize';
 import { useCart } from '@/context/CartContext';
 import { useMarket } from '@/context/MarketContext';
 import { Badge } from '@/components/ui/Badge';
@@ -28,7 +29,7 @@ export interface ProductCardProps {
  */
 export function ProductCard({ product, priority = false, className }: ProductCardProps) {
   const { t } = useTranslation();
-  const { addItem, openCart } = useCart();
+  const { addItem } = useCart();
   const { country, formatLocale } = useMarket();
   const [isAdding, setIsAdding] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
@@ -46,6 +47,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
   const multiVariant = hasVariantChoice(product);
   const productHref = `/products/${product.handle}`;
   const title = product.title;
+  const description = stripHtml(product.descriptionHtml) || product.description;
   const alt = image?.altText?.trim() || t('productCard.imageAltFallback', { title });
 
   const handleAdd = async () => {
@@ -56,10 +58,9 @@ export function ProductCard({ product, priority = false, className }: ProductCar
         merchandiseId: variant.id,
         quantity: 1,
         countryCode: country,
-        successMessage: t('productCard.added', { title }),
+        itemTitle: title,
         errorMessage: t('productCard.addError'),
       });
-      openCart();
     } catch {
       // The toast already explains the failure.
     } finally {
@@ -97,7 +98,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
           ) : availability === 'sold-out' ? (
             <Badge tone="soldout">{t('common.soldOut')}</Badge>
           ) : onSale ? (
-            <Badge tone="sale">{t('common.sale')}</Badge>
+            <Badge tone="sale">{t('productCard.onDiscount')}</Badge>
           ) : null}
         </div>
 
@@ -126,24 +127,31 @@ export function ProductCard({ product, priority = false, className }: ProductCar
         ) : null}
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col pt-2.5">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 text-[15px] font-medium leading-snug text-ink">
-            <Link to={productHref} className="rounded-sm hover:text-terra-700">
-              {title}
-            </Link>
-          </h3>
-          <div className="shrink-0 text-right">
-            <span className="tabular block text-[15px] font-semibold text-ink">
-              {formatMoney(price, { locale: formatLocale }) || t('productCard.priceUnavailable')}
-            </span>
-            {onSale && compareAt ? (
-              <span className="tabular mt-0.5 block text-[13px] text-neutral-500 line-through">
-                {formatMoney(compareAt, { locale: formatLocale })}
+        <div className="flex min-h-0 flex-1 flex-col pt-2.5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h3 className="line-clamp-2 text-[15px] font-medium leading-snug text-ink">
+                <Link to={productHref} className="rounded-sm hover:text-terra-700">
+                  {title}
+                </Link>
+              </h3>
+              {description ? (
+                <p className="line-clamp-1 mt-1 text-[12px] leading-4 text-neutral-600">
+                  {description}
+                </p>
+              ) : null}
+            </div>
+            <div className="shrink-0 text-right">
+              <span className="tabular block text-[18px] font-bold text-terra-700">
+                {formatMoney(price, { locale: formatLocale }) || t('productCard.priceUnavailable')}
               </span>
-            ) : null}
+              {onSale && compareAt ? (
+                <span className="tabular mt-0.5 block text-[14px] text-terra-600 line-through font-medium">
+                  {formatMoney(compareAt, { locale: formatLocale })}
+                </span>
+              ) : null}
+            </div>
           </div>
-        </div>
 
         {unitPrice ? (
           <p className="tabular mt-1 text-[12px] text-neutral-600">

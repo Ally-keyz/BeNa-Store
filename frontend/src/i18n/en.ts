@@ -45,6 +45,12 @@ const en = {
     mainNav: 'Main navigation',
     footerNav: 'Footer navigation',
   },
+  theme: {
+    label: 'Appearance',
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
+  },
   nav: {
     shop: 'Shop',
     shopAll: 'Catalog',
@@ -199,6 +205,7 @@ const en = {
     added: '{{title}} added to your cart.',
     addError: 'Could not add this item. Please try again.',
     priceUnavailable: 'Price on request',
+    onDiscount: 'On discount',
   },
   product: {
     breadcrumbHome: 'Home',
@@ -273,6 +280,9 @@ const en = {
     discountApplied: 'applied',
     discountError: 'We could not apply that code.',
     viewCart: 'View full cart',
+    addedTitle: 'Added to cart',
+    addedBody: '{{title}} is now in your cart.',
+    viewCartButton: 'View cart',
     detailsTitle: 'Checkout details',
     detailsBody:
       'Your email and destination are passed to the Shopify-hosted checkout. No payment is taken here.',
@@ -368,11 +378,22 @@ const en = {
     added: '{{title}} added to your cart.',
     addError: 'Could not add this item. Please try again.',
     quantityLabel: 'Quantity for {{title}}',
+    total: 'Total',
     priceUnavailable: 'Price on request',
     imageAlt: '{{title}} — view {{number}}',
     openImage: 'Open image {{number}} in full screen',
     closeImage: 'Close image viewer',
     imageCounter: '{{current}} / {{total}}',
+    aiSuggestionsTitle: 'AI suggestions',
+    aiIngredients: 'Ingredients (AI)',
+    aiAllergens: 'Allergens (AI)',
+    aiNutrition: 'Nutrition (AI)',
+    aiOrigin: 'Origin (AI)',
+    aiPreparation: 'Preparation (AI)',
+    aiNotVerified:
+      'AI-generated suggestion — not verified. Model: {{model}} · Generated: {{suggestedAt}}. Check packaging before publishing.',
+    aiDisclaimer:
+      'AI-generated suggestion — not a verified fact. Ingredients and allergens are suggestions only and must be checked against the product packaging before being published. This service does not modify shop data.',
   },
   about: {
     eyebrow: 'Our story',

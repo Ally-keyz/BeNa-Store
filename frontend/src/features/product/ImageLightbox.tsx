@@ -50,7 +50,7 @@ export function ImageLightbox({
 
   return createPortal(
     <div
-      className="animate-fade-in fixed inset-0 z-[95] flex items-center justify-center bg-ink/95 p-4 backdrop-blur-sm sm:p-8"
+      className="animate-fade-in fixed inset-0 z-[95] flex items-center justify-center bg-night/95 p-4 backdrop-blur-sm sm:p-8"
       onClick={stableClose}
       role="presentation"
     >
@@ -66,7 +66,7 @@ export function ImageLightbox({
           type="button"
           onClick={stableClose}
           aria-label={t('productInfo.closeImage')}
-          className="absolute right-0 top-0 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand hover:text-ink"
+          className="absolute right-0 top-0 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand hover:text-on-brand"
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
@@ -76,7 +76,7 @@ export function ImageLightbox({
             type="button"
             onClick={() => onIndexChange((index - 1 + images.length) % images.length)}
             aria-label={t('a11y.previousSlide')}
-            className="absolute left-0 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand hover:text-ink sm:left-2"
+            className="absolute left-0 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand hover:text-on-brand sm:left-2"
           >
             <ChevronLeft className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -94,7 +94,7 @@ export function ImageLightbox({
             type="button"
             onClick={() => onIndexChange((index + 1) % images.length)}
             aria-label={t('a11y.nextSlide')}
-            className="absolute right-0 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand hover:text-ink sm:right-2"
+            className="absolute right-0 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand hover:text-on-brand sm:right-2"
           >
             <ChevronRight className="h-6 w-6" aria-hidden="true" />
           </button>

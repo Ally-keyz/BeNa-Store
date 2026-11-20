@@ -18,6 +18,7 @@ import { ReviewsService } from './services/reviews.service';
 import { SeoService } from './services/seo.service';
 import { ShippingService } from './services/shipping.service';
 import { CustomerAuthService } from './services/customerAuth.service';
+import { AiService } from './services/ai.service';
 
 export interface Services {
   products: ProductsService;
@@ -33,6 +34,7 @@ export interface Services {
   seo: SeoService;
   health: HealthService;
   customerAuth: CustomerAuthService;
+  ai: AiService;
 }
 
 export interface Container {
@@ -82,6 +84,7 @@ export function createContainer(
       seo: new SeoService(client, config),
       health: new HealthService(client, config),
       customerAuth: new CustomerAuthService(config, logger, cartService),
+      ai: new AiService(config, logger),
     },
   };
 }

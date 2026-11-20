@@ -38,7 +38,12 @@ export function CartLines({ lines, compact = false }: CartLinesProps) {
     <ul className="divide-y divide-terra-100">
       {lines.map((line) => {
         const merchandise = line.merchandise;
-        const title = merchandise?.title ?? t('cart.lineUnavailable');
+        const productTitle = merchandise?.product.title ?? t('cart.lineUnavailable');
+        const variantTitle = merchandise?.title;
+        const isDefaultVariant = !variantTitle || /^default\s*title$/i.test(variantTitle.trim());
+        const title = variantTitle && !isDefaultVariant && variantTitle !== productTitle
+          ? `${productTitle} — ${variantTitle}`
+          : productTitle;
         const options = merchandise?.selectedOptions.map((option) => option.value).join(' · ');
         const each = formatMoney(line.cost.amountPerQuantity, { locale: formatLocale });
         return (
@@ -61,6 +66,11 @@ export function CartLines({ lines, compact = false }: CartLinesProps) {
                 <div className="min-w-0">
                   <p className="truncate text-[15px] font-medium text-ink">{title}</p>
                   {options ? <p className="mt-0.5 text-[13px] text-neutral-600">{options}</p> : null}
+                  {merchandise?.product.description ? (
+                    <p className="mt-0.5 line-clamp-1 text-[12px] text-neutral-500">
+                      {merchandise.product.description}
+                    </p>
+                  ) : null}
                   {each && line.quantity > 1 ? (
                     <p className="mt-0.5 text-[12px] text-neutral-500">
                       {t('cart.each', { amount: each })}

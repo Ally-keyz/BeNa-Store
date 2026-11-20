@@ -9,7 +9,7 @@ export function NewsletterSection() {
   return (
     <section className={sectionSpacing} aria-labelledby="home-newsletter">
       <div className={pageContainer}>
-        <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-hero border border-terra-100 bg-gradient-to-br from-terra-50 via-white to-white p-6 sm:p-10">
+        <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-hero border border-terra-100 bg-gradient-to-br from-terra-50 via-surface to-surface p-6 sm:p-10">
           <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5 bg-brand" />
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12">
             <SectionHeading

@@ -178,6 +178,18 @@ const EnvSchema = z.object({
     ])
     .default('auto'),
   REVIEWS_API_TOKEN: optionalString,
+
+  // AI ingredient/allergen suggestions. Opt-in, default off. Runs a free local
+  // model (Ollama) — no external API calls and no per-request cost. Suggestions
+  // are never written to Shopify automatically; they require owner review.
+  AI_ENABLED: booleanish.default(false),
+  AI_PROVIDER: z.enum(['ollama']).default('ollama'),
+  AI_OLLAMA_BASE_URL: optionalString,
+  AI_OLLAMA_MODEL: z.string().trim().min(1).default('llama3.2:3b'),
+  AI_TEMPERATURE: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().min(0).max(1).default(0.2),
+  ),
 });
 
 export type RawEnv = z.infer<typeof EnvSchema>;
@@ -287,6 +299,15 @@ export interface AppConfig {
     mailchimpServerPrefix: string | null;
   };
   reviews: { provider: RawEnv['REVIEWS_PROVIDER']; apiToken: string | null };
+  ai: {
+    enabled: boolean;
+    provider: RawEnv['AI_PROVIDER'];
+    ollama: {
+      baseUrl: string;
+      model: string;
+      temperature: number;
+    };
+  };
   warnings: string[];
 }
 
@@ -687,6 +708,15 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       mailchimpServerPrefix: env.MAILCHIMP_SERVER_PREFIX ?? null,
     },
     reviews: { provider: env.REVIEWS_PROVIDER, apiToken: env.REVIEWS_API_TOKEN ?? null },
+    ai: {
+      enabled: env.AI_ENABLED,
+      provider: env.AI_PROVIDER,
+      ollama: {
+        baseUrl: env.AI_OLLAMA_BASE_URL ?? 'http://localhost:11434',
+        model: env.AI_OLLAMA_MODEL,
+        temperature: env.AI_TEMPERATURE,
+      },
+    },
     warnings,
   };
 }
@@ -723,6 +753,11 @@ export function safeConfigSummary(config: AppConfig): Record<string, unknown> {
     },
     newsletterProvider: config.newsletter.provider,
     reviewsProvider: config.reviews.provider,
+    ai: {
+      enabled: config.ai.enabled,
+      provider: config.ai.provider,
+      model: config.ai.ollama.model,
+    },
     redisEnabled: Boolean(config.redisUrl),
     rateLimits: config.rateLimits,
   };

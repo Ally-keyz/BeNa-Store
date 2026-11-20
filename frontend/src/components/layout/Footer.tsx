@@ -49,7 +49,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 bg-ink text-white">
+    <footer className="mt-16 bg-night text-white">
       <div className={cn(pageContainer, 'grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-16')}>
         <div className="max-w-sm">
           <p className="font-display text-xl font-semibold tracking-tight">{BRAND.name}</p>

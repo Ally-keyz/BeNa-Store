@@ -28,3 +28,4 @@ export { PlaceholderImage } from './PlaceholderImage';
 export { ProductImage } from './ProductImage';
 export { SectionHeading } from './SectionHeading';
 export type { SectionHeadingProps } from './SectionHeading';
+export { ThemeToggle, ThemeSegmented } from './ThemeToggle';

@@ -84,7 +84,7 @@ export function NewsletterForm({
         )}
         role="status"
       >
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-ink">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand">
           <Check className="h-5 w-5" aria-hidden="true" />
         </span>
         <p className="text-[14px] font-medium leading-6 text-ink">
@@ -101,7 +101,7 @@ export function NewsletterForm({
       <div
         className={cn(
           'rounded-2xl border p-2 shadow-sm transition-shadow focus-within:shadow-md',
-          isFooter ? 'border-white/20 bg-white/10' : 'border-terra-100 bg-white',
+          isFooter ? 'border-white/20 bg-white/10' : 'border-terra-100 bg-surface',
         )}
       >
         <div className="flex flex-col gap-2 sm:flex-row">

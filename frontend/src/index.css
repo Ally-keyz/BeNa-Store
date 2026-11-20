@@ -250,6 +250,31 @@
   }
 }
 
+/* Top-centre notifications: a soft spring drop with a gentle overshoot. */
+@keyframes bena-toast-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.94);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(3px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bena-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
 @layer utilities {
   .animate-fade-in {
     animation: bena-fade-in 180ms var(--ease-out-soft) both;
@@ -268,5 +293,11 @@
   }
   .animate-pop-out {
     animation: bena-pop-out 220ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  .animate-toast-in {
+    animation: bena-toast-in 420ms var(--ease-out-soft) both;
+  }
+  .animate-toast-progress {
+    animation: bena-toast-progress 4500ms linear both;
   }
 }

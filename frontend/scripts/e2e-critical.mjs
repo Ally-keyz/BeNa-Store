@@ -9,18 +9,27 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const fixtureUrl = new URL('../../src/fixtures/mock/data.ts', import.meta.url);
+const fixturePath = fileURLToPath(new URL('../../src/fixtures/mock/data.ts', import.meta.url));
+
+process.env.VITE_SOCKET_URL ??= 'http://127.0.0.1:9';
+
+const { createServer, transformWithEsbuild } = await import('vite');
+
+// Node cannot import TypeScript fixtures directly. Transpile the (type-only)
+// fixture to ESM first so the script also runs on the pinned Node 20 toolchain.
+const fixtureSource = fs.readFileSync(fixturePath, 'utf8');
+const { code: fixtureCode } = await transformWithEsbuild(fixtureSource, fixturePath, {
+  loader: 'ts',
+  format: 'esm',
+  target: 'esnext',
+});
 const {
   fixtureProducts,
   fixtureCollections,
   fixtureLocalization,
   fixturePolicies,
   money,
-} = await import(fixtureUrl.href);
-
-process.env.VITE_SOCKET_URL ??= 'http://127.0.0.1:9';
-
-const { createServer } = await import('vite');
+} = await import(`data:text/javascript;base64,${Buffer.from(fixtureCode).toString('base64')}`);
 const react = (await import('@vitejs/plugin-react')).default;
 const tailwindcss = (await import('@tailwindcss/vite')).default;
 
@@ -379,17 +388,28 @@ async function run() {
       await fn();
     };
 
-    await step('home shell, exact navigation and market control', async () => {
+    await step('home shell, exact navigation and header controls', async () => {
       await page.goto(ORIGIN, { waitUntil: 'domcontentloaded' });
       await page.getByRole('heading', { name: 'Discover Rwanda in every box.' }).waitFor();
       const nav = page.getByRole('navigation', { name: 'Main navigation' });
       for (const label of ['Home', 'Rwandan Products', 'Catalog', 'About Us', 'Contact']) {
         await nav.getByRole('link', { name: label, exact: true }).waitFor();
       }
-      const market = page.getByRole('button', {
-        name: 'Region and language selector — EUR / EN',
-      });
-      await market.waitFor();
+
+      const language = page.getByRole('group', { name: 'Language', exact: true });
+      await language.getByRole('button', { name: 'English', exact: true }).waitFor();
+
+      // The appearance control defaults to system and can force dark mode.
+      const appearance = page.getByRole('button', { name: 'Appearance', exact: true });
+      await appearance.click();
+      await page.getByRole('menuitemradio', { name: 'Dark', exact: true }).click();
+      assert.equal(
+        await page.locator('html.dark').count(),
+        1,
+        'Choosing Dark should apply the dark theme class.',
+      );
+      await appearance.click();
+      await page.getByRole('menuitemradio', { name: 'System', exact: true }).click();
     });
 
     await step('home category filter uses the backend collection endpoint', async () => {
@@ -423,6 +443,9 @@ async function run() {
       await page.locator('main').getByRole('link', { name: 'Rwanda Coffee 250g' }).click();
       await page.getByRole('heading', { name: 'Rwanda Coffee 250g' }).waitFor();
       await page.getByTestId('add-to-cart').click();
+      // Adding no longer hijacks the page with the cart drawer; the top-centre
+      // notification offers an explicit "View cart" action instead.
+      await page.getByRole('button', { name: 'View cart', exact: true }).click();
       const checkout = page.getByRole('button', { name: 'Continue to checkout' });
       await checkout.waitFor();
       assert.equal(await checkout.isEnabled(), true, 'Checkout handoff should be available.');

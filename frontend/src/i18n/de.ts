@@ -52,6 +52,12 @@ const de: Resources = {
     mainNav: 'Hauptnavigation',
     footerNav: 'Fußzeilennavigation',
   },
+  theme: {
+    label: 'Darstellung',
+    light: 'Hell',
+    dark: 'Dunkel',
+    system: 'System',
+  },
   nav: {
     shop: 'Shop',
     shopAll: 'Katalog',
@@ -206,6 +212,7 @@ const de: Resources = {
     added: '{{title}} wurde in den Warenkorb gelegt.',
     addError: 'Der Artikel konnte nicht hinzugefügt werden. Bitte versuche es erneut.',
     priceUnavailable: 'Preis auf Anfrage',
+    onDiscount: 'Im Angebot',
   },
   product: {
     breadcrumbHome: 'Start',
@@ -280,6 +287,9 @@ const de: Resources = {
     discountApplied: 'angewendet',
     discountError: 'Der Code konnte nicht angewendet werden.',
     viewCart: 'Vollständigen Warenkorb ansehen',
+    addedTitle: 'Zum Warenkorb hinzugefügt',
+    addedBody: '{{title}} ist jetzt in deinem Warenkorb.',
+    viewCartButton: 'Warenkorb ansehen',
     detailsTitle: 'Checkout-Daten',
     detailsBody:
       'Deine E-Mail-Adresse und dein Zielland werden an den von Shopify gehosteten Checkout übergeben. Hier wird keine Zahlung ausgelöst.',
@@ -375,11 +385,22 @@ const de: Resources = {
     added: '{{title}} wurde in den Warenkorb gelegt.',
     addError: 'Der Artikel konnte nicht hinzugefügt werden. Bitte versuche es erneut.',
     quantityLabel: 'Menge für {{title}}',
+    total: 'Gesamt',
     priceUnavailable: 'Preis auf Anfrage',
     imageAlt: '{{title}} — Ansicht {{number}}',
     openImage: 'Bild {{number}} Vollbild öffnen',
     closeImage: 'Bildansicht schließen',
     imageCounter: '{{current}} / {{total}}',
+    aiSuggestionsTitle: 'KI-Vorschläge',
+    aiIngredients: 'Zutaten (KI)',
+    aiAllergens: 'Allergene (KI)',
+    aiNutrition: 'Nährwerte (KI)',
+    aiOrigin: 'Herkunft (KI)',
+    aiPreparation: 'Zubereitung (KI)',
+    aiNotVerified:
+      'KI-generierter Vorschlag — nicht verifiziert. Modell: {{model}} · Erstellt: {{suggestedAt}}. Verpackung vor der Veröffentlichung prüfen.',
+    aiDisclaimer:
+      'KI-generierter Vorschlag — keine verifizierte Tatsache. Zutaten und Allergene sind Vorschläge und müssen vor der Veröffentlichung auf der Verpackung geprüft werden. Dieser Dienst ändert keine Shop-Daten.',
   },
   about: {
     eyebrow: 'Unsere Geschichte',

@@ -65,7 +65,7 @@ export function CatalogPage() {
           path: '/catalog',
         }}
       />
-      <div className={`${pageContainer} min-h-[70vh] bg-white pb-16`}>
+      <div className={`${pageContainer} min-h-[70vh] bg-paper pb-16`}>
         <Breadcrumbs
           items={[{ label: t('nav.home'), href: '/' }, { label: t('nav.catalog') }]}
           label={t('a11y.breadcrumb')}
@@ -94,7 +94,7 @@ export function CatalogPage() {
               <div
                 role="group"
                 aria-label={t('catalog.priceLabel')}
-                className="inline-flex flex-wrap items-center rounded-xl border border-terra-200 bg-white p-1"
+                className="inline-flex flex-wrap items-center gap-0.5 rounded-full border border-terra-200 bg-surface p-1.5"
               >
                 {PRICE_OPTIONS.map((option) => {
                   const active = priceFilter === option.value;
@@ -105,9 +105,9 @@ export function CatalogPage() {
                       onClick={() => setPriceFilter(option.value)}
                       aria-pressed={active}
                       className={cn(
-                        'rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors',
+                        'rounded-full px-4 py-2 text-[13px] font-medium transition-colors',
                         active
-                          ? 'bg-brand text-ink'
+                          ? 'bg-brand text-on-brand shadow-sm'
                           : 'text-neutral-600 hover:bg-terra-50 hover:text-ink',
                       )}
                     >

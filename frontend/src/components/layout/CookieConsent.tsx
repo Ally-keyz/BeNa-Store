@@ -60,7 +60,7 @@ export function CookieConsent() {
           aria-label={t('cookie.title')}
           className="fixed inset-x-0 bottom-0 z-[70] p-3 sm:p-4"
         >
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 rounded-2xl border border-terra-100 bg-white p-4 sm:p-5">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 rounded-2xl border border-terra-100 bg-surface p-4 sm:p-5">
             <div className="flex items-start gap-3">
               <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-terra-50 text-terra-800">
                 <Cookie className="h-4 w-4" aria-hidden="true" />

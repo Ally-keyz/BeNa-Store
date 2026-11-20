@@ -56,7 +56,7 @@ export function ContactForm() {
   };
 
   return (
-    <div className="rounded-card border border-terra-100 bg-white p-6 sm:p-8">
+    <div className="rounded-card border border-terra-100 bg-surface p-6 sm:p-8">
       <h2 className="text-xl font-semibold">{t('contact.formTitle')}</h2>
       <p className="mt-2 text-[13px] leading-6 text-neutral-600">{t('contact.mailtoNote')}</p>
 
