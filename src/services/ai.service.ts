@@ -7,9 +7,19 @@ import { AppError, featureDisabled, upstreamUnavailable } from '../utils/errors'
 interface ChatCompletionRequest {
   model: string;
   messages: Array<{ role: 'system' | 'user'; content: string }>;
-  temperature: number;
-  response_format: { type: 'json_object' };
-  max_tokens: number;
+  temperature?: number;
+  response_format?: { type: 'json_object' };
+  max_completion_tokens: number;
+}
+
+interface ProviderErrorDetail {
+  status: number;
+  message?: string;
+  raw?: string;
+}
+
+function oneLine(value: string, maxLength = 300): string {
+  return value.replace(/\s+/g, ' ').trim().slice(0, maxLength);
 }
 
 interface ChatCompletionResponse {
@@ -188,53 +198,122 @@ Required JSON shape:
 }`;
   }
 
+  private buildRequests(prompt: string): ChatCompletionRequest[] {
+    const { model, temperature } = this.config.ai;
+    const systemInstruction =
+      'You are a careful food-label assistant. You only output the requested JSON object. ' +
+      'You never claim that a suggestion is a verified fact.';
+    const messages: Array<{ role: 'system' | 'user'; content: string }> = [
+      { role: 'system', content: systemInstruction },
+      { role: 'user', content: prompt },
+    ];
+    const fallbackMessages: Array<{ role: 'system' | 'user'; content: string }> = [
+      { role: 'user', content: `${systemInstruction}\n\n${prompt}` },
+    ];
+
+    return [
+      {
+        model,
+        temperature,
+        response_format: { type: 'json_object' },
+        max_completion_tokens: 800,
+        messages,
+      },
+      {
+        model,
+        max_completion_tokens: 800,
+        messages: fallbackMessages,
+      },
+    ];
+  }
+
+  private async readProviderError(res: Response): Promise<ProviderErrorDetail> {
+    let raw = '';
+    try {
+      raw = await res.text();
+    } catch {
+      raw = '';
+    }
+
+    let message: string | undefined;
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as {
+          error?: { message?: unknown };
+          message?: unknown;
+        };
+        const candidate = parsed.error?.message ?? parsed.message;
+        if (typeof candidate === 'string' && candidate.trim()) {
+          message = oneLine(candidate);
+        }
+      } catch {
+        message = undefined;
+      }
+    }
+
+    return {
+      status: res.status,
+      message,
+      raw: raw ? oneLine(raw, 1000) : undefined,
+    };
+  }
+
+  private providerFailure(detail: ProviderErrorDetail): AppError {
+    const suffix = detail.message ? `: ${detail.message}` : '';
+    if (detail.status === 401 || detail.status === 403) {
+      return upstreamUnavailable(`AI API key was rejected. Check AI_API_KEY.${suffix}`);
+    }
+    if (detail.status === 429) {
+      return upstreamUnavailable(`AI provider rate limit reached. Please try again later.${suffix}`);
+    }
+    return upstreamUnavailable(`AI provider returned ${detail.status}${suffix}`);
+  }
+
   private async callProvider(prompt: string): Promise<string> {
-    const { apiKey, baseUrl, model, temperature } = this.config.ai;
+    const { apiKey, baseUrl } = this.config.ai;
     if (!apiKey) {
       throw featureDisabled('AI suggestions are disabled. Set AI_API_KEY to enable them.');
     }
 
-    const body: ChatCompletionRequest = {
-      model,
-      temperature,
-      response_format: { type: 'json_object' },
-      max_tokens: 800,
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a careful food-label assistant. You only output the requested JSON object. ' +
-            'You never claim that a suggestion is a verified fact.',
+    let lastError: ProviderErrorDetail | undefined;
+    for (const [attempt, body] of this.buildRequests(prompt).entries()) {
+      const res = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
         },
-        { role: 'user', content: prompt },
-      ],
-    };
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(20_000),
+      });
 
-    const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(20_000),
-    });
+      if (res.ok) {
+        const data = (await res.json()) as ChatCompletionResponse;
+        const content = data.choices?.[0]?.message?.content;
+        if (typeof content !== 'string' || !content.trim()) {
+          throw new Error('AI provider returned no content');
+        }
+        return content;
+      }
 
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        throw upstreamUnavailable('AI API key was rejected. Check AI_API_KEY.');
+      lastError = await this.readProviderError(res);
+      this.logger.warn(
+        {
+          status: lastError.status,
+          attempt: attempt + 1,
+          model: body.model,
+          endpoint: baseUrl,
+          providerMessage: lastError.message,
+          providerResponse: lastError.raw,
+        },
+        'AI provider rejected chat completion request',
+      );
+
+      if (lastError.status !== 400) {
+        throw this.providerFailure(lastError);
       }
-      if (res.status === 429) {
-        throw upstreamUnavailable('AI provider rate limit reached. Please try again later.');
-      }
-      throw upstreamUnavailable(`AI provider returned ${res.status}.`);
     }
 
-    const data = (await res.json()) as ChatCompletionResponse;
-    const content = data.choices?.[0]?.message?.content;
-    if (typeof content !== 'string' || !content.trim()) {
-      throw new Error('AI provider returned no content');
-    }
-    return content;
+    throw this.providerFailure(lastError ?? { status: 400 });
   }
 }
