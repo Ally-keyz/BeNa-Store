@@ -99,53 +99,35 @@ npm run smoke          # read-only live smoke (fixture message when no credentia
 
 Repository: `https://github.com/Ally-keyz/BeNa-Store`
 
-One-click blueprint:
+One-click blueprint (storefront only):
 
 ```text
 https://render.com/deploy?repo=https://github.com/Ally-keyz/BeNa-Store
 ```
 
-or Render Dashboard → **New → Blueprint** → select the repo.
+or Render Dashboard → **New → Blueprint** → select the repo, branch `main`, path `render.yaml`.
 
-`render.yaml` configures:
+#### Backend (already deployed)
 
-- Node 20, `npm ci --include=dev && npm run build && npm prune --omit=dev`, `npm start`
-- health check `/health`
-- live Shopify mode (`SHOPIFY_MOCK_MODE=false`, store domain, API `2026-10`)
-- production CORS for `benaorigins.de` / `www.benaorigins.de` and the Render frontend origin
-- generated `ADMIN_JWT_SECRET` + `SESSION_SECRET`
-- Customer Account public endpoints and client ID
-- `AUTH_CUSTOMER_ACCOUNTS_ENABLED=false` until the Render URL is registered in Shopify
+The backend already runs at `https://bena-origins.onrender.com` and is managed separately in the Render dashboard. `render.yaml` intentionally does **not** declare it, so creating this Blueprint will not create a duplicate backend service. The backend service settings are preserved in `render.backend.yaml` for reference.
 
-Render prompts for secrets marked `sync: false`:
+Backend reminders:
 
-- `SHOPIFY_STOREFRONT_PRIVATE_TOKEN` (recommended; without it, tokenless live reads still work)
-- `SHOPIFY_STOREFRONT_PUBLIC_TOKEN` (optional)
-- `SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_SECRET`
-- `SHOPIFY_WEBHOOK_SECRET` + `PUBLIC_WEBHOOK_BASE_URL` (later)
-- `ADMIN_API_KEY_SHA256` (optional; JWT auth is generated)
-- `REDIS_URL` (optional)
-
-After the first deploy:
-
-1. Copy the service URL (`https://<service>.onrender.com`).
-2. Set `API_PUBLIC_URL` to that URL.
-3. Register `https://<service>.onrender.com/api/v1/auth/callback` and
-   `https://<service>.onrender.com` (JS origin) in Shopify's Customer Account API settings.
-4. Set `SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI`, `SHOPIFY_CUSTOMER_ACCOUNT_JS_ORIGIN`, and
-   `AUTH_CUSTOMER_ACCOUNTS_ENABLED=true`, then redeploy.
-5. Verify `/health/ready` and `/api/v1/products` show live Shopify data.
+- Node 20 build, `npm start`, health check `/health`, live Shopify mode (API `2026-10`).
+- `CORS_ALLOWED_ORIGINS` and `SOCKET_CORS_ORIGINS` must include `https://benaorigins.de`, `https://www.benaorigins.de`, `https://bena-origins.onrender.com`, and the new frontend origin `https://bena-origins-frontend.onrender.com`. Add the frontend origin in the dashboard and redeploy the backend if it is missing — otherwise the site loads but API/Socket requests fail CORS.
+- Shopify Customer Account callback and JS origin are already registered for the backend URL.
 
 #### Storefront (frontend) on Render
 
-The same Blueprint also creates `bena-origins-frontend` as a **static site**:
+`render.yaml` creates one static site, `bena-origins-frontend`:
 
 - Root Directory: `frontend`; Build: `npm ci && npm run build`; Publish Directory: `dist`
 - `/* → /index.html` rewrite so React Router deep links (e.g. `/products/:handle`) survive refresh
-- Build-time `VITE_API_BASE_URL` and `VITE_SOCKET_URL` point at the backend service. They are public values baked into the JS bundle — never put secrets in them.
-- The frontend's Render origin is included in the backend's `CORS_ALLOWED_ORIGINS` and `SOCKET_CORS_ORIGINS`.
+- Build-time `VITE_API_BASE_URL=https://bena-origins.onrender.com/api/v1` and `VITE_SOCKET_URL=https://bena-origins.onrender.com`. They are public values baked into the JS bundle — never put secrets in them.
+- `NODE_VERSION=20.20.2` is pinned because the repo-root `.nvmrc` is outside the frontend root directory.
+- Immutable `Cache-Control` headers for `/assets/*`.
 
-If your backend service URL is not `https://bena-origins-backend.onrender.com`, change both `VITE_` values and the CORS lists in `render.yaml` before deploying. If the storefront uses a custom domain, add that origin to the CORS lists and to Shopify's Customer Account JS origin/redirect settings, then redeploy.
+After the first deploy, deep-link to `/catalog` and refresh to verify the SPA rewrite, then check the browser console for CORS errors. If the storefront uses a custom domain, add that origin to the backend CORS lists and to Shopify's Customer Account JS origin/redirect settings, then redeploy.
 
 #### Performance and SEO notes
 
