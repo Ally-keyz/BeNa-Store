@@ -23,6 +23,9 @@ const de: Resources = {
     quantity: 'Menge',
     unit_one: 'Einheit',
     unit_other: 'Einheiten',
+    pricePerKg: '{{price}} / kg',
+    pricePerKgLabel: 'Preis pro Kilogramm',
+    packageWeight: '× {{weight}} kg',
     from: 'Ab',
     all: 'Alle',
     required: 'Pflichtfeld',
@@ -63,7 +66,7 @@ const de: Resources = {
   nav: {
     shop: 'Shop',
     shopAll: 'Katalog',
-    rwandanProducts: 'Ruandische Produkte',
+    africanProducts: 'Afrikanische Produkte',
     catalog: 'Katalog',
     coffee: 'Kaffee',
     food: 'Food',
@@ -94,7 +97,7 @@ const de: Resources = {
     closeSearch: 'Suche schließen',
   },
   footer: {
-    tagline: 'Ruandischer Kaffee, Vorratsprodukte und handgewebte Crafts — mit Sorgfalt bezogen.',
+    tagline: 'Afrikanischer Kaffee, Vorratsprodukte und handgewebte Crafts — mit Sorgfalt bezogen.',
     shopHeading: 'Shop',
     companyHeading: 'Unternehmen',
     helpHeading: 'Hilfe',
@@ -123,11 +126,11 @@ const de: Resources = {
     productImageAlt: '{{title}} — Neuheit',
     slides: {
       rwanda: {
-        eyebrow: 'Ruandische Produkte, mit Sorgfalt bezogen',
-        title: 'Ruanda in jeder Kiste entdecken.',
-        subtitle: 'Kaffee, Vorratsprodukte und handgewebte Crafts von Erzeugern und Handwerkern aus Ruanda.',
-        cta: 'Ruandische Produkte entdecken',
-        imageAlt: 'Auswahl aus ruandischem Kaffee, Food und Crafts',
+        eyebrow: 'Afrikanische Produkte, mit Sorgfalt bezogen',
+        title: 'Afrika in jeder Kiste entdecken.',
+        subtitle: 'Kaffee, Vorratsprodukte und handgewebte Crafts von Erzeugern und Handwerkern aus Afrika.',
+        cta: 'Afrikanische Produkte entdecken',
+        imageAlt: 'Auswahl aus afrikanischem Kaffee, Food und Crafts',
       },
       coffee: {
         eyebrow: 'Rwandas Single Origin',
@@ -305,8 +308,8 @@ const de: Resources = {
   },
   catalog: {
     eyebrow: 'Das gesamte Sortiment',
-    title: 'Ruandische Produkte an einem Ort',
-    body: 'Kaffee, Vorratsprodukte und handgewebte Crafts aus Ruanda. Preise und Verfügbarkeit richten sich nach deiner gewählten Region.',
+    title: 'Afrikanische Produkte an einem Ort',
+    body: 'Kaffee, Vorratsprodukte, Gewürze und handgewebte Crafts aus ganz Afrika. Preise und Verfügbarkeit richten sich nach deiner gewählten Region.',
     sortLabel: 'Produkte sortieren',
     filtersToggle: 'Filter',
     sortFeatured: 'Empfohlen',
@@ -345,10 +348,10 @@ const de: Resources = {
     productsCount_other: '{{count}} Produkte',
     fallbackBody: 'Stöbere in dieser Kollektion im aktuellen Katalog.',
   },
-  rwandan: {
-    eyebrow: 'Ruanda, kuratiert',
-    title: 'Ruandische Produkte mit klarer Geschichte',
-    body: 'Kaffee, Vorratsprodukte und handgewebte Crafts — bezogen von Erzeugern und Handwerkern in Ruanda und versandt aus Deutschland.',
+  african: {
+    eyebrow: 'Afrika, kuratiert',
+    title: 'Afrikanische Produkte mit klarer Geschichte',
+    body: 'Kaffee, Vorratsprodukte, Gewürze und handgewebte Crafts — bezogen von Erzeugern und Handwerkern aus Afrika und versandt aus Deutschland.',
     categoriesTitle: 'Nach Kategorie entdecken',
     categoriesBody: 'Starte mit Kaffee, Food oder Crafts. Jede Gruppe lädt Live-Produkte aus dem Backend.',
     featuredTitle: 'Aus dem aktuellen Katalog',
@@ -407,11 +410,20 @@ const de: Resources = {
   },
   about: {
     eyebrow: 'Unsere Geschichte',
-    title: 'Von den Hügeln Ruandas in europäische Küchen',
-    lead: 'BeNa Origins bringt Kaffee, Vorratsprodukte und handgewebte Crafts von Erzeugern und Handwerkern aus Ruanda zu Kundinnen und Kunden in Europa.',
-    storyTitle: 'Eine größere ruandische Speisekammer',
+    title: 'Von afrikanischen Ernten in europäische Küchen',
+    lead: 'BeNa Origins bringt Kaffee, Vorratsprodukte, Gewürze und handgewebte Crafts von Erzeugern und Handwerkern aus Afrika zu Kundinnen und Kunden in Europa.',
+    storyTitle: 'Eine Geschichte, erzählt durch unsere Produkte',
     storyBody:
-      'Unser Sortiment geht bewusst über Kaffee hinaus: Bohnen, Alltagsprodukte und handgemachte Wohnaccessoires — mit klaren Preisen, regionsabhängiger Verfügbarkeit und ehrlichen Produktinformationen.',
+      'Wir begannen mit ruandischem Kaffee und einer einfachen Idee: afrikanische Vorratsprodukte und Crafts in Europa leichter zugänglich zu machen. Heute reicht das Sortiment über Ruanda hinaus, und jedes Produkt behält seinen eigenen Namen, seine Herkunft und seine Geschichte.',
+    storiesTitle: 'Unsere Produkte',
+    storiesBody:
+      'Vier Grundnahrungsmittel aus unserem Sortiment: Kaffee, Ubuki (Honig), Indagara und Ibishyimbo (Bohnen). Jedes hat eine eigene Geschichtsseite; weitere kommen mit dem Sortiment dazu.',
+    missionTitle: 'Unsere Mission',
+    missionBody:
+      'Die alltäglichen Lebensmittel, Getränke und Crafts Afrikas auf mehr Tische in Europa zu bringen — mit klaren Informationen, fairer Darstellung und Respekt für die Menschen, die sie herstellen.',
+    visionTitle: 'Unsere Vision',
+    visionBody:
+      'Ein Shop, in dem jedes Produkt einen Namen, einen Ort und eine Geschichte hat; in dem Kundinnen und Kunden afrikanische Vorratsprodukte und Crafts ohne Rätselraten entdecken können und in dem mit dem Sortiment weitere Produzenten dazukommen.',
     pillarsTitle: 'Das ist uns wichtig',
     sourcingTitle: 'Genannte Herkunft',
     sourcingBody:
@@ -427,6 +439,14 @@ const de: Resources = {
       'Fotos, Partnerporträts und die endgültige Markensprache warten auf die Freigabe. Diese Seite vermeidet absichtlich unbelegte Aussagen.',
     ctaTitle: 'Sieh, was im Katalog ist',
     ctaBody: 'Stöbere durch Live-Produkte aus dem aktuellen Shop-Backend.',
+  },
+  productStories: {
+    eyebrow: 'Produktgeschichten',
+    readStory: 'Geschichte lesen',
+    backToAbout: 'Zurück zu Über uns',
+    shopProduct: 'Dieses Produkt kaufen',
+    findProduct: 'Im Katalog finden',
+    moreStories: 'Weitere Produktgeschichten',
   },
   contact: {
     eyebrow: 'Kontakt',

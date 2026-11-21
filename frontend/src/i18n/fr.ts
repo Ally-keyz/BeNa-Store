@@ -16,6 +16,9 @@ const fr = {
     quantity: 'Quantité',
     unit_one: 'unité',
     unit_other: 'unités',
+    pricePerKg: '{{price}} / kg',
+    pricePerKgLabel: 'Prix au kilogramme',
+    packageWeight: '× {{weight}} kg',
     from: 'À partir de',
     all: 'Tout',
     required: 'Obligatoire',
@@ -56,7 +59,7 @@ const fr = {
   nav: {
     shop: 'Boutique',
     shopAll: 'Catalogue',
-    rwandanProducts: 'Produits rwandais',
+    africanProducts: 'Produits africains',
     catalog: 'Catalogue',
     coffee: 'Café',
     food: 'Alimentation',
@@ -87,7 +90,7 @@ const fr = {
     closeSearch: 'Fermer la recherche',
   },
   footer: {
-    tagline: 'Café rwandais, produits de garde-manger et artisanats tissés à la main — sélectionnés avec soin.',
+    tagline: 'Café africain, produits de garde-manger et artisanats tissés à la main — sélectionnés avec soin.',
     shopHeading: 'Boutique',
     companyHeading: 'Entreprise',
     helpHeading: 'Aide',
@@ -116,11 +119,11 @@ const fr = {
     productImageAlt: '{{title}} — nouvel arrivage',
     slides: {
       rwanda: {
-        eyebrow: 'Produits rwandais, sélectionnés avec soin',
-        title: 'Découvrez le Rwanda dans chaque boîte.',
-        subtitle: 'Café, produits de garde-manger et artisanats tissés à la main, issus des producteurs et artisans du Rwanda.',
-        cta: 'Découvrir les produits rwandais',
-        imageAlt: 'Une sélection de café, de produits alimentaires et d’artisanats rwandais',
+        eyebrow: 'Produits africains, sélectionnés avec soin',
+        title: 'Découvrez l’Afrique dans chaque boîte.',
+        subtitle: 'Café, produits de garde-manger et artisanats tissés à la main, issus des producteurs et artisans d’Afrique.',
+        cta: 'Découvrir les produits africains',
+        imageAlt: 'Une sélection de café, de produits alimentaires et d’artisanats africains',
       },
       coffee: {
         eyebrow: 'Origine unique du Rwanda',
@@ -298,8 +301,8 @@ const fr = {
   },
   catalog: {
     eyebrow: 'Toute la gamme',
-    title: 'Produits rwandais, réunis au même endroit',
-    body: 'Café, aliments et artisanats tissés à la main du Rwanda. Les prix et la disponibilité suivent le marché sélectionné.',
+    title: 'Produits africains, réunis au même endroit',
+    body: 'Café, aliments, épices et artisanats tissés à la main de toute l’Afrique. Les prix et la disponibilité suivent le marché sélectionné.',
     sortLabel: 'Trier les produits',
     filtersToggle: 'Filtres',
     sortFeatured: 'En vedette',
@@ -338,10 +341,10 @@ const fr = {
     productsCount_other: '{{count}} produits',
     fallbackBody: 'Parcourez cette collection dans le catalogue actuel.',
   },
-  rwandan: {
-    eyebrow: 'Le Rwanda, en sélection',
-    title: 'Produits rwandais avec une histoire claire',
-    body: 'Café, produits de garde-manger et artisanats tissés à la main — issus des producteurs et artisans du Rwanda et expédiés depuis l’Allemagne.',
+  african: {
+    eyebrow: 'L’Afrique, en sélection',
+    title: 'Produits africains avec une histoire claire',
+    body: 'Café, produits de garde-manger, épices et artisanats tissés à la main — issus des producteurs et artisans d’Afrique et expédiés depuis l’Allemagne.',
     categoriesTitle: 'Explorer par catégorie',
     categoriesBody: 'Commencez par le café, l’alimentation ou les artisanats. Chaque groupe affiche les produits en direct du serveur.',
     featuredTitle: 'Du catalogue actuel',
@@ -400,11 +403,20 @@ const fr = {
   },
   about: {
     eyebrow: 'Notre histoire',
-    title: 'Des collines rwandaises aux cuisines européennes',
-    lead: 'BeNa Origins apporte le café, les aliments de garde-manger et les artisanats tissés à la main des producteurs et artisans rwandais à des clients partout en Europe.',
-    storyTitle: 'Un garde-manger rwandais plus large',
+    title: 'Des récoltes africaines aux cuisines européennes',
+    lead: 'BeNa Origins apporte le café, les aliments de garde-manger, les épices et les artisanats tissés à la main des producteurs et artisans africains à des clients partout en Europe.',
+    storyTitle: 'Une histoire racontée par nos produits',
     storyBody:
-      'Notre gamme dépasse volontairement le café : grains, provisions quotidiennes et objets faits main, présentés avec des prix clairs, une disponibilité selon le marché et des informations produit honnêtes.',
+      'Nous avons commencé avec le café rwandais et une idée simple : rendre les produits de garde-manger et les artisanats africains plus faciles à trouver en Europe. Aujourd’hui, la gamme dépasse le Rwanda, et chaque produit garde son nom, son origine et son histoire.',
+    storiesTitle: 'Les produits que nous vendons',
+    storiesBody:
+      'Quatre essentiels de nos rayons : le café, l’ubuki (miel), l’indagara et l’ibishyimbo (haricots). Chacun a sa page d’histoire, et nous en ajouterons d’autres au fil de la gamme.',
+    missionTitle: 'Notre mission',
+    missionBody:
+      'Faire découvrir les aliments, boissons et artisanats du quotidien d’Afrique à davantage de tables en Europe — avec des informations claires, une présentation honnête et le respect des personnes qui les produisent.',
+    visionTitle: 'Notre vision',
+    visionBody:
+      'Une boutique où chaque produit a un nom, un lieu et une histoire ; où les clients peuvent découvrir les produits de garde-manger et les artisanats africains sans deviner, et où d’autres producteurs peuvent rejoindre la gamme au fil de sa croissance.',
     pillarsTitle: 'Ce qui nous tient à cœur',
     sourcingTitle: 'Origines nommées',
     sourcingBody:
@@ -420,6 +432,14 @@ const fr = {
       'Photos, profils de partenaires et formulation finale de la marque attendent l’approbation du propriétaire. Cette page évite volontairement toute affirmation non vérifiée.',
     ctaTitle: 'Découvrez le catalogue',
     ctaBody: 'Parcourez les produits en direct du serveur de la boutique.',
+  },
+  productStories: {
+    eyebrow: 'Histoires de produits',
+    readStory: 'Lire l’histoire',
+    backToAbout: 'Retour à À propos',
+    shopProduct: 'Acheter ce produit',
+    findProduct: 'Trouver dans le catalogue',
+    moreStories: 'D’autres histoires de produits',
   },
   contact: {
     eyebrow: 'Contact',

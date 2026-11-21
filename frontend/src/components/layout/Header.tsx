@@ -17,7 +17,7 @@ import { LanguageSwitch } from './LanguageSwitch';
 
 const DESKTOP_LINKS = [
   { href: '/', labelKey: 'nav.home', end: true },
-  { href: '/rwandan-products', labelKey: 'nav.rwandanProducts' },
+  { href: '/african-products', labelKey: 'nav.africanProducts' },
   { href: '/catalog', labelKey: 'nav.catalog' },
   { href: '/about', labelKey: 'nav.about' },
   { href: '/contact', labelKey: 'nav.contact' },

@@ -8,7 +8,7 @@ import { pageContainer } from '@/lib/layout';
 
 const HERO_CATEGORIES = ['coffee', 'food', 'crafts'] as const;
 
-export function RwandanProductsPage() {
+export function AfricanProductsPage() {
   const { t } = useTranslation();
   const { marketParams } = useMarket();
 
@@ -37,9 +37,9 @@ export function RwandanProductsPage() {
     <>
       <PageSeo
         fallback={{
-          title: `${t('rwandan.title')} — BeNa Origins`,
-          description: t('rwandan.body'),
-          path: '/rwandan-products',
+          title: `${t('african.title')} — BeNa Origins`,
+          description: t('african.body'),
+          path: '/african-products',
         }}
       />
 
@@ -51,10 +51,10 @@ export function RwandanProductsPage() {
 
       <FeaturedProducts
         variant="white"
-        titleId="rwandan-featured"
+        titleId="african-featured"
         eyebrow={t('home.featuredEyebrow')}
-        title={t('rwandan.featuredTitle')}
-        body={t('rwandan.featuredBody')}
+        title={t('african.featuredTitle')}
+        body={t('african.featuredBody')}
         align="center"
         headingAs="h1"
         showFilters={false}
@@ -69,11 +69,11 @@ export function RwandanProductsPage() {
               {t('home.storyEyebrow')}
             </p>
             <h2 className="mt-2 text-[clamp(24px,2.4vw,32px)] font-semibold tracking-tight">
-              {t('rwandan.sourcingTitle')}
+              {t('african.sourcingTitle')}
             </h2>
           </div>
           <p className="max-w-2xl text-[15px] leading-7 text-neutral-600">
-            {t('rwandan.sourcingBody')}
+            {t('african.sourcingBody')}
           </p>
         </section>
       </div>

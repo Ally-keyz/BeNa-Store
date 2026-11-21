@@ -15,7 +15,7 @@ const COLUMNS = [
   {
     headingKey: 'footer.shopHeading',
     links: [
-      { href: '/rwandan-products', key: 'nav.rwandanProducts' },
+      { href: '/african-products', key: 'nav.africanProducts' },
       { href: '/catalog', key: 'nav.catalog' },
       { href: '/collections/coffee', key: 'nav.coffee' },
       { href: '/collections/food', key: 'nav.food' },

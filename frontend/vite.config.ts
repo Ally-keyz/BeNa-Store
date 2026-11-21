@@ -2,22 +2,24 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { PRODUCT_STORIES } from './src/content/productStories';
 
 // Backend target for the local dev proxy. Override with VITE_PROXY_TARGET.
 const proxyTarget = process.env.VITE_PROXY_TARGET ?? 'https://bena-origins.onrender.com';
 const siteUrl = (process.env.VITE_SITE_URL ?? 'https://benaorigins.de').replace(/\/+$/, '');
 
 /** Routes that are safe to expose to crawlers as static, indexable pages. */
-const PUBLIC_ROUTES = [
+const PUBLIC_ROUTES: string[] = [
   '/',
-  '/rwandan-products',
+  '/african-products',
   '/catalog',
   '/collections',
   '/about',
+  ...PRODUCT_STORIES.map((story) => `/about/products/${story.slug}`),
   '/contact',
   '/shipping',
   '/faq',
-] as const;
+];
 
 /**
  * A Vite SPA ships one HTML shell, so crawlers that do not run JavaScript see
@@ -57,8 +59,8 @@ function staticSeoPlugin(): Plugin {
         '    <meta property="og:site_name" content="BeNa Origins" />',
         `    <meta property="og:image" content="${siteUrl}/logo.webp" />`,
         '    <meta name="twitter:card" content="summary_large_image" />',
-        '    <meta name="twitter:title" content="BeNa Origins — Rwandan coffee, food & crafts" />',
-        '    <meta name="twitter:description" content="Rwandan coffee, pantry staples and handwoven crafts, sourced with care and delivered across Europe." />',
+        '    <meta name="twitter:title" content="BeNa Origins — African coffee, food & crafts" />',
+        '    <meta name="twitter:description" content="African coffee, pantry staples and handwoven crafts, sourced with care and delivered across Europe." />',
         `    <meta name="twitter:image" content="${siteUrl}/logo.webp" />`,
         `    <script type="application/ld+json">${JSON.stringify(organization)}</script>`,
       ].join('\n');

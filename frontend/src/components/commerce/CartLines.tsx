@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Trash2 } from 'lucide-react';
 import type { CartLine } from '@/types';
 import { formatMoney } from '@/lib/money';
+import { formatWeightKg, getKilogramPackageWeightKg } from '@/lib/units';
 import { stripHtml } from '@/lib/sanitize';
 import { useMarket } from '@/context/MarketContext';
 import { useCart } from '@/context/CartContext';
@@ -53,6 +54,17 @@ export function CartLines({ lines, compact = false }: CartLinesProps) {
         const description = merchandise
           ? stripHtml(merchandise.product.descriptionHtml) || merchandise.product.description
           : '';
+        const packageWeightKg = merchandise
+          ? getKilogramPackageWeightKg({
+              handle: merchandise.product.handle,
+              title: merchandise.product.title,
+              variantTitle: merchandise.title,
+              selectedOptions: merchandise.selectedOptions,
+            })
+          : null;
+        const quantityUnit = packageWeightKg
+          ? t('common.packageWeight', { weight: formatWeightKg(packageWeightKg, formatLocale) })
+          : t('common.unit', { count: line.quantity });
         const each = formatMoney(line.cost.amountPerQuantity, { locale: formatLocale });
         return (
           <li key={line.id} className="flex gap-3 py-5 first:pt-0 sm:gap-4">
@@ -100,7 +112,7 @@ export function CartLines({ lines, compact = false }: CartLinesProps) {
                   value={line.quantity}
                   onChange={(quantity) => void run(() => updateLine(line.id, quantity))}
                   label={t('cart.quantityFor', { title })}
-                  unit={t('common.unit', { count: line.quantity })}
+                  unit={quantityUnit}
                   disabled={isUpdating || !merchandise?.availableForSale}
                 />
                 <button

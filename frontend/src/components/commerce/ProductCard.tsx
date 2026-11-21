@@ -7,6 +7,7 @@ import type { Product } from '@/types';
 import { cn } from '@/lib/cn';
 import { formatMoney, isOnSale } from '@/lib/money';
 import { getAvailability, getDefaultVariant, getPrimaryImage, hasVariantChoice } from '@/lib/product';
+import { getPricePerKg } from '@/lib/units';
 import { stripHtml } from '@/lib/sanitize';
 import { useCart } from '@/context/CartContext';
 import { useMarket } from '@/context/MarketContext';
@@ -41,6 +42,18 @@ export function ProductCard({ product, priority = false, className }: ProductCar
   const price = variant?.price ?? product.priceRange.minVariantPrice;
   const compareAt = variant?.compareAtPrice ?? null;
   const onSale = availability === 'available' && isOnSale(price, compareAt);
+  const pricePerKg = getPricePerKg({
+    handle: product.handle,
+    title: product.title,
+    productType: product.productType,
+    tags: product.tags,
+    variantTitle: variant?.title,
+    selectedOptions: variant?.selectedOptions,
+    measurement: variant?.unitPriceMeasurement,
+    price,
+    unitPrice: variant?.unitPrice,
+    unitPriceMeasurement: variant?.unitPriceMeasurement,
+  });
   const sellable = availability === 'available' && Boolean(variant?.availableForSale);
   const multiVariant = hasVariantChoice(product);
   const productHref = `/products/${product.handle}`;
@@ -159,6 +172,17 @@ export function ProductCard({ product, priority = false, className }: ProductCar
             {onSale && compareAt ? (
               <span className="tabular mt-0.5 block text-[14px] font-medium text-terra-600 line-through">
                 {formatMoney(compareAt, { locale: formatLocale })}
+              </span>
+            ) : null}
+            {pricePerKg ? (
+              <span className="tabular mt-0.5 block text-[11px] font-normal text-neutral-500">
+                <span className="sr-only">{t('common.pricePerKgLabel')}: </span>
+                {t('common.pricePerKg', {
+                  price: formatMoney(pricePerKg, {
+                    locale: formatLocale,
+                    alwaysDecimals: true,
+                  }),
+                })}
               </span>
             ) : null}
           </div>

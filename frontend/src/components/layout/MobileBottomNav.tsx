@@ -28,6 +28,7 @@ export function MobileBottomNav({ onMenu, onSearch }: MobileBottomNavProps) {
   const homeActive = pathname === '/';
   const shopActive =
     pathname.startsWith('/catalog') ||
+    pathname.startsWith('/african-products') ||
     pathname.startsWith('/rwandan-products') ||
     pathname.startsWith('/collections') ||
     pathname.startsWith('/products');

@@ -11,7 +11,11 @@ vi.mock('@/context/CartContext', () => ({
 }));
 vi.mock('@/components/ui/Toast', () => ({ useToast: () => ({ toast: vi.fn() }) }));
 
-function line(selectedOptions: Array<{ name: string; value: string }>, variantTitle = 'Default Title'): CartLine {
+function line(
+  selectedOptions: Array<{ name: string; value: string }>,
+  variantTitle = 'Default Title',
+  product: { handle: string; title: string } = { handle: 'rwanda-honey', title: 'Rwanda Honey' },
+): CartLine {
   const amount = money('12.50');
   return {
     id: 'gid://shopify/CartLine/1',
@@ -26,8 +30,7 @@ function line(selectedOptions: Array<{ name: string; value: string }>, variantTi
       image: null,
       product: {
         id: 'gid://shopify/Product/1',
-        handle: 'rwanda-honey',
-        title: 'Rwanda Honey',
+        ...product,
         description: 'Plain description fallback',
         descriptionHtml: '<p>Short honey note from the product card.</p>',
         url: 'https://benaorigins.de/products/rwanda-honey',
@@ -58,5 +61,30 @@ describe('CartLines', () => {
 
     expect(screen.getAllByText(/250 g/).length).toBeGreaterThan(0);
     expect(screen.getByText('Short honey note from the product card.')).toBeVisible();
+  });
+
+  it('shows the package weight for coffee lines and keeps generic units otherwise', () => {
+    const { unmount } = render(
+      <MemoryRouter>
+        <CartLines
+          lines={[
+            line([{ name: 'Title', value: 'Default Title' }], 'Default Title', {
+              handle: 'premium-rwandan-arabica-coffee-freshly-roasted-250g',
+              title: 'Premium Rwandan Arabica Coffee 250g',
+            }),
+          ]}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('× 0.25 kg')).toBeVisible();
+    unmount();
+
+    render(
+      <MemoryRouter>
+        <CartLines lines={[line([{ name: 'Title', value: 'Default Title' }])]} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('unit')).toBeVisible();
   });
 });

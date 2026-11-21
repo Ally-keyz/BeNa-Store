@@ -61,7 +61,7 @@ function productSlides(products: Product[], t: (key: string, options?: Record<st
 export interface HeroCarouselProps {
   /**
    * Supply products to show a different set in the carousel (e.g. the
-   * Rwandan-products page). When omitted, the five newest products are used.
+   * African-products page). When omitted, the five newest products are used.
    */
   products?: Product[];
   className?: string;

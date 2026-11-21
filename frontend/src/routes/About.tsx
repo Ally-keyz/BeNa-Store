@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ArrowRight } from 'lucide-react';
 import { PageSeo } from '@/features/seo/PageSeo';
+import { ProductStoryIcon } from '@/features/about/ProductStoryIcon';
 import { buttonVariants } from '@/components/ui/Button';
+import { PRODUCT_STORIES, localizedText } from '@/content/productStories';
+import { useMarket } from '@/context/MarketContext';
 import { contentContainer } from '@/lib/layout';
 
 const PILLARS = [
@@ -12,6 +16,7 @@ const PILLARS = [
 
 export function AboutPage() {
   const { t } = useTranslation();
+  const { language } = useMarket();
 
   return (
     <>
@@ -25,7 +30,10 @@ export function AboutPage() {
 
       <div className={contentContainer}>
         <section className="pb-10 pt-10 text-center sm:pb-20 sm:pt-20">
-          <h1 className="mx-auto max-w-3xl break-words text-[clamp(30px,4vw,52px)] font-semibold leading-[1.08] tracking-tight text-ink">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
+            {t('about.eyebrow')}
+          </p>
+          <h1 className="mx-auto mt-3 max-w-3xl break-words text-[clamp(30px,4vw,52px)] font-semibold leading-[1.08] tracking-tight text-ink">
             {t('about.title')}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl break-words text-[17px] leading-8 text-neutral-600 sm:mt-6">
@@ -47,6 +55,65 @@ export function AboutPage() {
           <p className="mx-auto mt-5 max-w-2xl break-words text-base leading-8 text-neutral-600">
             {t('about.storyBody')}
           </p>
+        </section>
+
+        <section className="border-t border-neutral-200 py-10 sm:py-20" aria-labelledby="about-products">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2
+              id="about-products"
+              className="break-words text-2xl font-semibold tracking-tight text-ink sm:text-[28px]"
+            >
+              {t('about.storiesTitle')}
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl break-words text-sm leading-7 text-neutral-600">
+              {t('about.storiesBody')}
+            </p>
+          </div>
+
+          <div className="mx-auto mt-8 grid max-w-4xl gap-4 text-left sm:grid-cols-2 sm:gap-5">
+            {PRODUCT_STORIES.map((story) => (
+              <Link
+                key={story.slug}
+                to={`/about/products/${story.slug}`}
+                className="group flex min-w-0 flex-col rounded-2xl border border-terra-100 bg-surface p-5 transition-colors hover:border-terra-300 hover:bg-terra-50/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              >
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-terra-50 text-terra-700">
+                  <ProductStoryIcon icon={story.icon} className="h-5 w-5" />
+                </span>
+                <h3 className="mt-4 break-words text-base font-semibold text-ink">
+                  {localizedText(story.title, language)}
+                </h3>
+                <p className="mt-2 flex-1 break-words text-sm leading-6 text-neutral-600">
+                  {localizedText(story.summary, language)}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-terra-800 group-hover:text-ink">
+                  {t('productStories.readStory')}
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-neutral-200 py-10 sm:py-20">
+          <div className="mx-auto grid max-w-4xl gap-8 text-left md:grid-cols-2 md:gap-12">
+            <article className="min-w-0 border-t border-ink pt-4 sm:pt-5">
+              <h2 className="break-words text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">
+                {t('about.missionTitle')}
+              </h2>
+              <p className="mt-3 break-words text-sm leading-7 text-neutral-600">
+                {t('about.missionBody')}
+              </p>
+            </article>
+            <article className="min-w-0 border-t border-ink pt-4 sm:pt-5">
+              <h2 className="break-words text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">
+                {t('about.visionTitle')}
+              </h2>
+              <p className="mt-3 break-words text-sm leading-7 text-neutral-600">
+                {t('about.visionBody')}
+              </p>
+            </article>
+          </div>
         </section>
 
         <section className="border-t border-neutral-200 py-10 text-center sm:py-20">
@@ -73,7 +140,7 @@ export function AboutPage() {
             </p>
           </div>
           <Link
-            to="/catalog"
+            to="/african-products"
             className={`${buttonVariants({ size: 'sm' })} min-h-11 !rounded-full sm:min-h-9`}
           >
             {t('home.featuredCta')}

@@ -12,7 +12,7 @@ export function HomePage() {
 
   return (
     <>
-      <Seo title="BeNa Origins — Rwandan products, coffee & crafts" description={description} path="/" />
+      <Seo title="BeNa Origins — African products, coffee & crafts" description={description} path="/" />
       <div className="pt-4 sm:pt-6">
         <div className="mx-auto w-full max-w-6xl sm:px-6 lg:px-8">
           <HeroCarousel />

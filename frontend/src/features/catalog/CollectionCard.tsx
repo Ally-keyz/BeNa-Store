@@ -10,7 +10,7 @@ export interface CollectionCardProps {
   priority?: boolean;
 }
 
-/** Collection tile used on the collection index and Rwandan-products landing page. */
+/** Collection tile used on the collection index and African-products landing page. */
 export function CollectionCard({ collection, priority = false }: CollectionCardProps) {
   const { t } = useTranslation();
   const description = stripHtml(collection.description);

@@ -16,6 +16,9 @@ const en = {
     quantity: 'Quantity',
     unit_one: 'unit',
     unit_other: 'units',
+    pricePerKg: '{{price}} / kg',
+    pricePerKgLabel: 'Price per kilogram',
+    packageWeight: '× {{weight}} kg',
     from: 'From',
     all: 'All',
     required: 'Required',
@@ -56,7 +59,7 @@ const en = {
   nav: {
     shop: 'Shop',
     shopAll: 'Catalog',
-    rwandanProducts: 'Rwandan Products',
+    africanProducts: 'African Products',
     catalog: 'Catalog',
     coffee: 'Coffee',
     food: 'Food',
@@ -87,7 +90,7 @@ const en = {
     closeSearch: 'Close search',
   },
   footer: {
-    tagline: 'Rwandan coffee, pantry staples and handwoven crafts — sourced with care.',
+    tagline: 'African coffee, pantry staples and handwoven crafts — sourced with care.',
     shopHeading: 'Shop',
     companyHeading: 'Company',
     helpHeading: 'Help',
@@ -116,11 +119,11 @@ const en = {
     productImageAlt: '{{title}} — new arrival',
     slides: {
       rwanda: {
-        eyebrow: 'Rwandan products, thoughtfully sourced',
-        title: 'Discover Rwanda in every box.',
-        subtitle: 'Coffee, pantry staples and handwoven crafts from growers and makers in Rwanda.',
-        cta: 'Explore Rwandan products',
-        imageAlt: 'A curated selection of Rwandan coffee, food and crafts',
+        eyebrow: 'African products, thoughtfully sourced',
+        title: 'Discover Africa in every box.',
+        subtitle: 'Coffee, pantry staples and handwoven crafts from growers and makers across Africa.',
+        cta: 'Explore African products',
+        imageAlt: 'A curated selection of African coffee, food and crafts',
       },
       coffee: {
         eyebrow: 'Rwandan single origin',
@@ -298,8 +301,8 @@ const en = {
   },
   catalog: {
     eyebrow: 'The full range',
-    title: 'Rwandan products, all in one place',
-    body: 'Coffee, pantry food and handwoven crafts from Rwanda. Prices and availability follow your selected market.',
+    title: 'African products, all in one place',
+    body: 'Coffee, pantry food, spices and handwoven crafts from across Africa. Prices and availability follow your selected market.',
     sortLabel: 'Sort products',
     filtersToggle: 'Filters',
     sortFeatured: 'Featured',
@@ -338,10 +341,10 @@ const en = {
     productsCount_other: '{{count}} products',
     fallbackBody: 'Browse this collection in the current catalog.',
   },
-  rwandan: {
-    eyebrow: 'Rwanda, curated',
-    title: 'Rwandan products with a clear story',
-    body: 'Coffee, pantry staples and handwoven crafts — sourced from growers and makers in Rwanda and shipped from Germany.',
+  african: {
+    eyebrow: 'Africa, curated',
+    title: 'African products with a clear story',
+    body: 'Coffee, pantry staples, spices and handwoven crafts — sourced from growers and makers across Africa and shipped from Germany.',
     categoriesTitle: 'Explore by category',
     categoriesBody: 'Start with coffee, food or crafts. Every group pulls live products from the backend.',
     featuredTitle: 'From the current catalog',
@@ -400,11 +403,20 @@ const en = {
   },
   about: {
     eyebrow: 'Our story',
-    title: 'From Rwandan hills to European kitchens',
-    lead: 'BeNa Origins brings coffee, pantry food and handwoven crafts from Rwandan growers and makers to customers across Europe.',
-    storyTitle: 'A broader Rwandan pantry',
+    title: 'From African harvests to European kitchens',
+    lead: 'BeNa Origins brings coffee, pantry foods, spices and handwoven crafts from African growers and makers to customers across Europe.',
+    storyTitle: 'A story told through what we sell',
     storyBody:
-      'Our range is deliberately wider than coffee: beans, everyday provisions and handmade home goods, presented with clear prices, market-aware availability and honest product information.',
+      'We began with Rwandan coffee and a simple idea: make African pantry staples and crafts easier to find in Europe. Today the range reaches beyond Rwanda, and every product keeps its own name, origin and story.',
+    storiesTitle: 'The products we sell',
+    storiesBody:
+      'Start with four staples from our shelves: coffee, ubuki (honey), indagara and ibishyimbo (beans). Each has its own story page, and we will add more as the range grows.',
+    missionTitle: 'Our mission',
+    missionBody:
+      'To bring the everyday foods, drinks and crafts of Africa to more tables in Europe — with clear information, fair presentation and respect for the people who make them.',
+    visionTitle: 'Our vision',
+    visionBody:
+      'A storefront where every product has a name, a place and a story; where customers can discover African pantry staples and crafts without guesswork, and where more producers can join the range as it grows.',
     pillarsTitle: 'What we care about',
     sourcingTitle: 'Named origins',
     sourcingBody:
@@ -420,6 +432,14 @@ const en = {
       'Photos, partner profiles and final brand wording are awaiting owner approval. This page intentionally avoids unverified claims.',
     ctaTitle: 'See what is in the catalog',
     ctaBody: 'Browse live products from the current shop backend.',
+  },
+  productStories: {
+    eyebrow: 'Product stories',
+    readStory: 'Read the story',
+    backToAbout: 'Back to About',
+    shopProduct: 'Shop this product',
+    findProduct: 'Find it in the catalog',
+    moreStories: 'More product stories',
   },
   contact: {
     eyebrow: 'Contact',

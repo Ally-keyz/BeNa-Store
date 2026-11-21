@@ -48,7 +48,7 @@ export interface FeaturedProductsProps {
 /**
  * Featured feed with automatic infinite scrolling. Products load as the
  * visitor scrolls — there is deliberately no "Load more" button. The same
- * component powers the home page and the Rwandan-products catalog feed so both
+ * component powers the home page and the African-products catalog feed so both
  * share the exact layout and scroll behaviour.
  */
 export function FeaturedProducts({
