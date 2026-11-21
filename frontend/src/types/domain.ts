@@ -567,6 +567,30 @@ export interface ProductReviewsResult {
   checkedAt: string;
 }
 
+export interface ReviewSubmission {
+  author: string;
+  rating: number;
+  body: string;
+  language?: string;
+}
+
+export interface ReviewSubmissionResult {
+  handle: string;
+  reference: string;
+  review: ProductReview;
+  status: 'received' | 'simulated';
+  provider: string;
+  receivedAt: string;
+  notification: {
+    provider: string;
+    delivered: boolean;
+    simulated: boolean;
+    message: string;
+  };
+  message: string;
+  simulated: boolean;
+}
+
 export interface CatalogFacetValue {
   value: string;
   label: string;

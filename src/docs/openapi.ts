@@ -5,6 +5,7 @@ import {
   newsletterBody,
   removeCartLinesBody,
   restockSubscribeBody,
+  submitReviewBody,
   updateBuyerIdentityBody,
   updateCartLinesBody,
   updateDiscountCodesBody,
@@ -238,6 +239,7 @@ export function buildOpenApiDocument(serverUrl = 'http://localhost:4000'): JsonS
         UpdateDiscountCodesBody: zodToOpenApiBody(updateDiscountCodesBody),
         NewsletterBody: zodToOpenApiBody(newsletterBody),
         RestockSubscribeBody: zodToOpenApiBody(restockSubscribeBody),
+        SubmitReviewBody: zodToOpenApiBody(submitReviewBody),
         Cart: {
           type: 'object',
           properties: {
@@ -634,6 +636,33 @@ export function buildOpenApiDocument(serverUrl = 'http://localhost:4000'): JsonS
           },
           responses: {
             201: successResponse('Restock registration result'),
+            400: { $ref: '#/components/responses/BadRequest' },
+            429: { $ref: '#/components/responses/RateLimited' },
+          },
+        },
+      },
+      '/api/v1/reviews/product/{handle}': {
+        get: {
+          tags: ['Reviews'],
+          summary: 'List genuine provider reviews plus public customer submissions for a product',
+          parameters: [handleParam, ...contextParams],
+          responses: {
+            200: successResponse('Product reviews, aggregate rating and count'),
+            400: { $ref: '#/components/responses/BadRequest' },
+          },
+        },
+        post: {
+          tags: ['Reviews'],
+          summary: 'Submit a public product review without an account',
+          parameters: [handleParam],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/SubmitReviewBody' } },
+            },
+          },
+          responses: {
+            201: successResponse('Stored review and owner notification status'),
             400: { $ref: '#/components/responses/BadRequest' },
             429: { $ref: '#/components/responses/RateLimited' },
           },

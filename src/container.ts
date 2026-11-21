@@ -17,6 +17,7 @@ import { RestockService } from './services/restock.service';
 import { createRestockStore } from './services/restockStore';
 import { PoliciesService } from './services/policies.service';
 import { ReviewsService } from './services/reviews.service';
+import { createReviewStore } from './services/reviewStore';
 import { SeoService } from './services/seo.service';
 import { ShippingService } from './services/shipping.service';
 import { CustomerAuthService } from './services/customerAuth.service';
@@ -70,6 +71,7 @@ export function createContainer(
 
   const cartService = new CartService(client);
   const restockStore = createRestockStore(config.restock.signupTtlSeconds);
+  const reviewStore = createReviewStore();
 
   return {
     config,
@@ -88,7 +90,7 @@ export function createContainer(
       policies: new PoliciesService(client),
       newsletter: new NewsletterService(config, logger),
       restock: new RestockService(config, logger, client, restockStore),
-      reviews: new ReviewsService(client, config, logger),
+      reviews: new ReviewsService(client, config, logger, fetch, reviewStore),
       audit: new AuditService(client, config, logger),
       seo: new SeoService(client, config),
       health: new HealthService(client, config),

@@ -28,6 +28,7 @@ import {
   shippingQuery,
   sitemapQuery,
   suggestionsQuery,
+  submitReviewBody,
   updateBuyerIdentityBody,
   updateCartLinesBody,
   updateDiscountCodesBody,
@@ -167,6 +168,13 @@ export function createApiRouter(
     '/reviews/product/:handle',
     validate({ params: productReviewsParams, query: productReviewsQuery }),
     comms.productReviews,
+  );
+  router.post(
+    '/reviews/product/:handle',
+    limiters.reviews,
+    trustedOrigin,
+    validate({ params: productReviewsParams, body: submitReviewBody }),
+    comms.submitProductReview,
   );
   router.post(
     '/withdrawals',

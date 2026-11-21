@@ -169,7 +169,10 @@ const EnvSchema = z.object({
     emptyToUndefined,
     z.coerce.number().int().min(1).max(1000).default(5),
   ),
-  RESTOCK_PROVIDER: z.enum(['mock', 'webhook', 'resend']).default('mock'),
+  RESTOCK_PROVIDER: z.preprocess(
+    emptyToUndefined,
+    z.enum(['mock', 'webhook', 'resend']).default('mock'),
+  ),
   RESTOCK_WEBHOOK_URL: optionalString,
   RESTOCK_WEBHOOK_SECRET: optionalString,
   RESTOCK_RESEND_API_KEY: optionalString,
@@ -180,6 +183,14 @@ const EnvSchema = z.object({
     z.coerce.number().int().min(3600).max(31_536_000).default(2_592_000),
   ),
 
+  REVIEWS_RATE_LIMIT_MAX: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(1).max(1000).default(5),
+  ),
+  REVIEWS_NOTIFICATION_EMAIL: z.preprocess(
+    emptyToUndefined,
+    z.email().default('store@benaorigins.de'),
+  ),
   REVIEWS_PROVIDER: z
     .enum([
       'auto',
@@ -329,6 +340,7 @@ export interface AppConfig {
     cartMax: number;
     newsletterMax: number;
     restockMax: number;
+    reviewsMax: number;
     withdrawalMax: number;
     webhookMax: number;
     authMax: number;
@@ -361,6 +373,7 @@ export interface AppConfig {
     apiToken: string | null;
     apiUrlTemplate: string | null;
     cacheTtlSeconds: number;
+    notificationEmail: string;
   };
   withdrawal: {
     provider: RawEnv['WITHDRAWAL_PROVIDER'];
@@ -677,6 +690,11 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       'RESTOCK_PROVIDER=mock: restock alerts are simulated and no emails will be sent. Set resend or webhook before launch.',
     );
   }
+  if (isProduction && env.RESTOCK_PROVIDER !== 'resend') {
+    warnings.push(
+      'Customer review notifications reuse the restock email transport; set RESTOCK_PROVIDER=resend with RESTOCK_RESEND_API_KEY and RESTOCK_FROM_EMAIL to email new reviews to the store owner.',
+    );
+  }
 
   return {
     nodeEnv: env.NODE_ENV,
@@ -805,6 +823,7 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       cartMax: env.CART_RATE_LIMIT_MAX,
       newsletterMax: env.NEWSLETTER_RATE_LIMIT_MAX,
       restockMax: env.RESTOCK_RATE_LIMIT_MAX,
+      reviewsMax: env.REVIEWS_RATE_LIMIT_MAX,
       withdrawalMax: env.WITHDRAWAL_RATE_LIMIT_MAX,
       webhookMax: env.WEBHOOK_RATE_LIMIT_MAX,
       authMax: env.AUTH_RATE_LIMIT_MAX,
@@ -837,6 +856,7 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       apiToken: env.REVIEWS_API_TOKEN ?? null,
       apiUrlTemplate: env.REVIEWS_API_URL_TEMPLATE ?? null,
       cacheTtlSeconds: env.REVIEWS_CACHE_TTL_SECONDS,
+      notificationEmail: env.REVIEWS_NOTIFICATION_EMAIL,
     },
     withdrawal: {
       provider: env.WITHDRAWAL_PROVIDER,
@@ -892,6 +912,11 @@ export function safeConfigSummary(config: AppConfig): Record<string, unknown> {
     newsletterProvider: config.newsletter.provider,
     restockProvider: config.restock.provider,
     reviewsProvider: config.reviews.provider,
+    reviewNotifications: {
+      configured:
+        config.restock.provider === 'resend' &&
+        Boolean(config.restock.resendApiKey && config.restock.fromEmail),
+    },
     ai: {
       enabled: config.ai.enabled,
       configured: Boolean(config.ai.apiKey),

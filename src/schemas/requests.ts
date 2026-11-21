@@ -221,6 +221,12 @@ export const withdrawalBody = z.object({
 
 export const productReviewsParams = handleParams;
 export const productReviewsQuery = marketContextQuery.extend({ refresh: booleanQuery.optional() });
+export const submitReviewBody = z.object({
+  author: z.string().trim().min(2).max(80),
+  rating: z.coerce.number().int().min(1).max(5),
+  body: z.string().trim().min(10).max(2000),
+  language: z.string().trim().length(2).transform((value) => value.toUpperCase()).optional(),
+});
 export const catalogFacetsQuery = marketContextQuery.extend({ refresh: booleanQuery.optional() });
 
 // ---------------------------------------------------------- audit + seo ---

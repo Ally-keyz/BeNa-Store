@@ -16,6 +16,8 @@ import type {
   CatalogFacets,
   ProductReviewsResult,
   RestockSignupResult,
+  ReviewSubmission,
+  ReviewSubmissionResult,
   WithdrawalResult,
   WithdrawalSubmission,
 } from '@/types';
@@ -261,6 +263,16 @@ export function getProductReviews(
   return apiRequest<ProductReviewsResult>(`/reviews/product/${enc(handle)}`, {
     query: { country: params.country, language: params.language, refresh: params.refresh },
     signal: options?.signal,
+  });
+}
+
+export function submitProductReview(
+  handle: string,
+  input: ReviewSubmission,
+): Promise<ApiResult<ReviewSubmissionResult>> {
+  return apiRequest<ReviewSubmissionResult>(`/reviews/product/${enc(handle)}`, {
+    method: 'POST',
+    body: input,
   });
 }
 

@@ -114,6 +114,10 @@ services:
         value: mock
       - key: REVIEWS_PROVIDER
         value: auto
+      - key: REVIEWS_RATE_LIMIT_MAX
+        value: "5"
+      - key: REVIEWS_NOTIFICATION_EMAIL
+        value: store@benaorigins.de
       # Restock alerts send real email via Resend. RESTOCK_FROM_EMAIL must be a
       # verified sender/domain in Resend. Signups are memory-only (no Redis).
       - key: RESTOCK_PROVIDER

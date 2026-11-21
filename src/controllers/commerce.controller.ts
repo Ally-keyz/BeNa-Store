@@ -17,6 +17,7 @@ import type {
   productReviewsParams,
   productReviewsQuery,
   restockSubscribeBody,
+  submitReviewBody,
 } from '../schemas/requests';
 
 export function cartController(container: Container): Record<string, RequestHandler> {
@@ -161,6 +162,15 @@ export function communicationsController(container: Container): Record<string, R
         refresh: query.refresh,
       });
       res.json(success(res, reviews, baseMeta(container)));
+    }),
+
+    submitProductReview: asyncHandler(async (_req, res) => {
+      const { params, body } = getValidated<{
+        params: z.infer<typeof productReviewsParams>;
+        body: z.infer<typeof submitReviewBody>;
+      }>(res);
+      const result = await container.services.reviews.submit(params.handle, body);
+      sendCreated(res, result, baseMeta(container));
     }),
 
     withdrawal: asyncHandler(async (_req, res) => {

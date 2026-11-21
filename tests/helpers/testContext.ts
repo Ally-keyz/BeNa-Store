@@ -29,6 +29,7 @@ export function testConfig(overrides: Record<string, string | undefined> = {}): 
     AUTH_CUSTOMER_ACCOUNTS_ENABLED: 'false',
     SHOPIFY_WEBHOOK_SECRET: TEST_WEBHOOK_SECRET,
     REVIEWS_PROVIDER: 'none',
+    RESTOCK_PROVIDER: 'mock',
     NEWSLETTER_PROVIDER: 'mock',
     ADMIN_API_TOKEN: '',
     ...overrides,

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { Logger } from 'pino';
 import { z } from 'zod';
 import type { AppConfig } from '../config/env';
@@ -6,8 +7,11 @@ import type {
   ProductReview,
   ProductReviewsResult,
   ReviewProviderAssessment,
+  ReviewSubmission,
+  ReviewSubmissionResult,
 } from '../types/domain';
 import { truncate } from '../utils/html';
+import { createReviewStore, type ReviewStore } from './reviewStore';
 
 const providerReviewSchema = z.object({
   id: z.union([z.string(), z.number()]),
@@ -112,6 +116,7 @@ export class ReviewsService {
     private readonly config: AppConfig,
     private readonly logger: Logger,
     private readonly fetchImpl: typeof fetch = fetch,
+    private readonly store: ReviewStore = createReviewStore(),
   ) {}
 
   /**
@@ -123,6 +128,29 @@ export class ReviewsService {
     options: { refresh?: boolean } = {},
   ): Promise<ProductReviewsResult> {
     const checkedAt = new Date().toISOString();
+    const submitted = await this.store.list(handle);
+    const withSubmitted = (base: ProductReviewsResult): ProductReviewsResult => {
+      if (submitted.length === 0) return base;
+      const reviews = [...submitted, ...base.reviews].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      const averageRating = Math.round(
+        (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length) * 10,
+      ) / 10;
+      return {
+        ...base,
+        status: 'available',
+        source: base.source ?? 'customer_reviews',
+        reviews,
+        summary: { count: reviews.length, averageRating },
+        simulated: false,
+        message:
+          base.status === 'available'
+            ? `${base.message} Includes customer-submitted reviews.`
+            : 'Customer-submitted reviews for this product.',
+        checkedAt,
+      };
+    };
     const empty = (status: ProductReviewsResult['status'], message: string, source: string | null = null) => ({
       handle,
       status,
@@ -136,15 +164,19 @@ export class ReviewsService {
 
     const template = this.config.reviews.apiUrlTemplate;
     if (!template || this.config.reviews.provider === 'none') {
-      return empty(
-        'not_configured',
-        'No review feed is configured. Set REVIEWS_API_URL_TEMPLATE to surface genuine reviews.',
+      return withSubmitted(
+        empty(
+          'not_configured',
+          'No review feed is configured. Set REVIEWS_API_URL_TEMPLATE to surface genuine reviews.',
+        ),
       );
     }
 
     const cacheKey = handle.toLowerCase();
     const cached = this.productCache.get(cacheKey);
-    if (!options.refresh && cached && cached.expiresAt > Date.now()) return cached.value;
+    if (!options.refresh && cached && cached.expiresAt > Date.now()) {
+      return withSubmitted(cached.value);
+    }
 
     let url: URL;
     try {
@@ -155,7 +187,7 @@ export class ReviewsService {
       );
       if (!/^https?:$/.test(url.protocol)) throw new Error('protocol');
     } catch {
-      return empty('unavailable', 'REVIEWS_API_URL_TEMPLATE is not a valid HTTP(S) URL.');
+      return withSubmitted(empty('unavailable', 'REVIEWS_API_URL_TEMPLATE is not a valid HTTP(S) URL.'));
     }
 
     try {
@@ -164,7 +196,7 @@ export class ReviewsService {
         signal: AbortSignal.timeout(8000),
       });
       if (!response.ok) {
-        return empty('unavailable', `Review feed responded with HTTP ${response.status}.`);
+        return withSubmitted(empty('unavailable', `Review feed responded with HTTP ${response.status}.`));
       }
       const parsed = providerPayloadSchema.parse(await response.json());
       const reviews: ProductReview[] = parsed.reviews.map((review) => ({
@@ -198,13 +230,136 @@ export class ReviewsService {
           value,
         });
       }
-      return value;
+      return withSubmitted(value);
     } catch (error) {
       this.logger.warn(
         { handle, error: error instanceof Error ? error.message : 'unknown' },
         'review feed read failed',
       );
-      return empty('unavailable', 'The configured review feed could not be read.');
+      return withSubmitted(empty('unavailable', 'The configured review feed could not be read.'));
+    }
+  }
+
+  /** Accepts a public review, stores it, and emails a copy to the store owner. */
+  async submit(handle: string, input: ReviewSubmission): Promise<ReviewSubmissionResult> {
+    const receivedAt = new Date().toISOString();
+    const review: ProductReview = {
+      id: randomUUID(),
+      author: input.author.trim(),
+      rating: input.rating,
+      body: input.body.trim(),
+      createdAt: receivedAt,
+      verifiedPurchase: false,
+    };
+
+    await this.store.add(handle, review);
+    this.productCache.delete(handle.toLowerCase());
+
+    const notification = await this.notifyOwner(handle, review, input.language);
+    const simulated = notification.simulated;
+    this.logger.info(
+      {
+        handle,
+        reviewId: review.id,
+        store: this.store.kind,
+        notification: notification.provider,
+        delivered: notification.delivered,
+      },
+      'customer review submitted',
+    );
+
+    return {
+      handle,
+      reference: review.id,
+      review,
+      status: simulated ? 'simulated' : 'received',
+      provider: notification.provider,
+      receivedAt,
+      notification,
+      message: simulated
+        ? 'Thank you. Your review is published; the owner notification is simulated.'
+        : 'Thank you. Your review is published and the store owner has been notified.',
+      simulated,
+    };
+  }
+
+  private async notifyOwner(
+    handle: string,
+    review: ProductReview,
+    language?: string,
+  ): Promise<ReviewSubmissionResult['notification']> {
+    const apiKey = this.config.restock.resendApiKey;
+    const from = this.config.restock.fromEmail;
+    const provider = this.config.restock.provider;
+    if (provider !== 'resend' || !apiKey || !from) {
+      return {
+        provider: 'mock',
+        delivered: false,
+        simulated: true,
+        message: 'Owner email is simulated; configure RESTOCK_PROVIDER=resend with Resend credentials.',
+      };
+    }
+
+    const to = this.config.reviews.notificationEmail;
+    const productUrl = `${this.config.siteUrl.replace(/\/+$/, '')}/products/${encodeURIComponent(handle)}`;
+    const heading = language === 'DE' ? 'Neue Produktbewertung' : language === 'FR' ? 'Nouvel avis produit' : 'New product review';
+    const subject = `${heading}: ${handle} — ${review.rating}/5`;
+    const lines = [
+      heading,
+      '',
+      `Product: ${productUrl}`,
+      `Author: ${review.author}`,
+      `Rating: ${review.rating}/5`,
+      '',
+      review.body,
+      '',
+      `Review ID: ${review.id}`,
+      `Submitted: ${review.createdAt}`,
+    ];
+    const html = [
+      `<h2>${escapeHtml(heading)}</h2>`,
+      `<p><a href="${escapeHtml(productUrl)}">${escapeHtml(handle)}</a></p>`,
+      `<p><strong>${escapeHtml(review.author)}</strong> · ${review.rating}/5</p>`,
+      `<p>${escapeHtml(review.body).replace(/\n/g, '<br />')}</p>`,
+      `<p><small>Review ID: ${escapeHtml(review.id)} · ${escapeHtml(review.createdAt)}</small></p>`,
+    ].join('');
+
+    try {
+      const response = await this.fetchImpl('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          from,
+          to: [to],
+          subject,
+          text: lines.join('\n'),
+          html,
+        }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) {
+        throw new Error(`Resend responded with HTTP ${response.status}`);
+      }
+      return {
+        provider: 'resend',
+        delivered: true,
+        simulated: false,
+        message: `Owner notified at ${to}.`,
+      };
+    } catch (error) {
+      this.logger.warn(
+        { handle, reviewId: review.id, error: error instanceof Error ? error.message : 'unknown' },
+        'review owner notification failed',
+      );
+      return {
+        provider: 'resend',
+        delivered: false,
+        simulated: true,
+        message: 'The review was saved, but the owner notification could not be delivered.',
+      };
     }
   }
 
@@ -342,4 +497,13 @@ export class ReviewsService {
       dataSource: this.client.mode,
     };
   }
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

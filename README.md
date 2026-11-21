@@ -462,7 +462,9 @@ kept server-side because the backend proxies all traffic. Use the **private** to
 | `RESTOCK_WEBHOOK_URL` / `RESTOCK_WEBHOOK_SECRET` | — | secret yes | Signed restock event to email automation |
 | `RESTOCK_SIGNUP_TTL_SECONDS` | `2592000` | no | Pending signup lifetime (30 days) |
 | `REVIEWS_PROVIDER` | `auto` | no | `auto` \| `judge_me` \| `loox` \| `stamped` \| `yotpo` \| `okendo` \| `shopify_product_reviews` \| `none` |
-| `REVIEWS_API_TOKEN` | — | **yes** | reserved; no review API calls are made in this phase |
+| `REVIEWS_API_TOKEN` | — | **yes** | reserved for a future authenticated provider API |
+| `REVIEWS_RATE_LIMIT_MAX` | `5` | no | public review submissions per rate-limit window |
+| `REVIEWS_NOTIFICATION_EMAIL` | `store@benaorigins.de` | no | owner recipient for new public review emails (delivery reuses Restock/Resend settings) |
 | `SENTRY_DSN` | — | yes | reserved, not wired yet |
 
 ### AI product-fact suggestions
@@ -603,7 +605,8 @@ Legend: **READY** = works now with defaults/fixtures · **MISSING** = needed for
 | `KLAVIYO_API_KEY` / `KLAVIYO_LIST_ID` / `KLAVIYO_API_REVISION` | Klaviyo private key + list | If provider=klaviyo | Klaviyo → **Account → Settings → API keys → Create Private API Key** (profiles/lists scopes); list ID from the list URL; revision from Klaviyo API docs | Key **secret**; list ID public | **NOT NEEDED YET** | Klaviyo adapter returns `503`; mock still works |
 | `MAILCHIMP_API_KEY` / `MAILCHIMP_LIST_ID` / `MAILCHIMP_SERVER_PREFIX` | Mailchimp credentials | If provider=mailchimp | Mailchimp → **Profile → Extras → API keys**; Audience → **Settings → Audience ID**; server prefix = `usX` suffix of the key | Key **secret**; IDs public | **NOT NEEDED YET** | Mailchimp adapter returns `503`; mock still works |
 | `REVIEWS_PROVIDER` | Installed review app (or `auto`) | No (`auto`) | Detect via `GET /api/v1/reviews/assessment` + Admin → **Settings → Apps and sales channels → Apps** | Public | **MISSING / UNKNOWN** | Detection may mislabel; integration guidance is still returned |
-| `REVIEWS_API_TOKEN` | Review provider API token | Only when review API is built | Judge.me: Settings → API → private token. Loox: Settings → API token. Okendo: API key/subscriber ID. Stamped: public key/store hash. Yotpo: app key | **Secret** | **NOT NEEDED YET** | No review API calls exist in this phase |
+| `REVIEWS_API_TOKEN` | Review provider API token | Only when a provider API feed is wired | Judge.me: Settings → API → private token. Loox: Settings → API token. Okendo: API key/subscriber ID. Stamped: public key/store hash. Yotpo: app key | **Secret** | **NOT NEEDED YET** | Public customer reviews use the built-in POST endpoint; a provider feed is still optional |
+| `REVIEWS_NOTIFICATION_EMAIL` | Owner recipient for new public reviews | No (`store@benaorigins.de`) | Public review submissions email via the Restock/Resend transport | Public | **READY** | Delivery is simulated unless `RESTOCK_PROVIDER=resend` is configured |
 | `REDIS_URL` | Redis for webhook dedup and Socket.IO scaling only | No | Upstash/Railway/ElastiCache/self-hosted; use `rediss://…` with TLS | **Secret** | **NOT NEEDED YET** | Restock signups are memory-only by design; dedup falls back to memory without Redis |
 | `SENTRY_DSN` | Error reporting | No | Sentry project settings | Secret-ish | **NOT NEEDED YET** | Reserved; not wired in this phase |
 | `TRUST_PROXY` | Proxy hop count | No | Hosting docs (1 for one reverse proxy) | Public | **MISSING for prod** | Wrong client IPs → rate limiting/CORS/buyer-IP issues |

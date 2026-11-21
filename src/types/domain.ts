@@ -582,6 +582,31 @@ export interface ProductReviewsResult {
   checkedAt: string;
 }
 
+/** Public, no-login review submission from a shopper. */
+export interface ReviewSubmission {
+  author: string;
+  rating: number;
+  body: string;
+  language?: string;
+}
+
+export interface ReviewSubmissionResult {
+  handle: string;
+  reference: string;
+  review: ProductReview;
+  status: 'received' | 'simulated';
+  provider: string;
+  receivedAt: string;
+  notification: {
+    provider: string;
+    delivered: boolean;
+    simulated: boolean;
+    message: string;
+  };
+  message: string;
+  simulated: boolean;
+}
+
 /** Facets derived from catalog data for the storefront (audit #20). */
 export interface CatalogFacets {
   categories: Array<{ value: string; label: string; count: number }>;
