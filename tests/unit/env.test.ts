@@ -22,6 +22,17 @@ describe('environment configuration', () => {
     ).toThrow(/CORS_ALLOWED_ORIGINS/);
   });
 
+  it('always allows the storefront origins when the CORS env var is narrow', () => {
+    const config = loadConfig({
+      NODE_ENV: 'test',
+      SHOPIFY_MOCK_MODE: 'true',
+      CORS_ALLOWED_ORIGINS: 'https://example.com',
+      SOCKET_CORS_ORIGINS: 'https://example.com',
+    });
+    expect(config.corsOrigins).toContain('https://bena-origins-frontend.onrender.com');
+    expect(config.socketCorsOrigins).toContain('https://bena-origins-frontend.onrender.com');
+  });
+
   it('requires explicit CORS and an admin token in production', () => {
     expect(() =>
       loadConfig({

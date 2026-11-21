@@ -381,6 +381,23 @@ export interface AppConfig {
 
 const DEFAULT_DEV_ORIGINS = ['http://localhost:5173', 'http://localhost:3000'];
 
+/**
+ * Storefront origins that must always be able to call the API, regardless of
+ * how CORS_ALLOWED_ORIGINS is configured on a given deploy. Keeping this list
+ * in code prevents a dashboard env var from silently breaking the frontend
+ * after a new Render service is created.
+ */
+const DEFAULT_STOREFRONT_ORIGINS = [
+  'https://benaorigins.de',
+  'https://www.benaorigins.de',
+  'https://bena-origins-frontend.onrender.com',
+  'https://bena-origins.onrender.com',
+] as const;
+
+function withStorefrontOrigins(origins: string[]): string[] {
+  return Array.from(new Set([...origins, ...DEFAULT_STOREFRONT_ORIGINS]));
+}
+
 function parseCsv(value: string | undefined): string[] {
   if (!value) return [];
   return value
@@ -476,10 +493,13 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
   if (isProduction && configuredOrigins.length === 0) {
     throw new Error('CORS_ALLOWED_ORIGINS is required in production.');
   }
-  const corsOrigins =
-    configuredOrigins.length > 0 ? configuredOrigins : isProduction ? [] : DEFAULT_DEV_ORIGINS;
+  const corsOrigins = withStorefrontOrigins(
+    configuredOrigins.length > 0 ? configuredOrigins : isProduction ? [] : DEFAULT_DEV_ORIGINS,
+  );
 
-  const socketCorsOrigins = parseCsv(env.SOCKET_CORS_ORIGINS).map(normalizeOrigin);
+  const socketCorsOrigins = withStorefrontOrigins(
+    parseCsv(env.SOCKET_CORS_ORIGINS).map(normalizeOrigin),
+  );
   if (socketCorsOrigins.includes('*')) {
     throw new Error('SOCKET_CORS_ORIGINS must not contain "*".');
   }
