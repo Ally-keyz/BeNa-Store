@@ -34,8 +34,9 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
 }
 
 /**
- * The logo artwork is shown at a larger size beside a compact wordmark with
- * the "Afro Shop" subtitle, so the artwork stays legible at navbar size.
+ * The logo artwork is shown from `sm` up beside the wordmark. On narrow phones
+ * it is hidden so the full brand name and "Afro Shop" subtitle always fit in
+ * the top nav alongside the menu, search and language controls.
  */
 function BrandMark() {
   return (
@@ -51,10 +52,10 @@ function BrandMark() {
         height={155}
         loading="eager"
         decoding="async"
-        className="h-20 w-auto shrink-0 object-contain sm:h-24"
+        className="hidden h-24 w-auto shrink-0 object-contain sm:block"
       />
-      <span className="hidden min-w-0 min-[360px]:block">
-        <span className="block truncate font-display text-[15px] font-semibold leading-none tracking-[-0.02em] text-ink sm:text-[17px]">
+      <span className="block min-w-0">
+        <span className="block whitespace-nowrap font-display text-[15px] font-semibold leading-none tracking-[-0.02em] text-ink sm:text-[17px]">
           {BRAND.name}
         </span>
         <span className="mt-1 block text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
@@ -92,7 +93,7 @@ export function Header() {
         <div
           className={cn(
             pageContainer,
-            'relative flex h-24 items-center justify-between gap-4 lg:h-28',
+            'relative flex h-20 items-center justify-between gap-2 sm:h-24 sm:gap-4 lg:h-28',
           )}
         >
           <div className="flex min-w-0 items-center gap-1 sm:gap-2">
@@ -131,7 +132,7 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <button
               type="button"
               onClick={() => setSearchOpen(true)}

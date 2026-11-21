@@ -103,7 +103,7 @@ export function LanguageSwitch({
         onClick={() => setOpen((value) => !value)}
         className={cn(
           'inline-flex items-center gap-1.5 rounded-full border border-neutral-200/80 bg-surface font-medium text-ink transition-colors hover:bg-neutral-100',
-          size === 'sm' ? 'h-11 px-2.5' : 'h-11 px-3',
+          size === 'sm' ? 'h-11 gap-1 px-2 sm:gap-1.5 sm:px-2.5' : 'h-11 px-3',
           variant === 'inline' && 'w-full',
         )}
       >
