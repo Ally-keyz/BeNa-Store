@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import type { Product } from '@/types';
 import { cn } from '@/lib/cn';
-import { formatMoney, formatUnitPrice, isOnSale } from '@/lib/money';
+import { formatMoney, isOnSale } from '@/lib/money';
 import { getAvailability, getDefaultVariant, getPrimaryImage, hasVariantChoice } from '@/lib/product';
 import { stripHtml } from '@/lib/sanitize';
 import { useCart } from '@/context/CartContext';
@@ -26,7 +26,7 @@ export interface ProductCardProps {
 /**
  * Catalog card. Square image, title left / price right, no card chrome.
  * Audit rules: coming-soon never adds to cart (#9), compare-at only when
- * strictly above price (#15), unit price hidden when unknown (#2).
+ * strictly above price (#15).
  */
 export function ProductCard({ product, priority = false, className }: ProductCardProps) {
   const { t } = useTranslation();
@@ -41,9 +41,6 @@ export function ProductCard({ product, priority = false, className }: ProductCar
   const price = variant?.price ?? product.priceRange.minVariantPrice;
   const compareAt = variant?.compareAtPrice ?? null;
   const onSale = availability === 'available' && isOnSale(price, compareAt);
-  const unitPrice = formatUnitPrice(variant?.unitPrice, variant?.unitPriceMeasurement, {
-    locale: formatLocale,
-  });
   const sellable = availability === 'available' && Boolean(variant?.availableForSale);
   const multiVariant = hasVariantChoice(product);
   const productHref = `/products/${product.handle}`;
@@ -166,13 +163,6 @@ export function ProductCard({ product, priority = false, className }: ProductCar
             ) : null}
           </div>
         </div>
-
-        {unitPrice ? (
-          <p className="tabular mt-1 break-words text-[12px] text-neutral-600">
-            <span className="sr-only">{t('productCard.unitPriceLabel')}: </span>
-            {unitPrice}
-          </p>
-        ) : null}
 
         {availability !== 'available' ? (
           <Button

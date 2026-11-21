@@ -202,7 +202,6 @@ const en = {
     notifyConsent: 'Email me only when this product is back in stock.',
     notifySubmit: 'Notify me',
     notifySuccess: "You're on the list — we'll email you as soon as it's back.",
-    unitPriceLabel: 'Unit price',
     imageAltFallback: '{{title}}',
     added: '{{title}} added to your cart.',
     addError: 'Could not add this item. Please try again.',
@@ -413,7 +412,7 @@ const en = {
       'We present the origin and maker information that the shop backend supplies, and mark anything that is still missing.',
     clarityTitle: 'Clear product information',
     clarityBody:
-      'Ingredients, allergens, preparation and unit prices appear on product pages only when the underlying data exists.',
+      'Ingredients, allergens and preparation appear on product pages only when the underlying data exists.',
     fulfilmentTitle: 'Careful fulfilment',
     fulfilmentBody:
       'Orders are fulfilled through the shop backend and checkout is hosted by Shopify. Exact delivery costs are shown for your country at checkout.',

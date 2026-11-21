@@ -209,7 +209,6 @@ const de: Resources = {
     notifyConsent: 'Nur benachrichtigen, wenn dieses Produkt wieder verfügbar ist.',
     notifySubmit: 'Benachrichtige mich',
     notifySuccess: 'Du bist auf der Liste — wir schreiben dir, sobald es wieder da ist.',
-    unitPriceLabel: 'Grundpreis',
     imageAltFallback: '{{title}}',
     added: '{{title}} wurde in den Warenkorb gelegt.',
     addError: 'Der Artikel konnte nicht hinzugefügt werden. Bitte versuche es erneut.',
@@ -420,7 +419,7 @@ const de: Resources = {
       'Wir zeigen die Herkunfts- und Herstellerangaben, die das Shop-Backend liefert, und markieren alles, was noch fehlt.',
     clarityTitle: 'Klare Produktinformationen',
     clarityBody:
-      'Zutaten, Allergene, Zubereitung und Grundpreise erscheinen nur dann auf Produktseiten, wenn die zugrunde liegenden Daten vorhanden sind.',
+      'Zutaten, Allergene und Zubereitung erscheinen nur dann auf Produktseiten, wenn die zugrunde liegenden Daten vorhanden sind.',
     fulfilmentTitle: 'Sorgfältige Abwicklung',
     fulfilmentBody:
       'Bestellungen werden über das Shop-Backend abgewickelt, der Checkout läuft über Shopify. Genaue Versandkosten siehst du an der Kasse für dein Land.',

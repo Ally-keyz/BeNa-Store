@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { MessageCircleQuestion, RotateCcw, Truck } from 'lucide-react';
 import type { Product, ProductVariant } from '@/types';
 import { BRAND } from '@/config';
-import { formatMoney, formatUnitPrice, isOnSale, toAmount } from '@/lib/money';
+import { formatMoney, isOnSale, toAmount } from '@/lib/money';
 import { getAvailability } from '@/lib/product';
 import { useCart } from '@/context/CartContext';
 import { useMarket } from '@/context/MarketContext';
@@ -36,9 +36,6 @@ export function PurchasePanel({
   const availability = getAvailability(product);
   const price = variant?.price ?? product.priceRange.minVariantPrice;
   const compareAt = variant?.compareAtPrice ?? null;
-  const unitPrice = formatUnitPrice(variant?.unitPrice, variant?.unitPriceMeasurement, {
-    locale: formatLocale,
-  });
   const onSale = isOnSale(price, compareAt);
   const totalAmount =
     price && quantity > 1
@@ -65,7 +62,6 @@ export function PurchasePanel({
             </span>
           ) : null}
         </div>
-        {unitPrice ? <p className="mt-1 text-[13px] text-neutral-600">{unitPrice}</p> : null}
         {totalAmount ? (
           <p className="mt-1 tabular text-[20px] font-bold text-terra-700">
             {t('productInfo.total')}: {formatMoney(totalAmount, { locale: formatLocale })}

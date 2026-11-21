@@ -202,7 +202,6 @@ const fr = {
     notifyConsent: 'M’écrire uniquement lorsque ce produit est de nouveau disponible.',
     notifySubmit: 'Me prévenir',
     notifySuccess: 'Vous êtes inscrit — nous vous écrirons dès son retour.',
-    unitPriceLabel: 'Prix unitaire',
     imageAltFallback: '{{title}}',
     added: '{{title}} ajouté à votre panier.',
     addError: 'Impossible d’ajouter cet article. Veuillez réessayer.',
@@ -413,7 +412,7 @@ const fr = {
       'Nous présentons l’origine et le fabricant lorsque le serveur les fournit, et signalons ce qui manque encore.',
     clarityTitle: 'Informations produit claires',
     clarityBody:
-      'Ingrédients, allergènes, préparation et prix unitaire apparaissent sur les fiches produit uniquement lorsque les données existent.',
+      'Ingrédients, allergènes et préparation apparaissent sur les fiches produit uniquement lorsque les données existent.',
     fulfilmentTitle: 'Préparation soignée',
     fulfilmentBody:
       'Les commandes sont traitées par le serveur de la boutique et le paiement est hébergé par Shopify. Les frais de livraison exacts sont affichés pour votre pays au paiement.',

@@ -1,4 +1,4 @@
-import type { Money, ProductVariant, UnitPriceMeasurement } from '@/types/domain';
+import type { Money, ProductVariant } from '@/types/domain';
 
 export interface MoneyFormatOptions {
   /** BCP-47 locale for Intl.NumberFormat, e.g. 'de-DE'. */
@@ -36,18 +36,6 @@ export function formatMoney(
   } catch {
     return `${amount.toFixed(2)} ${currency}`;
   }
-}
-
-/** Format a unit price like "31,60 € / kg". Returns '' when missing. */
-export function formatUnitPrice(
-  unitPrice: Money | null | undefined,
-  measurement: UnitPriceMeasurement | null | undefined,
-  options: MoneyFormatOptions = {},
-): string {
-  if (!unitPrice || toAmount(unitPrice) === 0) return '';
-  const reference = (measurement?.referenceUnit ?? '').trim().toLowerCase();
-  const base = formatMoney(unitPrice, { ...options, alwaysDecimals: true });
-  return reference ? `${base} / ${reference}` : base;
 }
 
 /** True when the variant has a valid sale: compare-at strictly above price. */
