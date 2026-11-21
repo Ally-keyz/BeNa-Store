@@ -360,7 +360,6 @@ const fr = {
     unavailableTitle: 'Pas encore renseigné',
     unavailableBody: 'Le serveur de la boutique ne fournit pas cette information. Nous ne la devinons pas.',
     ingredientsUnavailable: 'Les ingrédients n’ont pas été fournis pour ce produit.',
-    allergensUnavailable: 'L’IA analyse la description et les autres informations du produit pour repérer les allergènes probables.',
     allergensNote: 'Vérifiez toujours l’emballage du produit avant utilisation.',
     nutritionUnavailable: 'Les valeurs nutritionnelles n’ont pas été fournies pour ce produit.',
     originUnavailable: 'L’origine n’a pas été fournie pour ce produit.',

@@ -171,24 +171,26 @@ export function ProductFacts({ product }: ProductFactsProps) {
       : null,
   ].filter((row): row is { label: string; value: string } => row !== null);
 
+  const allergenItems: AccordionItem[] = declaredAllergens
+    ? [
+        {
+          id: 'allergens',
+          title: t('product.allergens'),
+          content: (
+            <div>
+              <p className="whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
+                {declaredAllergens}
+              </p>
+              <p className="mt-1 text-[12px] text-neutral-600">{t('productInfo.allergensNote')}</p>
+              {aiSuggestion && aiAllergens ? <AiNote /> : null}
+            </div>
+          ),
+        },
+      ]
+    : [];
+
   const items: AccordionItem[] = [
-    {
-      id: 'allergens',
-      title: t('product.allergens'),
-      content: declaredAllergens ? (
-        <div>
-          <p className="whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
-            {declaredAllergens}
-          </p>
-          <p className="mt-1 text-[12px] text-neutral-600">{t('productInfo.allergensNote')}</p>
-          {aiSuggestion && aiAllergens ? <AiNote /> : null}
-        </div>
-      ) : (
-        <p className="text-[13px] leading-5 text-neutral-600">
-          {t('productInfo.allergensUnavailable')}
-        </p>
-      ),
-    },
+    ...allergenItems,
     {
       id: 'description',
       title: t('productInfo.descriptionTitle'),

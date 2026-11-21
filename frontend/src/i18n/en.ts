@@ -360,7 +360,6 @@ const en = {
     unavailableTitle: 'Not provided yet',
     unavailableBody: 'The shop backend does not supply this information. We will not guess.',
     ingredientsUnavailable: 'Ingredients have not been supplied for this product.',
-    allergensUnavailable: 'AI checks the product description and other details for likely allergens.',
     allergensNote: 'Always check the product packaging before use.',
     nutritionUnavailable: 'Nutrition values have not been supplied for this product.',
     originUnavailable: 'Origin details have not been supplied for this product.',

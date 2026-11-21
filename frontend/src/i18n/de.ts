@@ -367,7 +367,6 @@ const de: Resources = {
     unavailableTitle: 'Noch nicht angegeben',
     unavailableBody: 'Das Shop-Backend liefert diese Information nicht. Wir raten nicht.',
     ingredientsUnavailable: 'Zutaten wurden für dieses Produkt nicht angegeben.',
-    allergensUnavailable: 'Die KI prüft die Produktbeschreibung und weitere Angaben auf mögliche Allergene.',
     allergensNote: 'Prüfe vor der Verwendung immer die Verpackung.',
     nutritionUnavailable: 'Nährwerte wurden für dieses Produkt nicht angegeben.',
     originUnavailable: 'Herkunftsangaben wurden für dieses Produkt nicht angegeben.',
