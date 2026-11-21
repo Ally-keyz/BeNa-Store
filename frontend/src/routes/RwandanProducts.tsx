@@ -60,7 +60,6 @@ export function RwandanProductsPage() {
         showFilters={false}
         showCta={false}
         first={8}
-        darkOverlay
       />
 
       <div className={pageContainer}>

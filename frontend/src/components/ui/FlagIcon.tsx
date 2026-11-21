@@ -16,6 +16,18 @@ export function FlagIcon({ code, className }: { code: string; className?: string
     );
   }
 
+  if (code === 'fr') {
+    return (
+      <span className={cn(FRAME, 'h-3.5 w-5', className)} aria-hidden="true">
+        <svg viewBox="0 0 30 20" className="h-full w-full" focusable="false">
+          <rect width="10" height="20" fill="#002395" />
+          <rect x="10" width="10" height="20" fill="#FFFFFF" />
+          <rect x="20" width="10" height="20" fill="#ED2939" />
+        </svg>
+      </span>
+    );
+  }
+
   return (
     <span className={cn(FRAME, 'h-3.5 w-5', className)} aria-hidden="true">
       <svg viewBox="0 0 60 30" className="h-full w-full" focusable="false">

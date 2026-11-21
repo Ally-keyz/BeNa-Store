@@ -14,7 +14,7 @@ import { stripHtml } from '@/lib/sanitize';
 import type { Product } from '@/types';
 import { HERO_FALLBACK_IMAGES, HERO_SLIDES, type HeroCarouselSlide } from './slides';
 
-const AUTOPLAY_MS = 7000;
+const AUTOPLAY_MS = 4500;
 const SWIPE_THRESHOLD = 40;
 function isExcludedFromHero(product: Product): boolean {
   const text = `${product.handle} ${product.title}`;
@@ -117,13 +117,24 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
     setIndex(0);
   }, [slideKeys]);
 
+  // A timeout keyed on the active slide gives every product the full display
+  // time, including right after someone uses the arrows or the dots.
   useEffect(() => {
     if (!autoplay || total < 2) return;
-    const id = window.setInterval(() => {
+    const id = window.setTimeout(() => {
       setIndex((current) => (current + 1) % total);
     }, AUTOPLAY_MS);
-    return () => window.clearInterval(id);
-  }, [autoplay, total]);
+    return () => window.clearTimeout(id);
+  }, [autoplay, total, index]);
+
+  // Warm the next image so the crossfade never shows an empty frame.
+  useEffect(() => {
+    if (typeof Image === 'undefined' || total < 2) return;
+    const next = slides[(index + 1) % total];
+    if (!next) return;
+    const image = new Image();
+    image.src = next.image;
+  }, [index, total, slides]);
 
   const goTo = (next: number) => setIndex(((next % total) + total) % total);
 
@@ -165,10 +176,11 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
         <motion.div
           key={slide.key}
           className="absolute inset-0 -z-20"
-          initial={{ opacity: 0, scale: 1.06 }}
+          initial={{ opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          exit={{ opacity: 0, scale: 1.015 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          style={{ willChange: 'opacity, transform' }}
         >
           <img
             src={slide.image}
@@ -191,10 +203,11 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
             <motion.div
               key={`copy-${slide.key}`}
               className="min-w-0 max-w-xl"
-              initial={{ opacity: 0, y: 22 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, y: -8, transition: { duration: 0.18 } }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              style={{ willChange: 'opacity, transform' }}
             >
               <p className="flex items-center gap-2 break-words text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
                 {slide.meta ? <Sparkles className="h-3.5 w-3.5 shrink-0 text-brand" aria-hidden="true" /> : null}

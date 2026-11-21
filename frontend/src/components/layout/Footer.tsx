@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Instagram, MessageCircle } from 'lucide-react';
+import { Instagram, MapPin, MessageCircle } from 'lucide-react';
 import { BRAND } from '@/config';
 import { cn } from '@/lib/cn';
 import { pageContainer } from '@/lib/layout';
@@ -64,7 +64,21 @@ export function Footer() {
             {BRAND.contactEmail}
           </a>
 
-          <ul aria-label={t('footer.socialLabel', { brand: BRAND.name })} className="mt-6 flex items-center gap-2">
+          <div className="mt-5">
+            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/50">
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+              {t('footer.locationHeading')}
+            </p>
+            <address className="mt-2 text-sm not-italic leading-6 text-white/70">
+              {BRAND.address.street}
+              <br />
+              {BRAND.address.city}
+              <br />
+              {BRAND.address.country}
+            </address>
+          </div>
+
+          <ul aria-label={t('footer.socialLabel', { brand: BRAND.name })} className="mt-6 flex flex-wrap items-center gap-2">
             {SOCIALS.map(({ href, label, Icon }) => (
               <li key={label}>
                 <a
@@ -72,9 +86,10 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${label} — ${t('a11y.externalLink')}`}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 px-3.5 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
                 >
                   <Icon className="h-4 w-4" aria-hidden="true" />
+                  <span>{label}</span>
                 </a>
               </li>
             ))}

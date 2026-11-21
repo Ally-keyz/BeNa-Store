@@ -336,10 +336,14 @@
     animation: bena-dialog-in 220ms var(--ease-out-soft) both;
   }
   .animate-drawer-in-right {
-    animation: bena-drawer-in-right 240ms var(--ease-out-soft) both;
+    animation: bena-drawer-in-right 200ms var(--ease-out-soft) both;
+    backface-visibility: hidden;
+    will-change: transform;
   }
   .animate-drawer-in-left {
-    animation: bena-drawer-in-left 240ms var(--ease-out-soft) both;
+    animation: bena-drawer-in-left 200ms var(--ease-out-soft) both;
+    backface-visibility: hidden;
+    will-change: transform;
   }
   .animate-pop-in {
     animation: bena-pop-in 320ms var(--ease-out-soft) both;

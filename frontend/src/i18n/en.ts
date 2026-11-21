@@ -105,6 +105,7 @@ const en = {
     paymentNote: 'Checkout is securely hosted by Shopify.',
     cookieSettings: 'Cookie settings',
     socialLabel: 'Follow {{brand}}',
+    locationHeading: 'Business location',
   },
   hero: {
     placeholderLabel: 'Photography placeholder',
@@ -301,6 +302,7 @@ const en = {
     title: 'Rwandan products, all in one place',
     body: 'Coffee, pantry food and handwoven crafts from Rwanda. Prices and availability follow your selected market.',
     sortLabel: 'Sort products',
+    filtersToggle: 'Filters',
     sortFeatured: 'Featured',
     sortNewest: 'Newest',
     sortPriceAsc: 'Price: low to high',

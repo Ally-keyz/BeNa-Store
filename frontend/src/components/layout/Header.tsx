@@ -34,8 +34,8 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
 }
 
 /**
- * The current logo is a square image. It is shown in full beside a crisp
- * typographic wordmark so the artwork stays legible at navbar size.
+ * The logo artwork is shown at a larger size beside a compact wordmark with
+ * the "Afro Shop" subtitle, so the artwork stays legible at navbar size.
  */
 function BrandMark() {
   return (
@@ -51,10 +51,15 @@ function BrandMark() {
         height={155}
         loading="eager"
         decoding="async"
-        className="h-16 w-auto shrink-0 object-contain sm:h-20"
+        className="h-20 w-auto shrink-0 object-contain sm:h-24"
       />
-      <span className="hidden min-w-0 truncate font-display text-[18px] font-semibold leading-none tracking-[-0.02em] text-ink min-[360px]:block sm:text-[20px]">
-        {BRAND.name}
+      <span className="hidden min-w-0 min-[360px]:block">
+        <span className="block truncate font-display text-[15px] font-semibold leading-none tracking-[-0.02em] text-ink sm:text-[17px]">
+          {BRAND.name}
+        </span>
+        <span className="mt-1 block text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+          Afro Shop
+        </span>
       </span>
     </Link>
   );
@@ -87,7 +92,7 @@ export function Header() {
         <div
           className={cn(
             pageContainer,
-            'relative flex h-16 items-center justify-between gap-4 lg:h-[72px]',
+            'relative flex h-24 items-center justify-between gap-4 lg:h-28',
           )}
         >
           <div className="flex min-w-0 items-center gap-1 sm:gap-2">
@@ -137,11 +142,11 @@ export function Header() {
             </button>
 
             <ThemeToggle className="hidden sm:inline-flex" />
-            <LanguageSwitch className="hidden sm:inline-flex" />
+            <LanguageSwitch className="shrink-0" />
             <button
               type="button"
               onClick={openCart}
-              className="relative inline-flex h-11 items-center gap-2 rounded-full border border-neutral-200/80 bg-surface pl-3 pr-3 text-ink transition-colors hover:bg-neutral-100 sm:pl-3.5 sm:pr-2.5"
+              className="relative hidden h-11 items-center gap-2 rounded-full border border-neutral-200/80 bg-surface pl-3 pr-3 text-ink transition-colors hover:bg-neutral-100 sm:inline-flex sm:pl-3.5 sm:pr-2.5"
               aria-label={cartLabel}
             >
               <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />

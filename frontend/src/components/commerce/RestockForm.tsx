@@ -117,7 +117,7 @@ export function RestockForm({
             type="submit"
             variant="secondary"
             loading={isSubmitting}
-            className="h-12 shrink-0 whitespace-nowrap rounded-xl border-neutral-300 px-5 text-[13px] text-ink hover:border-ink hover:bg-neutral-50 sm:px-7 sm:text-sm"
+            className="h-12 shrink-0 whitespace-nowrap rounded-xl border-red-600 bg-red-600 px-5 text-[13px] text-white hover:border-red-700 hover:bg-red-700 sm:px-7 sm:text-sm"
           >
             {submitLabel ?? t('productCard.notifySubmit')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />

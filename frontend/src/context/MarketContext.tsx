@@ -18,6 +18,16 @@ import type { LocalizationInfo } from '@/types';
 const COUNTRY_KEY = 'bena.country';
 const DEFAULT_COUNTRY = 'DE';
 
+function toLanguage(value: string): Language {
+  return value === 'de' || value === 'fr' ? value : 'en';
+}
+
+const FORMAT_LOCALES: Record<Language, string> = {
+  de: 'de-DE',
+  en: 'en-IE',
+  fr: 'fr-FR',
+};
+
 export interface MarketContextValue {
   country: string;
   language: Language;
@@ -41,10 +51,9 @@ const MarketContext = createContext<MarketContextValue | null>(null);
 export function MarketProvider({ children }: { children: ReactNode }) {
   const { i18n: i18nInstance } = useTranslation();
   const [country, setCountryState] = useState<string>(() => readStorage(COUNTRY_KEY) ?? DEFAULT_COUNTRY);
-  const [language, setLanguageState] = useState<Language>(() => {
-    const current = i18nInstance.language;
-    return current === 'de' ? 'de' : 'en';
-  });
+  const [language, setLanguageState] = useState<Language>(() =>
+    toLanguage(i18nInstance.language),
+  );
 
   const localizationQuery = useQuery({
     queryKey: queryKeys.localization({ country }),
@@ -65,7 +74,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
 
   // Keep state in sync if another component changes i18next directly.
   useEffect(() => {
-    const onChange = (next: string) => setLanguageState(next === 'de' ? 'de' : 'en');
+    const onChange = (next: string) => setLanguageState(toLanguage(next));
     i18n.on('languageChanged', onChange);
     return () => i18n.off('languageChanged', onChange);
   }, []);
@@ -97,7 +106,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       currency,
       regionName,
       marketParams: { country, language: language.toUpperCase() },
-      formatLocale: language === 'de' ? 'de-DE' : 'en-IE',
+      formatLocale: FORMAT_LOCALES[language],
     }),
     [
       country,

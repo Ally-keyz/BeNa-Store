@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2, SlidersHorizontal } from 'lucide-react';
 import { PageSeo } from '@/features/seo/PageSeo';
 import { useCatalogFacets, useInfiniteProducts } from '@/hooks/useCatalog';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
@@ -44,6 +44,7 @@ export function CatalogPage() {
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
   const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
   const [selectedFacets, setSelectedFacets] = useState<SelectedFacets>(EMPTY_FACETS);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const query = useInfiniteProducts({ ...marketParams, first: 12, sortKey: 'CREATED_AT' });
   const facetsQuery = useCatalogFacets(marketParams);
@@ -58,6 +59,13 @@ export function CatalogPage() {
   );
   const pages = query.data?.pages ?? [];
   const hasNextPage = pages.at(-1)?.hasNextPage ?? false;
+  const activeFilterCount =
+    (category === ALL_CATEGORIES ? 0 : 1) +
+    (priceFilter === 'all' ? 0 : 1) +
+    (['brands', 'dietary', 'origins'] as const).reduce(
+      (total, group) => total + selectedFacets[group].length,
+      0,
+    );
 
   const sentinelRef = useInfiniteScroll<HTMLDivElement>({
     hasNextPage,
@@ -91,52 +99,76 @@ export function CatalogPage() {
         </div>
 
         <div className="mt-8 border-t border-terra-100 pt-6" aria-busy={query.isFetching}>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0 flex-1">
-              <CategoryFilter value={category} onChange={setCategory} controls="catalog-grid" />
-            </div>
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+            aria-controls="catalog-filters"
+            className="inline-flex min-h-11 w-full items-center justify-between rounded-xl border border-terra-200 bg-surface px-4 text-sm font-medium text-ink lg:hidden"
+          >
+            <span className="inline-flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+              {t('catalog.filtersToggle')}
+              {activeFilterCount > 0 ? (
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-semibold leading-none text-on-brand">
+                  {activeFilterCount}
+                </span>
+              ) : null}
+            </span>
+            <ChevronDown
+              aria-hidden="true"
+              className={cn('h-4 w-4 transition-transform duration-200', filtersOpen && 'rotate-180')}
+            />
+          </button>
 
-            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-              <span className="hidden text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-500 sm:inline">
-                {t('catalog.priceLabel')}
-              </span>
-              <div
-                role="group"
-                aria-label={t('catalog.priceLabel')}
-                className="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto bg-surface px-4 py-1.5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:snap-none sm:overflow-visible sm:rounded-full sm:border sm:border-terra-200 sm:px-1.5 sm:py-1.5 [&::-webkit-scrollbar]:hidden"
-              >
-                {PRICE_OPTIONS.map((option) => {
-                  const active = priceFilter === option.value;
-                  return (
-                    <motion.button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setPriceFilter(option.value)}
-                      aria-pressed={active}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: 'spring', stiffness: 420, damping: 24 }}
-                      className={cn(
-                        'min-h-11 shrink-0 snap-start whitespace-nowrap rounded-full border-0 px-4 py-2 text-[13px] font-medium transition-colors sm:min-h-0',
-                        active
-                          ? 'bg-brand text-on-brand shadow-sm'
-                          : 'text-neutral-600 hover:bg-terra-50 hover:text-ink',
-                      )}
-                    >
-                      {t(option.labelKey)}
-                    </motion.button>
-                  );
-                })}
+          <div id="catalog-filters" className={cn(filtersOpen ? 'block' : 'hidden', 'lg:block')}>
+            <div className="mt-4 flex flex-col gap-4 lg:mt-0 lg:flex-row lg:items-center lg:justify-between">
+              <div className="min-w-0 flex-1">
+                <CategoryFilter value={category} onChange={setCategory} controls="catalog-grid" />
+              </div>
+  
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                <span className="hidden text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-500 sm:inline">
+                  {t('catalog.priceLabel')}
+                </span>
+                <div
+                  role="group"
+                  aria-label={t('catalog.priceLabel')}
+                  className="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto bg-surface px-4 py-1.5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:snap-none sm:overflow-visible sm:rounded-full sm:border sm:border-terra-200 sm:px-1.5 sm:py-1.5 [&::-webkit-scrollbar]:hidden"
+                >
+                  {PRICE_OPTIONS.map((option) => {
+                    const active = priceFilter === option.value;
+                    return (
+                      <motion.button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setPriceFilter(option.value)}
+                        aria-pressed={active}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: 'spring', stiffness: 420, damping: 24 }}
+                        className={cn(
+                          'min-h-11 shrink-0 snap-start whitespace-nowrap rounded-full border-0 px-4 py-2 text-[13px] font-medium transition-colors sm:min-h-0',
+                          active
+                            ? 'bg-brand text-on-brand shadow-sm'
+                            : 'text-neutral-600 hover:bg-terra-50 hover:text-ink',
+                        )}
+                      >
+                        {t(option.labelKey)}
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
 
-          <CatalogFacets
-            facets={facetsQuery.data}
-            selected={selectedFacets}
-            onChange={setSelectedFacets}
-            loading={facetsQuery.isLoading}
-          />
+            <CatalogFacets
+              facets={facetsQuery.data}
+              selected={selectedFacets}
+              onChange={setSelectedFacets}
+              loading={facetsQuery.isLoading}
+            />
+          </div>
 
           <div id="catalog-grid" className="mt-7">
             {query.isError ? (

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { StorefrontSocketBridge } from '@/app/StorefrontSocketBridge';
@@ -9,15 +9,26 @@ import { ScrollProgress } from '@/components/motion/ScrollProgress';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { CookieConsent } from './CookieConsent';
-import { OpeningScreen } from './OpeningScreen';
 
 /** Reset scroll on navigation (except when jumping to an in-page anchor). */
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
+
   useEffect(() => {
+    // The browser's own restoration can fire after React paints and leave the
+    // new route scrolled to the previous page's position (blank-looking page).
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  useLayoutEffect(() => {
     if (hash) return;
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    // `auto` would inherit `html { scroll-behavior: smooth }` and animate the
+    // reset, so the new page mounts mid-scroll. `instant` is immediate.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [pathname, hash]);
+
   return null;
 }
 
@@ -37,7 +48,6 @@ export function RootLayout() {
   return (
     <div className="relative flex min-h-dvh flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <ScrollProgress />
-      <OpeningScreen />
       <ScrollToTop />
       <AnalyticsPageView />
       <StorefrontSocketBridge />

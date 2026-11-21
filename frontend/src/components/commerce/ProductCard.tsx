@@ -180,7 +180,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
             size="sm"
             fullWidth
             onClick={() => setNotifyOpen(true)}
-            className="mt-3.5 min-h-11 border-neutral-300 text-ink hover:border-ink hover:bg-neutral-50 lg:min-h-9"
+            className="mt-3.5 min-h-11 border-red-600 bg-red-600 text-white hover:border-red-700 hover:bg-red-700 lg:min-h-9"
           >
             {t('productCard.notifyMe')}
           </Button>

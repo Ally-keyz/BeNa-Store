@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { io } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { queryKeys } from '@/api/queryKeys';
 import { env } from '@/config';
 
@@ -13,17 +13,16 @@ interface ProductChangedEvent {
  * Public `/storefront` socket listener. Socket events are hints only: they
  * invalidate REST queries, which then refetch from the backend. No admin
  * namespace is joined and no socket payload is rendered as product data.
+ *
+ * The client library is imported lazily so socket.io-client is not part of the
+ * initial storefront download.
  */
 export function useStorefrontSocket(): void {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const socket = io(env.socketUrl || undefined, {
-      path: '/socket.io',
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 3,
-      timeout: 8_000,
-    });
+    let disposed = false;
+    let socket: Socket | undefined;
 
     const invalidate = (event: ProductChangedEvent) => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
@@ -33,14 +32,26 @@ export function useStorefrontSocket(): void {
       }
     };
 
-    socket.on('product.changed', invalidate);
-    socket.on('connect_error', () => {
-      // Offline/socket-unavailable is non-fatal; REST remains the source.
+    void import('socket.io-client').then(({ io }) => {
+      if (disposed) return;
+      socket = io(env.socketUrl || undefined, {
+        path: '/socket.io',
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 3,
+        timeout: 8_000,
+      });
+      socket.on('product.changed', invalidate);
+      socket.on('connect_error', () => {
+        // Offline/socket-unavailable is non-fatal; REST remains the source.
+      });
     });
 
     return () => {
-      socket.off('product.changed', invalidate);
-      socket.disconnect();
+      disposed = true;
+      if (socket) {
+        socket.off('product.changed', invalidate);
+        socket.disconnect();
+      }
     };
   }, [queryClient]);
 }

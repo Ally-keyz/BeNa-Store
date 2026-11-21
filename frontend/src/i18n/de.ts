@@ -112,6 +112,7 @@ const de: Resources = {
     paymentNote: 'Der Checkout wird sicher von Shopify gehostet.',
     cookieSettings: 'Cookie-Einstellungen',
     socialLabel: 'Folge {{brand}}',
+    locationHeading: 'Geschäftsstandort',
   },
   hero: {
     placeholderLabel: 'Platzhalter für Fotografie',
@@ -308,6 +309,7 @@ const de: Resources = {
     title: 'Ruandische Produkte an einem Ort',
     body: 'Kaffee, Vorratsprodukte und handgewebte Crafts aus Ruanda. Preise und Verfügbarkeit richten sich nach deiner gewählten Region.',
     sortLabel: 'Produkte sortieren',
+    filtersToggle: 'Filter',
     sortFeatured: 'Empfohlen',
     sortNewest: 'Neueste',
     sortPriceAsc: 'Preis: aufsteigend',

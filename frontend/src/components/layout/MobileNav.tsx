@@ -85,7 +85,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           <p className="px-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
             {t('header.language')}
           </p>
-          <LanguageSwitch size="md" className="mt-2.5" />
+          <LanguageSwitch size="md" variant="inline" className="mt-2.5" />
         </div>
         <div>
           <p className="px-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-neutral-500">

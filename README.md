@@ -112,7 +112,7 @@ or Render Dashboard → **New → Blueprint** → select the repo.
 - Node 20, `npm ci --include=dev && npm run build && npm prune --omit=dev`, `npm start`
 - health check `/health`
 - live Shopify mode (`SHOPIFY_MOCK_MODE=false`, store domain, API `2026-10`)
-- production CORS for `benaorigins.de` / `www.benaorigins.de`
+- production CORS for `benaorigins.de` / `www.benaorigins.de` and the Render frontend origin
 - generated `ADMIN_JWT_SECRET` + `SESSION_SECRET`
 - Customer Account public endpoints and client ID
 - `AUTH_CUSTOMER_ACCOUNTS_ENABLED=false` until the Render URL is registered in Shopify
@@ -135,6 +135,25 @@ After the first deploy:
 4. Set `SHOPIFY_CUSTOMER_ACCOUNT_REDIRECT_URI`, `SHOPIFY_CUSTOMER_ACCOUNT_JS_ORIGIN`, and
    `AUTH_CUSTOMER_ACCOUNTS_ENABLED=true`, then redeploy.
 5. Verify `/health/ready` and `/api/v1/products` show live Shopify data.
+
+#### Storefront (frontend) on Render
+
+The same Blueprint also creates `bena-origins-frontend` as a **static site**:
+
+- Root Directory: `frontend`; Build: `npm ci && npm run build`; Publish Directory: `dist`
+- `/* → /index.html` rewrite so React Router deep links (e.g. `/products/:handle`) survive refresh
+- Build-time `VITE_API_BASE_URL` and `VITE_SOCKET_URL` point at the backend service. They are public values baked into the JS bundle — never put secrets in them.
+- The frontend's Render origin is included in the backend's `CORS_ALLOWED_ORIGINS` and `SOCKET_CORS_ORIGINS`.
+
+If your backend service URL is not `https://bena-origins-backend.onrender.com`, change both `VITE_` values and the CORS lists in `render.yaml` before deploying. If the storefront uses a custom domain, add that origin to the CORS lists and to Shopify's Customer Account JS origin/redirect settings, then redeploy.
+
+#### Performance and SEO notes
+
+- The blocking 2.8-second Lottie intro screen was removed, so first paint is the storefront itself.
+- Vendor code is split into cacheable chunks and Socket.IO is imported only when the listener starts. The production build no longer emits a chunk-size warning.
+- `robots.txt`, `sitemap.xml`, canonical/OG/Twitter tags and Organization JSON-LD are generated at build time in `frontend/vite.config.ts` from `VITE_SITE_URL`; `react-helmet-async` supplies per-route metadata at runtime.
+- Product and collection URLs are not in the static sitemap because they come from Shopify at runtime. Add prerendering or SSR if those pages must be indexed without JavaScript (the backend already serves `/seo/*` metadata with JSON-LD).
+- The selected language is stored in context rather than in the URL, so hreflang alternates are intentionally omitted — they would all point to the same address.
 
 Free Render services sleep after inactivity and are not suitable for production Socket.IO traffic.
 Upgrade before connecting the real storefront. For cookie-safe customer sessions, put the API on a
