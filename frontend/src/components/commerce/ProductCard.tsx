@@ -176,11 +176,11 @@ export function ProductCard({ product, priority = false, className }: ProductCar
 
         {availability !== 'available' ? (
           <Button
-            variant="restock"
+            variant="secondary"
             size="sm"
             fullWidth
             onClick={() => setNotifyOpen(true)}
-            className="mt-3.5 min-h-11 lg:min-h-9"
+            className="mt-3.5 min-h-11 border-neutral-300 text-ink hover:border-ink hover:bg-neutral-50 lg:min-h-9"
           >
             {t('productCard.notifyMe')}
           </Button>
@@ -193,7 +193,6 @@ export function ProductCard({ product, priority = false, className }: ProductCar
         title={t('productCard.notifyTitle')}
         description={t('productCard.notifyBody')}
         closeLabel={t('common.close')}
-        className="max-w-md"
       >
         <RestockForm
           productHandle={product.handle}

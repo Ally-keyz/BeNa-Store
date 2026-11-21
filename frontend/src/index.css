@@ -70,10 +70,6 @@
   --color-night: #0d0b0a;
   /* Text/icons placed on the brand orange, in either theme. */
   --color-on-brand: #17110d;
-  /* Restock CTA: medium/deep green, never a pale mint. */
-  --color-restock: #15803d;
-  --color-restock-dark: #166534;
-  --color-on-restock: #ffffff;
 
   /* Radii */
   --radius-card: 16px;
@@ -116,9 +112,6 @@
   --color-ink: #f7f2ec;
   --color-paper: #0b0a09;
   --color-surface: #151210;
-  --color-restock: #15803d;
-  --color-restock-dark: #166534;
-  --color-on-restock: #ffffff;
 }
 
 @layer base {

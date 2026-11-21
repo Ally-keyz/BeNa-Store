@@ -78,12 +78,12 @@ export function RestockForm({
     return (
       <div
         className={cn(
-          'flex items-center gap-4 rounded-2xl border border-restock/25 bg-restock/5 p-4',
+          'flex items-center gap-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4',
           className,
         )}
         role="status"
       >
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-restock text-on-restock">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-paper">
           <Check className="h-5 w-5" aria-hidden="true" />
         </span>
         <p className="text-[14px] font-medium leading-6 text-ink">
@@ -115,9 +115,9 @@ export function RestockForm({
           </div>
           <Button
             type="submit"
-            variant="restock"
+            variant="secondary"
             loading={isSubmitting}
-            className="h-12 shrink-0 rounded-xl px-7"
+            className="h-12 shrink-0 whitespace-nowrap rounded-xl border-neutral-300 px-5 text-[13px] text-ink hover:border-ink hover:bg-neutral-50 sm:px-7 sm:text-sm"
           >
             {submitLabel ?? t('productCard.notifySubmit')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
