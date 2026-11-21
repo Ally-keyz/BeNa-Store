@@ -13,6 +13,8 @@ import {
 } from './services/catalog.service';
 import { HealthService } from './services/health.service';
 import { NewsletterService } from './services/newsletter.service';
+import { RestockService } from './services/restock.service';
+import { createRestockStore } from './services/restockStore';
 import { PoliciesService } from './services/policies.service';
 import { ReviewsService } from './services/reviews.service';
 import { SeoService } from './services/seo.service';
@@ -31,6 +33,7 @@ export interface Services {
   shipping: ShippingService;
   policies: PoliciesService;
   newsletter: NewsletterService;
+  restock: RestockService;
   reviews: ReviewsService;
   audit: AuditService;
   seo: SeoService;
@@ -66,6 +69,7 @@ export function createContainer(
   }
 
   const cartService = new CartService(client);
+  const restockStore = createRestockStore(config.restock.signupTtlSeconds);
 
   return {
     config,
@@ -83,6 +87,7 @@ export function createContainer(
       shipping: new ShippingService(client, config),
       policies: new PoliciesService(client),
       newsletter: new NewsletterService(config, logger),
+      restock: new RestockService(config, logger, client, restockStore),
       reviews: new ReviewsService(client, config, logger),
       audit: new AuditService(client, config, logger),
       seo: new SeoService(client, config),

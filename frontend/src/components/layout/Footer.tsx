@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Facebook, Instagram } from 'lucide-react';
+import { Instagram, MessageCircle } from 'lucide-react';
 import { BRAND } from '@/config';
 import { cn } from '@/lib/cn';
 import { pageContainer } from '@/lib/layout';
@@ -8,7 +8,7 @@ import { useConsent } from '@/context/ConsentContext';
 
 const SOCIALS = [
   { href: BRAND.social.instagram, label: 'Instagram', Icon: Instagram },
-  { href: BRAND.social.facebook, label: 'Facebook', Icon: Facebook },
+  { href: BRAND.social.whatsapp, label: 'WhatsApp', Icon: MessageCircle },
 ] as const;
 
 const COLUMNS = [

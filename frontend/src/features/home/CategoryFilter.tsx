@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
 
@@ -19,6 +19,7 @@ interface CategoryFilterProps {
 
 export function CategoryFilter({ value, onChange, controls }: CategoryFilterProps) {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
 
   const options = [
     { handle: ALL_CATEGORIES, label: t('home.filterAll') },
@@ -29,35 +30,47 @@ export function CategoryFilter({ value, onChange, controls }: CategoryFilterProp
   ];
 
   return (
-    <div
-      role="group"
-      aria-label={t('home.filterLabel')}
-      className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:snap-none sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
-    >
-      {options.map((option) => {
-        const active = option.handle === value;
-        return (
-          <motion.button
-            key={option.handle}
-            type="button"
-            onClick={() => onChange(option.handle)}
-            aria-pressed={active}
-            aria-controls={controls}
-            whileHover={{ y: -3, scale: 1.02 }}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 24 }}
-            className={cn(
-              'inline-flex min-h-11 shrink-0 snap-start items-center justify-center whitespace-nowrap rounded-full border-0 px-5 py-2.5 text-sm font-semibold transition-colors',
-              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
-              active
-                ? 'bg-brand text-on-brand shadow-sm'
-                : 'bg-night text-white hover:bg-white/10',
-            )}
-          >
-            {option.label}
-          </motion.button>
-        );
-      })}
+    // Colors inherit from the surrounding text, so this works on light or dark sections.
+    <div className="relative">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-current opacity-15"
+      />
+      <div
+        role="group"
+        aria-label={t('home.filterLabel')}
+        className="-mx-4 flex snap-x snap-mandatory gap-7 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:snap-none sm:gap-9 sm:px-0 [&::-webkit-scrollbar]:hidden"
+      >
+        {options.map((option) => {
+          const active = option.handle === value;
+          return (
+            <button
+              key={option.handle}
+              type="button"
+              onClick={() => onChange(option.handle)}
+              aria-pressed={active}
+              aria-controls={controls}
+              className={cn(
+                'relative inline-flex min-h-12 shrink-0 snap-start items-center whitespace-nowrap text-[15px] font-medium transition-opacity',
+                'focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+                active ? 'opacity-100' : 'opacity-60 hover:opacity-100',
+              )}
+            >
+              {option.label}
+              {active ? (
+                <motion.span
+                  layoutId="category-filter-underline"
+                  aria-hidden="true"
+                  className="absolute inset-x-0 bottom-0 h-0.5 bg-brand"
+                  transition={
+                    reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 40 }
+                  }
+                />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -23,6 +23,7 @@ import {
   productReviewsParams,
   productReviewsQuery,
   removeCartLinesBody,
+  restockSubscribeBody,
   searchQuery,
   shippingQuery,
   sitemapQuery,
@@ -148,6 +149,13 @@ export function createApiRouter(
     limiters.newsletter,
     validate({ body: newsletterBody }),
     comms.newsletter,
+  );
+  router.post(
+    '/restock/subscribe',
+    limiters.restock,
+    trustedOrigin,
+    validate({ body: restockSubscribeBody }),
+    comms.restockSubscribe,
   );
   router.get(
     '/reviews/assessment',

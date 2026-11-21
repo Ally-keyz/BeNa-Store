@@ -427,6 +427,10 @@ async function run() {
         return json(ok({ subscribed: true, simulated: true }));
       }
 
+      if (apiPath === '/restock/subscribe' && method === 'POST') {
+        return json(ok({ status: 'registered', simulated: true }));
+      }
+
       if (apiPath.startsWith('/ai/suggestions/') && method === 'GET') {
         const unavailable = fail('SERVICE_UNAVAILABLE', 'AI suggestions are disabled in e2e.', 503);
         return json(unavailable.body, unavailable.status);

@@ -123,5 +123,13 @@ services:
         value: mock
       - key: REVIEWS_PROVIDER
         value: auto
-      - key: REDIS_URL
+      # Restock alerts send real email via Resend. RESTOCK_FROM_EMAIL must be a
+      # verified sender/domain in Resend. Signups are memory-only (no Redis).
+      - key: RESTOCK_PROVIDER
+        value: resend
+      - key: RESTOCK_RESEND_API_KEY
         sync: false
+      - key: RESTOCK_FROM_EMAIL
+        sync: false
+      - key: RESTOCK_SIGNUP_TTL_SECONDS
+        value: "2592000"

@@ -44,6 +44,11 @@ export function rateLimiters(config: AppConfig) {
       limit: config.rateLimits.newsletterMax,
       handler: limitHandler('Too many subscription attempts. Please retry later.'),
     }),
+    restock: rateLimit({
+      ...base,
+      limit: config.rateLimits.restockMax,
+      handler: limitHandler('Too many restock notification requests. Please retry later.'),
+    }),
     withdrawal: rateLimit({
       ...base,
       limit: config.rateLimits.withdrawalMax,

@@ -496,6 +496,17 @@ export interface NewsletterSubscriptionResult {
   message: string;
 }
 
+export interface RestockSignupResult {
+  email: string;
+  productHandle: string;
+  status: 'registered' | 'already_registered';
+  provider: 'mock' | 'webhook' | 'resend';
+  store: 'memory';
+  simulated: boolean;
+  registeredAt: string;
+  message: string;
+}
+
 export interface ReviewProviderAssessment {
   detectedProvider: string;
   detection: 'config_override' | 'public_page_signature' | 'none_detected';

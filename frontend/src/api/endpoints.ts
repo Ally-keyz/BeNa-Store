@@ -15,6 +15,7 @@ import type {
   SitemapData,
   CatalogFacets,
   ProductReviewsResult,
+  RestockSignupResult,
   WithdrawalResult,
   WithdrawalSubmission,
 } from '@/types';
@@ -276,6 +277,19 @@ export function subscribeNewsletter(input: {
   language?: string;
 }): Promise<ApiResult<NewsletterSubscriptionResult>> {
   return apiRequest<NewsletterSubscriptionResult>('/newsletter/subscribe', {
+    method: 'POST',
+    body: input,
+  });
+}
+
+export function subscribeToRestock(input: {
+  email: string;
+  productHandle: string;
+  country?: string;
+  language?: string;
+  consent: boolean;
+}): Promise<ApiResult<RestockSignupResult>> {
+  return apiRequest<RestockSignupResult>('/restock/subscribe', {
     method: 'POST',
     body: input,
   });

@@ -43,6 +43,7 @@ describe('OpenAPI docs', () => {
       '/api/v1/account/addresses',
       '/api/v1/account/cart/associate',
       '/api/v1/newsletter/subscribe',
+      '/api/v1/restock/subscribe',
       '/api/v1/reviews/assessment',
       '/api/v1/audit/products',
       '/api/v1/audit/products/{handle}',
@@ -63,6 +64,9 @@ describe('OpenAPI docs', () => {
     expect(spec.components.schemas.CreateCartBody.properties.lines).toBeTruthy();
     expect(spec.components.schemas.NewsletterBody.properties.marketingConsent.type).toBe(
       'boolean',
+    );
+    expect(spec.components.schemas.RestockSubscribeBody.properties.productHandle.type).toBe(
+      'string',
     );
     expect(spec.components.schemas.ErrorEnvelope.required).toEqual(['success', 'error']);
   });

@@ -2,7 +2,7 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'restock';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'header';
 
 export interface ButtonVariantOptions {
@@ -20,12 +20,15 @@ export function buttonVariants({
   return cn(
     'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full font-medium',
     'transition-colors duration-200 ease-out',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark',
+    'focus-visible:outline-2 focus-visible:outline-offset-2',
     'disabled:pointer-events-none disabled:opacity-50',
-    variant === 'primary' && 'bg-brand text-on-brand hover:bg-brand-dark',
+    variant === 'primary' &&
+      'bg-brand text-on-brand hover:bg-brand-dark focus-visible:outline-brand-dark',
     variant === 'secondary' &&
-      'border border-brand bg-surface text-terra-800 hover:bg-terra-50',
-    variant === 'ghost' && 'text-ink hover:bg-terra-50',
+      'border border-brand bg-surface text-terra-800 hover:bg-terra-50 focus-visible:outline-brand-dark',
+    variant === 'ghost' && 'text-ink hover:bg-terra-50 focus-visible:outline-brand-dark',
+    variant === 'restock' &&
+      'bg-restock text-on-restock hover:bg-restock-dark focus-visible:outline-restock-dark',
     size === 'sm' && 'h-9 px-4 text-[13px]',
     size === 'md' && 'h-11 px-5 text-sm',
     size === 'lg' && 'h-12 px-7 text-[15px]',

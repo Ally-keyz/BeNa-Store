@@ -182,7 +182,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-night/90 via-night/35 to-night/5 sm:bg-gradient-to-r sm:from-night/85 sm:via-night/30 sm:to-transparent"
+        className="pointer-events-none absolute inset-0 -z-10 dark-overlay sm:dark-overlay-right"
       />
 
       <div className="flex h-full flex-col justify-end px-5 pb-5 sm:px-8 sm:pb-8 lg:px-0 lg:pb-10">

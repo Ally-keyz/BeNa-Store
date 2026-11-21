@@ -19,7 +19,7 @@ export const env = {
 };
 
 export const BRAND = {
-  name: read('VITE_BRAND_NAME', 'BeNa Origins'),
+  name: read('VITE_BRAND_NAME', 'BeNa Store'),
   logoName: read('VITE_BRAND_LOGO_NAME', 'BeNa SheGrows Coffee'),
   legalName: read('VITE_LEGAL_NAME', 'BeNa Store'),
   contactEmail: read('VITE_CONTACT_EMAIL', 'store@benaorigins.de'),
@@ -31,8 +31,8 @@ export const BRAND = {
   },
   slogan: read('VITE_BRAND_SLOGAN', 'Taste of Rwanda'),
   social: {
-    instagram: read('VITE_SOCIAL_INSTAGRAM', 'https://www.instagram.com/'),
-    facebook: read('VITE_SOCIAL_FACEBOOK', 'https://www.facebook.com/'),
+    instagram: read('VITE_SOCIAL_INSTAGRAM', 'https://www.instagram.com/benaorigins/'),
+    whatsapp: read('VITE_SOCIAL_WHATSAPP', 'https://chat.whatsapp.com/CndIu3wGBVgJsgi7Q6Q6Xi'),
   },
 } as const;
 

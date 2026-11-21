@@ -16,6 +16,7 @@ import type {
   catalogFacetsQuery,
   productReviewsParams,
   productReviewsQuery,
+  restockSubscribeBody,
 } from '../schemas/requests';
 
 export function cartController(container: Container): Record<string, RequestHandler> {
@@ -137,6 +138,12 @@ export function communicationsController(container: Container): Record<string, R
         };
       }>(res);
       const result = await container.services.newsletter.subscribe(body);
+      sendCreated(res, result, baseMeta(container));
+    }),
+
+    restockSubscribe: asyncHandler(async (_req, res) => {
+      const { body } = getValidated<{ body: z.infer<typeof restockSubscribeBody> }>(res);
+      const result = await container.services.restock.subscribe(body);
       sendCreated(res, result, baseMeta(container));
     }),
 

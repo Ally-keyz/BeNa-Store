@@ -182,6 +182,7 @@ Errors use `{ "success": false, "error": { "code", "message", "details?", "reque
 | GET | `/api/v1/account/addresses` | Addresses, cursor pagination (read-only) | ✅ tested |
 | POST | `/api/v1/account/cart/associate` | Cart buyer identity for prefilled checkout | ✅ tested |
 | POST | `/api/v1/newsletter/subscribe` | Provider-agnostic subscription with explicit consent | ✅ tested |
+| POST | `/api/v1/restock/subscribe` | Product-specific back-in-stock alert signup (persisted) | ✅ tested |
 | GET | `/api/v1/reviews/assessment` | Review-app detection + integration guidance | ✅ tested (config mode) |
 | GET | `/api/v1/audit/products` | Bulk product-information completeness (read-only) | ✅ tested |
 | GET | `/api/v1/audit/products/:handle` | Single-product completeness | ✅ tested |
@@ -445,9 +446,9 @@ kept server-side because the backend proxies all traffic. Use the **private** to
 | `SOCKET_ADMIN_JWT_SECRET` | fallback only | **yes** | fallback for the admin JWT secret when `ADMIN_JWT_SECRET` is absent |
 | `SOCKET_ADMIN_TOKEN_TTL_SECONDS` | no (`3600`) | no | token lifetime |
 | `SOCKET_CORS_ORIGINS` | no | no | socket CORS allow-list (falls back to CORS list) |
-| `REDIS_URL` | no | **yes** | webhook dedup + Socket.IO adapter scaling |
+| `REDIS_URL` | no | **yes** | webhook dedup and Socket.IO adapter scaling (not used by restock signups) |
 
-### Newsletter / reviews
+### Newsletter / reviews / restock
 
 | Variable | Default | Secret | Purpose |
 | --- | --- | --- | --- |
@@ -455,6 +456,10 @@ kept server-side because the backend proxies all traffic. Use the **private** to
 | `NEWSLETTER_WEBHOOK_URL` / `NEWSLETTER_WEBHOOK_SECRET` | — | secret yes | provider-agnostic webhook (HMAC header) |
 | `KLAVIYO_API_KEY` / `KLAVIYO_LIST_ID` / `KLAVIYO_API_REVISION` | — / `2025-01-15` | key yes | Klaviyo adapter |
 | `MAILCHIMP_API_KEY` / `MAILCHIMP_LIST_ID` / `MAILCHIMP_SERVER_PREFIX` | — | key yes | Mailchimp adapter |
+| `RESTOCK_PROVIDER` | `mock` | no | `mock` \| `resend` \| `webhook` for product-specific alerts |
+| `RESTOCK_RESEND_API_KEY` / `RESTOCK_FROM_EMAIL` / `RESTOCK_REPLY_TO_EMAIL` | — | key yes | Direct restock email via Resend |
+| `RESTOCK_WEBHOOK_URL` / `RESTOCK_WEBHOOK_SECRET` | — | secret yes | Signed restock event to email automation |
+| `RESTOCK_SIGNUP_TTL_SECONDS` | `2592000` | no | Pending signup lifetime (30 days) |
 | `REVIEWS_PROVIDER` | `auto` | no | `auto` \| `judge_me` \| `loox` \| `stamped` \| `yotpo` \| `okendo` \| `shopify_product_reviews` \| `none` |
 | `REVIEWS_API_TOKEN` | — | **yes** | reserved; no review API calls are made in this phase |
 | `SENTRY_DSN` | — | yes | reserved, not wired yet |
@@ -509,7 +514,11 @@ fails, the AI accordion is simply omitted and the rest of the product page is un
    collection, search, cart and SEO endpoints. Prices come back contextualized via `@inContext`.
 7. **Newsletter.** `POST /newsletter/subscribe` with explicit `marketingConsent: true`; show a
    double opt-in message; do not subscribe without consent.
-8. **Accounts (only when `AUTH_CUSTOMER_ACCOUNTS_ENABLED=true`).**
+8. **Restock alerts.** `POST /restock/subscribe` with `{ email, productHandle, consent: true,
+   country?, language? }`. Signups are stored in process memory only (no Redis/database), so they
+   are lost on restart. Register the Shopify `products/update` webhook; the backend re-fetches the
+   product, checks availability, and sends one alert per pending signup through `RESTOCK_PROVIDER`.
+9. **Accounts (only when `AUTH_CUSTOMER_ACCOUNTS_ENABLED=true`).**
    - Navigate the browser to `GET /auth/login?returnTo=/account` (do not fetch it with XHR).
    - After the callback redirect, call `GET /auth/session` with `credentials: 'include'`.
      The API returns `{ enabled, authenticated, customer, csrfToken }` — never Shopify tokens.
@@ -588,12 +597,13 @@ Legend: **READY** = works now with defaults/fixtures · **MISSING** = needed for
 | New Customer Accounts setting | Shopify identity mode | Auth: yes | Admin → **Settings → Customer accounts** → **New customer accounts** (not legacy) | Config | **MISSING / UNKNOWN** | Customer Account API requires new accounts; legacy mode is incompatible |
 | Protected customer data | Shopify compliance requirement | Auth: yes | Customer Account API settings / app protected customer data configuration | Config | **MISSING / UNKNOWN** | Live account API may be blocked until requirements are met |
 | `NEWSLETTER_PROVIDER` | Newsletter backend selection | No (`mock`) | Choose `mock` (dev), `webhook`, `klaviyo`, `mailchimp` | Public | **READY (mock)** | Mock sends nothing; production needs a real provider |
+| `RESTOCK_PROVIDER` | Restock alert backend | No (`mock`) | `mock` (dev), `resend` (direct email), `webhook` (automation) | Public | **READY (mock)** | Set `resend` + verified sender or a signed webhook before launch |
 | `NEWSLETTER_WEBHOOK_URL` / `NEWSLETTER_WEBHOOK_SECRET` | Forwarding endpoint + HMAC | If provider=webhook | Your automation endpoint (Zapier/Make/n8n/custom) | Secret for the secret | **NOT NEEDED YET** | Webhook provider returns `503 NOT_CONFIGURED` |
 | `KLAVIYO_API_KEY` / `KLAVIYO_LIST_ID` / `KLAVIYO_API_REVISION` | Klaviyo private key + list | If provider=klaviyo | Klaviyo → **Account → Settings → API keys → Create Private API Key** (profiles/lists scopes); list ID from the list URL; revision from Klaviyo API docs | Key **secret**; list ID public | **NOT NEEDED YET** | Klaviyo adapter returns `503`; mock still works |
 | `MAILCHIMP_API_KEY` / `MAILCHIMP_LIST_ID` / `MAILCHIMP_SERVER_PREFIX` | Mailchimp credentials | If provider=mailchimp | Mailchimp → **Profile → Extras → API keys**; Audience → **Settings → Audience ID**; server prefix = `usX` suffix of the key | Key **secret**; IDs public | **NOT NEEDED YET** | Mailchimp adapter returns `503`; mock still works |
 | `REVIEWS_PROVIDER` | Installed review app (or `auto`) | No (`auto`) | Detect via `GET /api/v1/reviews/assessment` + Admin → **Settings → Apps and sales channels → Apps** | Public | **MISSING / UNKNOWN** | Detection may mislabel; integration guidance is still returned |
 | `REVIEWS_API_TOKEN` | Review provider API token | Only when review API is built | Judge.me: Settings → API → private token. Loox: Settings → API token. Okendo: API key/subscriber ID. Stamped: public key/store hash. Yotpo: app key | **Secret** | **NOT NEEDED YET** | No review API calls exist in this phase |
-| `REDIS_URL` | Redis for dedup + Socket.IO scaling | No | Upstash/Railway/ElastiCache/self-hosted; use `rediss://…` with TLS | **Secret** | **NOT NEEDED YET** | Single-instance only: memory dedup resets on restart and multi-instance sockets won’t fan out |
+| `REDIS_URL` | Redis for webhook dedup and Socket.IO scaling only | No | Upstash/Railway/ElastiCache/self-hosted; use `rediss://…` with TLS | **Secret** | **NOT NEEDED YET** | Restock signups are memory-only by design; dedup falls back to memory without Redis |
 | `SENTRY_DSN` | Error reporting | No | Sentry project settings | Secret-ish | **NOT NEEDED YET** | Reserved; not wired in this phase |
 | `TRUST_PROXY` | Proxy hop count | No | Hosting docs (1 for one reverse proxy) | Public | **MISSING for prod** | Wrong client IPs → rate limiting/CORS/buyer-IP issues |
 | `LOG_LEVEL` / `LOG_PRETTY` | Logging | No | — | Public | **READY** | Nothing critical |

@@ -180,6 +180,23 @@ export const newsletterBody = z.object({
   language: z.string().trim().length(2).optional(),
 });
 
+// ---------------------------------------------------------------- restock --
+
+export const restockSubscribeBody = z.object({
+  email: z.email('A valid email address is required').max(254),
+  productHandle: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .regex(/^[a-z0-9][a-z0-9_-]*$/i, 'productHandle must be a Shopify product handle')
+    .transform((value) => value.toLowerCase()),
+  country: z.string().trim().length(2).transform((value) => value.toUpperCase()).optional(),
+  language: z.string().trim().length(2).transform((value) => value.toUpperCase()).optional(),
+  /** Explicit one-purpose consent: alert me when THIS product is back. */
+  consent: z.boolean(),
+});
+
 // ------------------------------------------------------------ withdrawal ---
 
 export const withdrawalBody = z.object({

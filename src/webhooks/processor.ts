@@ -1,5 +1,6 @@
 import type { Logger } from 'pino';
 import type { RealtimePublisher } from '../sockets/publisher';
+import type { RestockNotificationResult } from '../types/domain';
 import {
   appUninstalledWebhookSchema,
   fulfillmentsWebhookSchema,
@@ -14,6 +15,9 @@ export interface WebhookProcessContext {
   webhookId: string;
   publisher: RealtimePublisher;
   logger: Logger;
+  restockService?: {
+    notifyIfRestocked(productHandle: string): Promise<RestockNotificationResult | null>;
+  };
 }
 
 export interface WebhookProcessResult {
@@ -116,7 +120,20 @@ export async function processWebhook(
           updatedAt: product.updated_at ?? null,
         },
       });
-      return { handled: true, events: ['product.updated', 'product.changed'] };
+
+      const events = ['product.updated', 'product.changed'];
+      if (ctx.restockService) {
+        try {
+          const restock = await ctx.restockService.notifyIfRestocked(product.handle);
+          if (restock && restock.notified > 0) events.push('restock.notified');
+        } catch (error) {
+          ctx.logger.error(
+            { handle: product.handle, err: error instanceof Error ? { message: error.message } : error },
+            'restock notification check failed',
+          );
+        }
+      }
+      return { handled: true, events };
     }
 
     case 'inventory_levels/update': {

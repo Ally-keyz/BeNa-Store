@@ -63,6 +63,7 @@ async function main(): Promise<void> {
     await new Promise<void>((resolve) => server.close(() => resolve()));
     await sockets.close();
     await dedupStore.close();
+    await container.services.restock.close();
     await container.services.customerAuth.close();
     logger.info('shutdown complete');
     process.exit(0);

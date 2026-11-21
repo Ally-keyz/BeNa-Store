@@ -35,7 +35,7 @@ export function AboutPage() {
           <img
             src="/logo_new.png"
             alt={t('about.title')}
-            className="mx-auto mt-10 aspect-[4/3] w-full max-w-sm rounded-2xl object-contain sm:max-w-md"
+            className="mx-auto mt-10 aspect-[4/3] w-full max-w-[220px] rounded-2xl object-contain sm:max-w-[280px]"
             loading="eager"
           />
         </section>

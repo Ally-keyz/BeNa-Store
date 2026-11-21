@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button, buttonVariants } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { ProductImage } from '@/components/ui/ProductImage';
-import { NewsletterForm } from '@/components/commerce/NewsletterForm';
+import { RestockForm } from '@/components/commerce/RestockForm';
 
 export interface ProductCardProps {
   product: Product;
@@ -174,20 +174,15 @@ export function ProductCard({ product, priority = false, className }: ProductCar
           </p>
         ) : null}
 
-        {availability === 'coming-soon' ? (
-          <Button variant="secondary" size="sm" fullWidth className="mt-3.5 min-h-11 lg:min-h-9" onClick={() => setNotifyOpen(true)}>
-            {t('productCard.notifyMe')}
-          </Button>
-        ) : null}
-        {availability === 'sold-out' ? (
+        {availability !== 'available' ? (
           <Button
-            variant="secondary"
+            variant="restock"
             size="sm"
             fullWidth
-            disabled
-            className="mt-3.5 min-h-11 !border-neutral-200 !bg-neutral-100 !text-neutral-500 disabled:!opacity-100 lg:min-h-9"
+            onClick={() => setNotifyOpen(true)}
+            className="mt-3.5 min-h-11 lg:min-h-9"
           >
-            {t('common.soldOut')}
+            {t('productCard.notifyMe')}
           </Button>
         ) : null}
       </div>
@@ -198,9 +193,10 @@ export function ProductCard({ product, priority = false, className }: ProductCar
         title={t('productCard.notifyTitle')}
         description={t('productCard.notifyBody')}
         closeLabel={t('common.close')}
+        className="max-w-md"
       >
-        <NewsletterForm
-          source={`product-notify:${product.handle}`}
+        <RestockForm
+          productHandle={product.handle}
           submitLabel={t('productCard.notifySubmit')}
           successMessage={t('productCard.notifySuccess')}
         />

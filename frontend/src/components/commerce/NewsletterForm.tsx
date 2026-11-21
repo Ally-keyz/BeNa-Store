@@ -14,7 +14,7 @@ import { cn } from '@/lib/cn';
 
 export interface NewsletterFormProps {
   source: string;
-  variant?: 'default' | 'footer';
+  variant?: 'default' | 'footer' | 'minimal';
   submitLabel?: string;
   successMessage?: string;
   className?: string;
@@ -36,6 +36,8 @@ export function NewsletterForm({
   const { t } = useTranslation();
   const { language } = useMarket();
   const emailId = useId();
+  const isFooter = variant === 'footer';
+  const isMinimal = variant === 'minimal';
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -79,12 +81,18 @@ export function NewsletterForm({
     return (
       <div
         className={cn(
-          'flex items-center gap-4 rounded-2xl border border-brand/25 bg-terra-50 p-4',
+          'flex items-center gap-4 rounded-2xl border p-4',
+          isMinimal ? 'border-neutral-200 bg-neutral-50' : 'border-brand/25 bg-terra-50',
           className,
         )}
         role="status"
       >
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand">
+        <span
+          className={cn(
+            'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+            isMinimal ? 'bg-ink text-paper' : 'bg-brand text-on-brand',
+          )}
+        >
           <Check className="h-5 w-5" aria-hidden="true" />
         </span>
         <p className="text-[14px] font-medium leading-6 text-ink">
@@ -94,24 +102,32 @@ export function NewsletterForm({
     );
   }
 
-  const isFooter = variant === 'footer';
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={cn('w-full', className)} noValidate>
       <div
         className={cn(
           'rounded-2xl border p-2 shadow-sm transition-shadow focus-within:shadow-md',
-          isFooter ? 'border-white/20 bg-white/10' : 'border-terra-100 bg-surface',
+          isFooter
+            ? 'border-white/20 bg-white/10'
+            : isMinimal
+              ? 'border-neutral-200 bg-surface'
+              : 'border-terra-100 bg-surface',
         )}
       >
         <div className="flex flex-col gap-2 sm:flex-row">
           <div
             className={cn(
               'flex flex-1 items-center gap-3 rounded-xl px-4',
-              isFooter ? 'bg-white/10' : 'bg-terra-50',
+              isFooter ? 'bg-white/10' : isMinimal ? 'bg-neutral-50' : 'bg-terra-50',
             )}
           >
-            <Mail className="h-[18px] w-[18px] shrink-0 text-brand-dark" aria-hidden="true" />
+            <Mail
+              className={cn(
+                'h-[18px] w-[18px] shrink-0',
+                isMinimal ? 'text-neutral-500' : 'text-brand-dark',
+              )}
+              aria-hidden="true"
+            />
             <label htmlFor={emailId} className="sr-only">
               {t('home.newsletterEmailLabel')}
             </label>
@@ -134,7 +150,10 @@ export function NewsletterForm({
             type="submit"
             variant={isFooter ? 'secondary' : 'primary'}
             loading={isSubmitting}
-            className="h-12 shrink-0 rounded-xl px-7"
+            className={cn(
+              'h-12 shrink-0 rounded-xl px-7',
+              isMinimal && 'bg-ink text-paper hover:bg-neutral-800',
+            )}
           >
             {submitLabel ?? t('home.newsletterSubmit')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />

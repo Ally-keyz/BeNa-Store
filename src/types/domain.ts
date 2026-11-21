@@ -498,6 +498,27 @@ export interface NewsletterSubscriptionResult {
   message: string;
 }
 
+/** Product-specific restock alert registration. */
+export interface RestockSignupResult {
+  email: string;
+  productHandle: string;
+  status: 'registered' | 'already_registered';
+  provider: 'mock' | 'webhook' | 'resend';
+  store: 'memory';
+  simulated: boolean;
+  registeredAt: string;
+  message: string;
+}
+
+/** Result of checking a restocked product and delivering pending alerts. */
+export interface RestockNotificationResult {
+  productHandle: string;
+  available: boolean;
+  notified: number;
+  failed: number;
+  simulated: boolean;
+}
+
 export interface ReviewProviderAssessment {
   detectedProvider: string;
   detection: 'config_override' | 'public_page_signature' | 'none_detected';

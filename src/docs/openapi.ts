@@ -4,6 +4,7 @@ import {
   createCartBody,
   newsletterBody,
   removeCartLinesBody,
+  restockSubscribeBody,
   updateBuyerIdentityBody,
   updateCartLinesBody,
   updateDiscountCodesBody,
@@ -236,6 +237,7 @@ export function buildOpenApiDocument(serverUrl = 'http://localhost:4000'): JsonS
         UpdateBuyerIdentityBody: zodToOpenApiBody(updateBuyerIdentityBody),
         UpdateDiscountCodesBody: zodToOpenApiBody(updateDiscountCodesBody),
         NewsletterBody: zodToOpenApiBody(newsletterBody),
+        RestockSubscribeBody: zodToOpenApiBody(restockSubscribeBody),
         Cart: {
           type: 'object',
           properties: {
@@ -617,6 +619,23 @@ export function buildOpenApiDocument(serverUrl = 'http://localhost:4000'): JsonS
             201: successResponse('Subscription result (simulated=true for mock provider)'),
             400: { $ref: '#/components/responses/BadRequest' },
             503: errorResponse('Provider not configured'),
+          },
+        },
+      },
+      '/api/v1/restock/subscribe': {
+        post: {
+          tags: ['Restock'],
+          summary: 'Register for a product-specific back-in-stock alert',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/RestockSubscribeBody' } },
+            },
+          },
+          responses: {
+            201: successResponse('Restock registration result'),
+            400: { $ref: '#/components/responses/BadRequest' },
+            429: { $ref: '#/components/responses/RateLimited' },
           },
         },
       },

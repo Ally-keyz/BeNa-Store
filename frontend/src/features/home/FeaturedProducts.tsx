@@ -40,6 +40,8 @@ export interface FeaturedProductsProps {
   showFilters?: boolean;
   showCta?: boolean;
   first?: number;
+  /** Adds a dark shadow wash behind the section content. */
+  darkOverlay?: boolean;
   className?: string;
 }
 
@@ -60,6 +62,7 @@ export function FeaturedProducts({
   showFilters = true,
   showCta = true,
   first = 6,
+  darkOverlay = false,
   className,
 }: FeaturedProductsProps) {
   const { t } = useTranslation();
@@ -99,10 +102,14 @@ export function FeaturedProducts({
         sectionSpacing,
         'pt-10 sm:pt-12 lg:pt-14',
         variant === 'white' ? 'bg-paper' : 'bg-transparent',
+        darkOverlay && 'relative isolate',
         className,
       )}
       aria-labelledby={titleId}
     >
+      {darkOverlay ? (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 dark-wash" />
+      ) : null}
       <div className={pageContainer}>
         <div className="mx-auto w-full max-w-5xl">
           <SectionHeading
@@ -128,7 +135,7 @@ export function FeaturedProducts({
           />
 
           {showFilters ? (
-            <div className="mt-6 border-b border-terra-100 pb-5">
+            <div className="mt-6 pb-5">
               <CategoryFilter value={category} onChange={setCategory} controls="home-featured-grid" />
             </div>
           ) : null}

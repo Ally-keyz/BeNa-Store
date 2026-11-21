@@ -13,7 +13,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileNav } from './MobileNav';
 import { LanguageSwitch } from './LanguageSwitch';
-import { RegionSelector } from './RegionSelector';
+
 
 const DESKTOP_LINKS = [
   { href: '/', labelKey: 'nav.home', end: true },
@@ -41,23 +41,20 @@ function BrandMark() {
   return (
     <Link
       to="/"
-      aria-label={`${BRAND.name} — home`}
-      className="group inline-flex items-center gap-2.5 rounded-full focus-visible:outline-offset-4 sm:gap-3"
+      aria-label={`${BRAND.name} home`}
+      className="inline-flex min-w-0 items-center gap-2 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand sm:gap-3"
     >
-      <span className="relative block h-11 w-11 shrink-0 overflow-hidden bg-white transition-shadow duration-300">
-        <img
-          src={logoUrl}
-          alt=""
-          width={44}
-          height={44}
-          className="h-full w-full object-contain"
-          loading="eager"
-        />
-      </span>
-      <span className="hidden leading-none min-[360px]:block">
-        <span className="block font-display mt-2 text-[17px] font-semibold tracking-[-0.03em] text-ink">
-          {BRAND.name}
-        </span>
+      <img
+        src={logoUrl}
+        alt=""
+        width={190}
+        height={155}
+        loading="eager"
+        decoding="async"
+        className="h-16 w-auto shrink-0 object-contain sm:h-20"
+      />
+      <span className="hidden min-w-0 truncate font-display text-[18px] font-semibold leading-none tracking-[-0.02em] text-ink min-[360px]:block sm:text-[20px]">
+        {BRAND.name}
       </span>
     </Link>
   );
@@ -141,8 +138,6 @@ export function Header() {
 
             <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitch className="hidden sm:inline-flex" />
-            <RegionSelector className="hidden xl:inline-flex" />
-
             <button
               type="button"
               onClick={openCart}

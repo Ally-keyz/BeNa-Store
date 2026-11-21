@@ -165,6 +165,21 @@ const EnvSchema = z.object({
   MAILCHIMP_LIST_ID: optionalString,
   MAILCHIMP_SERVER_PREFIX: optionalString,
 
+  RESTOCK_RATE_LIMIT_MAX: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(1).max(1000).default(5),
+  ),
+  RESTOCK_PROVIDER: z.enum(['mock', 'webhook', 'resend']).default('mock'),
+  RESTOCK_WEBHOOK_URL: optionalString,
+  RESTOCK_WEBHOOK_SECRET: optionalString,
+  RESTOCK_RESEND_API_KEY: optionalString,
+  RESTOCK_FROM_EMAIL: optionalString,
+  RESTOCK_REPLY_TO_EMAIL: optionalString,
+  RESTOCK_SIGNUP_TTL_SECONDS: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(3600).max(31_536_000).default(2_592_000),
+  ),
+
   REVIEWS_PROVIDER: z
     .enum([
       'auto',
@@ -313,6 +328,7 @@ export interface AppConfig {
     globalMax: number;
     cartMax: number;
     newsletterMax: number;
+    restockMax: number;
     withdrawalMax: number;
     webhookMax: number;
     authMax: number;
@@ -330,6 +346,15 @@ export interface AppConfig {
     mailchimpApiKey: string | null;
     mailchimpListId: string | null;
     mailchimpServerPrefix: string | null;
+  };
+  restock: {
+    provider: RawEnv['RESTOCK_PROVIDER'];
+    webhookUrl: string | null;
+    webhookSecret: string | null;
+    resendApiKey: string | null;
+    fromEmail: string | null;
+    replyToEmail: string | null;
+    signupTtlSeconds: number;
   };
   reviews: {
     provider: RawEnv['REVIEWS_PROVIDER'];
@@ -614,6 +639,25 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
     }
   }
 
+  if (env.RESTOCK_PROVIDER === 'webhook' && !env.RESTOCK_WEBHOOK_URL) {
+    warnings.push(
+      'RESTOCK_PROVIDER=webhook but RESTOCK_WEBHOOK_URL is missing; restock alerts will stay pending until it is set.',
+    );
+  }
+  if (
+    env.RESTOCK_PROVIDER === 'resend' &&
+    (!env.RESTOCK_RESEND_API_KEY || !env.RESTOCK_FROM_EMAIL)
+  ) {
+    warnings.push(
+      'RESTOCK_PROVIDER=resend but RESTOCK_RESEND_API_KEY/RESTOCK_FROM_EMAIL are incomplete; restock alerts will stay pending until they are set.',
+    );
+  }
+  if (isProduction && env.RESTOCK_PROVIDER === 'mock') {
+    warnings.push(
+      'RESTOCK_PROVIDER=mock: restock alerts are simulated and no emails will be sent. Set resend or webhook before launch.',
+    );
+  }
+
   return {
     nodeEnv: env.NODE_ENV,
     isProduction,
@@ -740,6 +784,7 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       globalMax: env.RATE_LIMIT_MAX,
       cartMax: env.CART_RATE_LIMIT_MAX,
       newsletterMax: env.NEWSLETTER_RATE_LIMIT_MAX,
+      restockMax: env.RESTOCK_RATE_LIMIT_MAX,
       withdrawalMax: env.WITHDRAWAL_RATE_LIMIT_MAX,
       webhookMax: env.WEBHOOK_RATE_LIMIT_MAX,
       authMax: env.AUTH_RATE_LIMIT_MAX,
@@ -757,6 +802,15 @@ export function loadConfig(overrides: NodeJS.ProcessEnv = {}): AppConfig {
       mailchimpApiKey: env.MAILCHIMP_API_KEY ?? null,
       mailchimpListId: env.MAILCHIMP_LIST_ID ?? null,
       mailchimpServerPrefix: env.MAILCHIMP_SERVER_PREFIX ?? null,
+    },
+    restock: {
+      provider: env.RESTOCK_PROVIDER,
+      webhookUrl: env.RESTOCK_WEBHOOK_URL ?? null,
+      webhookSecret: env.RESTOCK_WEBHOOK_SECRET ?? null,
+      resendApiKey: env.RESTOCK_RESEND_API_KEY ?? null,
+      fromEmail: env.RESTOCK_FROM_EMAIL ?? null,
+      replyToEmail: env.RESTOCK_REPLY_TO_EMAIL ?? null,
+      signupTtlSeconds: env.RESTOCK_SIGNUP_TTL_SECONDS,
     },
     reviews: {
       provider: env.REVIEWS_PROVIDER,
@@ -816,6 +870,7 @@ export function safeConfigSummary(config: AppConfig): Record<string, unknown> {
       cookieName: config.auth.cookieName,
     },
     newsletterProvider: config.newsletter.provider,
+    restockProvider: config.restock.provider,
     reviewsProvider: config.reviews.provider,
     ai: {
       enabled: config.ai.enabled,

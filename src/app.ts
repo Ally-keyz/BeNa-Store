@@ -93,6 +93,7 @@ export function createApp(container: Container, options: CreateAppOptions = {}):
       logger,
       publisher: container.publisher,
       dedupStore,
+      restockService: container.services.restock,
       rateLimiter: limiters.webhooks,
     }),
   );

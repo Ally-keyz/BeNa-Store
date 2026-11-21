@@ -20,7 +20,7 @@ describe('CatalogFacets', () => {
     const onChange = vi.fn();
     render(<CatalogFacets facets={facets} selected={EMPTY_FACETS} onChange={onChange} />);
 
-    await user.click(screen.getByRole('button', { name: /Bena Origins/ }));
+    await user.click(screen.getByRole('checkbox', { name: /Bena Origins/ }));
     expect(onChange).toHaveBeenCalledWith({ ...EMPTY_FACETS, brands: ['bena-origins'] });
   });
 

@@ -3,6 +3,7 @@ import type { RequestHandler, Response } from 'express';
 import type { Logger } from 'pino';
 import type { AppConfig } from '../config/env';
 import type { RealtimePublisher } from '../sockets/publisher';
+import type { RestockService } from '../services/restock.service';
 import type { DedupStore } from './dedup';
 import { verifyShopifyHmac } from './verify';
 import { processWebhook } from './processor';
@@ -23,6 +24,7 @@ export interface WebhookRouterOptions {
   logger: Logger;
   publisher: RealtimePublisher;
   dedupStore: DedupStore;
+  restockService?: RestockService;
   rateLimiter?: RequestHandler;
 }
 
@@ -144,6 +146,7 @@ export function createWebhookRouter(options: WebhookRouterOptions): Router {
               webhookId,
               publisher,
               logger,
+              restockService: options.restockService,
             })
               .then((result) => {
                 logger.info(
