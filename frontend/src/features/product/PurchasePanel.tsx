@@ -52,8 +52,6 @@ export function PurchasePanel({
     measurement: variant?.unitPriceMeasurement,
   };
   const pricePerKg = getPricePerKg({
-    ...weightContext,
-    price,
     unitPrice: variant?.unitPrice,
     unitPriceMeasurement: variant?.unitPriceMeasurement,
   });

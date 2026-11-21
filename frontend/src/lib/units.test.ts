@@ -53,7 +53,6 @@ describe('price per kg', () => {
   it('uses Shopify unit price and reference weight', () => {
     expect(
       getPricePerKg({
-        title: 'Indagara 200g',
         unitPrice: { amount: '60.00', currencyCode: 'EUR' },
         unitPriceMeasurement: measurement({ quantityValue: 200, referenceUnit: 'KG' }),
       }),
@@ -63,7 +62,6 @@ describe('price per kg', () => {
   it('normalizes a unit price that uses a smaller reference weight', () => {
     expect(
       getPricePerKg({
-        title: 'Coffee 250g',
         unitPrice: { amount: '4.00', currencyCode: 'EUR' },
         unitPriceMeasurement: measurement({
           quantityValue: 250,
@@ -74,27 +72,17 @@ describe('price per kg', () => {
     ).toEqual({ amount: '40.00', currencyCode: 'EUR' });
   });
 
-  it('derives a missing coffee or ifu unit price from the package weight', () => {
-    expect(
-      getPricePerKg({
-        title: 'Ifu Y’Indagara 200g',
-        price: { amount: '12.00', currencyCode: 'EUR' },
-      }),
-    ).toEqual({ amount: '60.00', currencyCode: 'EUR' });
-
-    expect(
-      getPricePerKg({
-        title: 'Premium coffee 500g',
-        price: { amount: '19.99', currencyCode: 'EUR' },
-      }),
-    ).toEqual({ amount: '39.98', currencyCode: 'EUR' });
+  it('never derives a per-kg price from a pack price', () => {
+    expect(getPricePerKg({})).toBeNull();
+    expect(getPricePerKg({ unitPriceMeasurement: measurement({ quantityValue: 200 }) })).toBeNull();
   });
 
-  it('does not derive per-kg prices for unrelated products', () => {
+  it('hides the price when Shopify omits the measurement or uses a non-weight unit', () => {
+    expect(getPricePerKg({ unitPrice: { amount: '60.00', currencyCode: 'EUR' } })).toBeNull();
     expect(
       getPricePerKg({
-        title: 'UBURANGA Honey 500g',
-        price: { amount: '9.50', currencyCode: 'EUR' },
+        unitPrice: { amount: '60.00', currencyCode: 'EUR' },
+        unitPriceMeasurement: measurement({ measuredType: 'VOLUME' }),
       }),
     ).toBeNull();
   });

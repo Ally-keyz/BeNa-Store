@@ -43,14 +43,6 @@ export function ProductCard({ product, priority = false, className }: ProductCar
   const compareAt = variant?.compareAtPrice ?? null;
   const onSale = availability === 'available' && isOnSale(price, compareAt);
   const pricePerKg = getPricePerKg({
-    handle: product.handle,
-    title: product.title,
-    productType: product.productType,
-    tags: product.tags,
-    variantTitle: variant?.title,
-    selectedOptions: variant?.selectedOptions,
-    measurement: variant?.unitPriceMeasurement,
-    price,
     unitPrice: variant?.unitPrice,
     unitPriceMeasurement: variant?.unitPriceMeasurement,
   });

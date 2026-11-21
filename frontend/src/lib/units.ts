@@ -11,8 +11,7 @@ export interface WeightContext {
   measurement?: UnitPriceMeasurement | null;
 }
 
-export interface PricePerKgContext extends WeightContext {
-  price?: Money | null;
+export interface PricePerKgContext {
   unitPrice?: Money | null;
   unitPriceMeasurement?: UnitPriceMeasurement | null;
 }
@@ -99,28 +98,16 @@ function moneyFromAmount(amount: number, currencyCode: string): Money {
 }
 
 /**
- * Price per kilogram.
- *
- * Prefer Shopify's unit price + measurement. Only when that is missing do we
- * derive a per-kg price from a known package weight, and only for the product
- * families where kilogram units are part of the buying experience.
+ * Price per kilogram, only when Shopify supplies both a unit price and a
+ * weight reference. We never divide the pack price by a weight parsed from a
+ * title: that would present a calculated figure as if it came from the shop.
  */
-export function getPricePerKg(context: PricePerKgContext): Money | null {
-  const { unitPrice, unitPriceMeasurement, price } = context;
+export function getPricePerKg({ unitPrice, unitPriceMeasurement }: PricePerKgContext): Money | null {
   const referenceKg = referenceWeightKg(unitPriceMeasurement);
+  if (!unitPrice || !referenceKg) return null;
 
-  if (unitPrice && referenceKg) {
-    const perKg = toAmount(unitPrice) / referenceKg;
-    if (perKg > 0) return moneyFromAmount(perKg, unitPrice.currencyCode);
-  }
-
-  if (!usesKilogramUnits(context)) return null;
-
-  const packageKg = getPackageWeightKg(context);
-  if (!price || !packageKg) return null;
-
-  const perKg = toAmount(price) / packageKg;
-  return perKg > 0 ? moneyFromAmount(perKg, price.currencyCode) : null;
+  const perKg = toAmount(unitPrice) / referenceKg;
+  return perKg > 0 ? moneyFromAmount(perKg, unitPrice.currencyCode) : null;
 }
 
 /** Locale-aware package weight without the unit, e.g. `0,25` in German. */

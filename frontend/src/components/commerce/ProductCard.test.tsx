@@ -20,8 +20,8 @@ function pricedProduct(handle: string, title: string, amount: string) {
 }
 
 describe('ProductCard price per kg', () => {
-  it('shows a per-kg price for coffee when Shopify provides none', () => {
-    render(
+  it('does not derive a per-kg price from a pack price', () => {
+    const { rerender } = render(
       <MemoryRouter>
         <ProductCard
           product={pricedProduct(
@@ -32,8 +32,16 @@ describe('ProductCard price per kg', () => {
         />
       </MemoryRouter>,
     );
+    expect(screen.queryByText(/\/kg/)).toBeNull();
 
-    expect(screen.getByText('€43.96 / kg')).toBeInTheDocument();
+    rerender(
+      <MemoryRouter>
+        <ProductCard
+          product={pricedProduct('ifu-y-indagara-200g', 'Ifu Y’Indagara 200g', '12.00')}
+        />
+      </MemoryRouter>,
+    );
+    expect(screen.queryByText(/\/kg/)).toBeNull();
   });
 
   it('shows the Shopify unit price when it is available', () => {
@@ -62,21 +70,5 @@ describe('ProductCard price per kg', () => {
     );
 
     expect(screen.getByText('€60.00 / kg')).toBeInTheDocument();
-  });
-
-  it('does not invent a per-kg price for honey or the unlabelled sample', () => {
-    const { rerender } = render(
-      <MemoryRouter>
-        <ProductCard product={pricedProduct('ubuki-honey-500g', 'Ubuki Honey 500g', '9.50')} />
-      </MemoryRouter>,
-    );
-    expect(screen.queryByText(/\/kg/)).toBeNull();
-
-    rerender(
-      <MemoryRouter>
-        <ProductCard product={pricedProduct('kleine-kaffee-probe', 'Kleine Kaffee Probe', '3.90')} />
-      </MemoryRouter>,
-    );
-    expect(screen.queryByText(/\/kg/)).toBeNull();
   });
 });

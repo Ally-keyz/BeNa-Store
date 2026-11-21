@@ -47,9 +47,9 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
       fr: 'Le café est le point de départ de BeNa Origins. Notre gamme actuelle est un Arabica rwandais, torréfié pour une tasse nette et proposé en trois formats.',
     },
     detail: {
-      en: 'Each pack shows its price per kilogram, so you can compare the 250 g, 500 g and 1 kg options before choosing.',
-      de: 'Jede Packung zeigt den Preis pro Kilogramm, damit du 250 g, 500 g und 1 kg vor dem Kauf vergleichen kannst.',
-      fr: 'Chaque paquet affiche son prix au kilogramme, pour comparer facilement les options de 250 g, 500 g et 1 kg avant de choisir.',
+      en: 'When the shop supplies a price per kilogram, it helps you compare the 250 g, 500 g and 1 kg options before choosing.',
+      de: 'Wenn der Shop einen Preis pro Kilogramm liefert, kannst du die Optionen 250 g, 500 g und 1 kg vor dem Kauf vergleichen.',
+      fr: 'Lorsque la boutique fournit un prix au kilogramme, il permet de comparer les options 250 g, 500 g et 1 kg avant de choisir.',
     },
   },
   {
@@ -98,9 +98,9 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
       fr: 'L’indagara est un ingrédient traditionnel de la cuisine rwandaise. Nous proposons de l’indagara séché entier et de l’Ifu Y’Indagara, la version moulue utilisée pour les sauces salées.',
     },
     detail: {
-      en: 'Both are sold in 200 g packs, with the price per kilogram shown alongside the pack price.',
-      de: 'Beide gibt es in 200-g-Packungen, mit dem Preis pro Kilogramm neben dem Packungspreis.',
-      fr: 'Les deux sont vendus en paquets de 200 g, avec le prix au kilogramme affiché à côté du prix du paquet.',
+      en: 'Both are sold in 200 g packs. A price per kilogram is shown only when the shop supplies one; otherwise you see the pack price.',
+      de: 'Beide gibt es in 200-g-Packungen. Ein Preis pro Kilogramm erscheint nur, wenn ihn der Shop liefert; sonst siehst du den Packungspreis.',
+      fr: 'Les deux sont vendus en paquets de 200 g. Le prix au kilogramme n’est affiché que lorsque la boutique le fournit ; sinon, seul le prix du paquet est indiqué.',
     },
   },
   {
