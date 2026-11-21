@@ -44,14 +44,24 @@ function cleanFactValue(value: string | null | undefined): string | null {
   return PLACEHOLDER_FACT_VALUES.has(normalized) ? null : trimmed;
 }
 
-function AiNote() {
+function MetafieldFacts({ metafields }: { metafields: ProductMetafields }) {
   const { t } = useTranslation();
-  return <p className="mt-2 text-[11px] leading-5 text-neutral-500">{t('productInfo.aiInlineNote')}</p>;
-}
-
-function AiNoData() {
-  const { t } = useTranslation();
-  return <p className="text-[13px] leading-6 text-neutral-600">{t('productInfo.aiNoData')}</p>;
+  return (
+    <dl>
+      <FactRow
+        label={t('product.ingredients')}
+        value={decodeMetafield(metafields.ingredients) || t('productInfo.ingredientsUnavailable')}
+      />
+      <FactRow
+        label={t('productInfo.nutrition')}
+        value={decodeMetafield(metafields.nutrition) || t('productInfo.nutritionUnavailable')}
+      />
+      <FactRow
+        label={t('product.origin')}
+        value={decodeMetafield(metafields.origin) || t('productInfo.originUnavailable')}
+      />
+    </dl>
+  );
 }
 
 function FoodFacts({
@@ -62,39 +72,20 @@ function FoodFacts({
   aiSuggestion: AISuggestion | null;
 }) {
   const { t } = useTranslation();
-  if (!aiSuggestion) {
-    return (
-      <dl>
-        <FactRow
-          label={t('product.ingredients')}
-          value={decodeMetafield(metafields.ingredients) || t('productInfo.ingredientsUnavailable')}
-        />
-        <FactRow
-          label={t('productInfo.nutrition')}
-          value={decodeMetafield(metafields.nutrition) || t('productInfo.nutritionUnavailable')}
-        />
-        <FactRow
-          label={t('product.origin')}
-          value={decodeMetafield(metafields.origin) || t('productInfo.originUnavailable')}
-        />
-      </dl>
-    );
+  const ingredients = cleanFactValue(aiSuggestion?.ingredients?.value);
+  const nutrition = cleanFactValue(aiSuggestion?.nutrition?.value);
+  const origin = cleanFactValue(aiSuggestion?.origin?.value);
+
+  if (!ingredients && !nutrition && !origin) {
+    return <MetafieldFacts metafields={metafields} />;
   }
 
-  const ingredients = cleanFactValue(aiSuggestion.ingredients?.value);
-  const nutrition = cleanFactValue(aiSuggestion.nutrition?.value);
-  const origin = cleanFactValue(aiSuggestion.origin?.value);
-  if (!ingredients && !nutrition && !origin) return <AiNoData />;
-
   return (
-    <div>
-      <dl>
-        {ingredients && <FactRow label={t('product.ingredients')} value={ingredients} />}
-        {nutrition && <FactRow label={t('productInfo.nutrition')} value={nutrition} />}
-        {origin && <FactRow label={t('product.origin')} value={origin} />}
-      </dl>
-      <AiNote />
-    </div>
+    <dl>
+      {ingredients && <FactRow label={t('product.ingredients')} value={ingredients} />}
+      {nutrition && <FactRow label={t('productInfo.nutrition')} value={nutrition} />}
+      {origin && <FactRow label={t('product.origin')} value={origin} />}
+    </dl>
   );
 }
 
@@ -106,14 +97,10 @@ function PreparationFacts({
   aiSuggestion: AISuggestion | null;
 }) {
   const { t } = useTranslation();
-  if (aiSuggestion) {
-    const aiPreparation = cleanFactValue(aiSuggestion.preparation?.value);
-    if (!aiPreparation) return <AiNoData />;
+  const aiPreparation = cleanFactValue(aiSuggestion?.preparation?.value);
+  if (aiPreparation) {
     return (
-      <div>
-        <p className="whitespace-pre-line text-[13px] leading-6 text-neutral-600">{aiPreparation}</p>
-        <AiNote />
-      </div>
+      <p className="whitespace-pre-line text-[13px] leading-6 text-neutral-600">{aiPreparation}</p>
     );
   }
 
@@ -181,7 +168,6 @@ export function ProductFacts({ product }: ProductFactsProps) {
                 {declaredAllergens}
               </p>
               <p className="mt-1 text-[12px] text-neutral-600">{t('productInfo.allergensNote')}</p>
-              {aiSuggestion && aiAllergens ? <AiNote /> : null}
             </div>
           ),
         },

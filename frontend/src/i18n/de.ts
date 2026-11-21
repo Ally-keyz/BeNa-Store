@@ -403,8 +403,6 @@ const de: Resources = {
     aiPreparation: 'Zubereitung (KI)',
     aiNotVerified:
       'KI-generierter Vorschlag — nicht verifiziert. Modell: {{model}} · Erstellt: {{suggestedAt}}. Verpackung vor der Veröffentlichung prüfen.',
-    aiInlineNote: 'KI-generierter Vorschlag — Verpackung vor der Verwendung prüfen.',
-    aiNoData: 'KI konnte aus den verfügbaren Produktinformationen keinen zuverlässigen Wert finden.',
     aiDisclaimer:
       'KI-generierter Vorschlag — keine verifizierte Tatsache. Zutaten und Allergene sind Vorschläge und müssen vor der Veröffentlichung auf der Verpackung geprüft werden. Dieser Dienst ändert keine Shop-Daten.',
   },

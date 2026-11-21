@@ -110,9 +110,49 @@ describe('ProductFacts', () => {
     expect(within(preparationRegion).queryByText(/Preparation instructions have not been supplied/i)).toBeNull();
 
     expect(screen.queryByRole('button', { name: 'AI suggestions' })).toBeNull();
-    expect(screen.getAllByText(/AI-generated suggestion/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/AI-generated suggestion/i)).toBeNull();
     expect(screen.getByText('Golden honey from Rwandan beekeepers.')).toBeVisible();
     expect(getAi).toHaveBeenCalledWith('rwanda-honey');
+  });
+
+  it('falls back to store data when AI returns no usable facts', async () => {
+    const user = userEvent.setup();
+    const emptySuggestion: AISuggestion = {
+      productId: 'gid://shopify/Product/1',
+      handle: 'rwanda-honey',
+      title: 'Rwanda Honey',
+      verified: false,
+      needsReview: false,
+      suggestedAt: '2026-11-20T10:00:00.000Z',
+      model: 'test-model',
+      ingredients: null,
+      allergens: null,
+      nutrition: null,
+      origin: null,
+      preparation: null,
+      disclaimer: '',
+    };
+    getAi.mockResolvedValue({ data: emptySuggestion, meta: {} as never });
+
+    const product = productFixture({
+      metafields: {
+        ...emptyMetafields(),
+        ingredients: metafield('Owner ingredient list'),
+        preparation: metafield('1. Warm gently'),
+      },
+    });
+
+    render(<ProductFacts product={product} />);
+
+    await user.click(screen.getByRole('button', { name: 'Food information' }));
+    const foodRegion = screen.getByRole('region', { name: 'Food information' });
+    expect(await within(foodRegion).findByText('Owner ingredient list')).toBeVisible();
+    expect(screen.queryByText(/AI could not find/i)).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Preparation' }));
+    const preparationRegion = screen.getByRole('region', { name: 'Preparation' });
+    expect(await within(preparationRegion).findByText('Warm gently')).toBeVisible();
+    expect(screen.queryByText(/AI-generated suggestion/i)).toBeNull();
   });
 
   it('does not execute scripts from Shopify description HTML', () => {

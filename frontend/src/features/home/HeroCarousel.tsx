@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Pause, Play, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { BRAND } from '@/config';
+import logoUrl from '@/assets/logo_new.png';
 import { buttonVariants } from '@/components/ui/Button';
 import { usePrefersReducedMotion } from '@/hooks/useMediaQuery';
 import { useMarket } from '@/context/MarketContext';
@@ -58,18 +60,33 @@ function productSlides(products: Product[], t: (key: string, options?: Record<st
     });
 }
 
+function brandSlide(t: (key: string, options?: Record<string, unknown>) => string): HeroCarouselSlide {
+  return {
+    key: 'hero-brand-logo',
+    href: '/african-products',
+    image: logoUrl,
+    imageClassName: 'bg-[#fff7ef] object-contain px-10 py-12 sm:px-24 sm:py-16',
+    eyebrow: t('hero.slides.rwanda.eyebrow'),
+    title: t('hero.slides.rwanda.title'),
+    subtitle: t('hero.slides.rwanda.subtitle'),
+    cta: t('hero.slides.rwanda.cta'),
+    imageAlt: BRAND.name,
+  };
+}
+
 export interface HeroCarouselProps {
   /**
    * Supply products to show a different set in the carousel (e.g. the
-   * African-products page). When omitted, the five newest products are used.
+   * African-products page). When omitted, the five newest products are used
+   * after the always-present brand slide.
    */
   products?: Product[];
   className?: string;
 }
 
 /**
- * Product-led hero carousel. It uses real, recently uploaded product imagery
- * and links each slide to that product with its live price and description.
+ * Product-led hero carousel. The brand logo is always the first slide,
+ * followed by real, recently uploaded product imagery linked to each product.
  * Editorial slides are used only until product photography is available.
  */
 export function HeroCarousel({ products, className }: HeroCarouselProps) {
@@ -90,22 +107,24 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
   const slides = useMemo<HeroCarouselSlide[]>(() => {
     const source = products ?? latestQuery.data?.items ?? [];
     const live = productSlides(source, t, formatLocale);
-    if (live.length) return live;
+    const content = live.length
+      ? live
+      : HERO_SLIDES.map((slide) => {
+          const text = (field: 'eyebrow' | 'title' | 'subtitle' | 'cta' | 'imageAlt') =>
+            t(`hero.slides.${slide.id}.${field}`);
+          return {
+            key: slide.id,
+            href: slide.href,
+            image: slide.image ?? HERO_FALLBACK_IMAGES[slide.id],
+            eyebrow: text('eyebrow'),
+            title: text('title'),
+            subtitle: text('subtitle'),
+            cta: text('cta'),
+            imageAlt: text('imageAlt'),
+          };
+        });
 
-    return HERO_SLIDES.map((slide) => {
-      const text = (field: 'eyebrow' | 'title' | 'subtitle' | 'cta' | 'imageAlt') =>
-        t(`hero.slides.${slide.id}.${field}`);
-      return {
-        key: slide.id,
-        href: slide.href,
-        image: slide.image ?? HERO_FALLBACK_IMAGES[slide.id],
-        eyebrow: text('eyebrow'),
-        title: text('title'),
-        subtitle: text('subtitle'),
-        cta: text('cta'),
-        imageAlt: text('imageAlt'),
-      };
-    });
+    return [brandSlide(t), ...content];
   }, [products, latestQuery.data, t, formatLocale]);
 
   const total = slides.length;
@@ -185,7 +204,7 @@ export function HeroCarousel({ products, className }: HeroCarouselProps) {
           <img
             src={slide.image}
             alt={slide.imageAlt}
-            className="h-full w-full object-cover"
+            className={cn('h-full w-full object-cover', slide.imageClassName)}
             draggable={false}
             decoding="async"
           />

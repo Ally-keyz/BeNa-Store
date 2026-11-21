@@ -41,6 +41,8 @@ export interface HeroCarouselSlide {
   subtitle: string;
   cta: string;
   imageAlt: string;
+  /** Optional override for slides whose art should not be cropped. */
+  imageClassName?: string;
   /** Short related detail, e.g. the live price of a product slide. */
   meta?: string;
 }

@@ -396,8 +396,6 @@ const fr = {
     aiPreparation: 'Préparation (IA)',
     aiNotVerified:
       'Suggestion générée par IA — non vérifiée. Modèle : {{model}} · Générée le {{suggestedAt}}. Vérifiez l’emballage avant publication.',
-    aiInlineNote: 'Suggestion générée par IA — vérifiez l’emballage avant utilisation.',
-    aiNoData: 'L’IA n’a pas trouvé de valeur fiable parmi les informations produit disponibles.',
     aiDisclaimer:
       'Suggestion générée par IA — fait non vérifié. Les ingrédients et allergènes ne sont que des suggestions et doivent être comparés à l’emballage du produit avant publication. Ce service ne modifie pas les données de la boutique.',
   },
