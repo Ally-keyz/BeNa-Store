@@ -610,9 +610,6 @@ const de: Resources = {
     withdrawalReference: 'Referenz',
     withdrawalSimulated:
       'Demo-Modus: Die Anfrage wurde lokal erfasst und nicht an einen Anbieter gesendet.',
-    allergenAlertTitle: 'Allergeninformationen',
-    allergenAlertBody: 'Prüfe vor dem Verzehr immer die Verpackung des Produkts.',
-    allergenAlertOpen: 'Allergendetails anzeigen',
     priceInfoTitle: 'Zum bisherigen Preis',
     priceInfoBody:
       'Der durchgestrichene Preis ist der Vergleichspreis des Shops. Nach deutschem Preisrecht ist der niedrigste Preis der letzten 30 Tage maßgeblich; unsere Preisprüfung ist im Audit-Ordner dokumentiert.',

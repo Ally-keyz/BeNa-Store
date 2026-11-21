@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle } from 'lucide-react';
 import type { Product, ProductMetafields, AISuggestion } from '@/types';
 import { decodeMetafield, metafieldLines } from '@/lib/metafields';
 import { sanitizeHtml } from '@/lib/sanitize';
@@ -234,30 +233,6 @@ export function ProductFacts({ product }: ProductFactsProps) {
       <h2 className="text-[13px] font-semibold uppercase tracking-[0.16em] text-neutral-700">
         {t('product.details')}
       </h2>
-
-      {declaredAllergens ? (
-        <div
-          role="note"
-          aria-label={t('remediation.allergenAlertTitle')}
-          className="rounded-card border border-terra-200 bg-terra-50 p-4"
-        >
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-terra-700" aria-hidden="true" />
-            <div className="min-w-0">
-              <h3 className="text-[13px] font-semibold text-ink">
-                {t('remediation.allergenAlertTitle')}
-              </h3>
-              <p className="mt-1 break-words whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
-                {declaredAllergens}
-              </p>
-              <p className="mt-1 text-[12px] leading-5 text-neutral-600">
-                {t('remediation.allergenAlertBody')}
-              </p>
-              {aiSuggestion && aiAllergens ? <AiNote /> : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       <Accordion items={items} allowMultiple />
     </section>

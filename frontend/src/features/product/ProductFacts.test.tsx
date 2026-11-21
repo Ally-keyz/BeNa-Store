@@ -24,7 +24,7 @@ describe('ProductFacts', () => {
 
     render(<ProductFacts product={product} />);
 
-    expect(screen.getByRole('note', { name: 'Allergen information' })).toBeVisible();
+    expect(screen.queryByRole('note')).toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'Allergens' }));
     const region = screen.getByRole('region', { name: 'Allergens' });
@@ -36,7 +36,7 @@ describe('ProductFacts', () => {
     render(<ProductFacts product={productFixture()} />);
 
     expect(screen.queryByRole('button', { name: 'Allergens' })).toBeNull();
-    expect(screen.queryByRole('note', { name: 'Allergen information' })).toBeNull();
+    expect(screen.queryByRole('note')).toBeNull();
     expect(screen.queryByText(/allergen/i)).toBeNull();
   });
 

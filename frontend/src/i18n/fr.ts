@@ -601,9 +601,6 @@ const fr = {
     withdrawalReference: 'Référence',
     withdrawalSimulated:
       'Mode démo : la demande a été enregistrée localement et n’a pas été envoyée à un prestataire.',
-    allergenAlertTitle: 'Informations sur les allergènes',
-    allergenAlertBody: 'Vérifiez toujours l’emballage du produit avant consommation.',
-    allergenAlertOpen: 'Afficher les détails sur les allergènes',
     priceInfoTitle: 'À propos du prix précédent',
     priceInfoBody:
       'Le prix barré est le prix de comparaison de la boutique. La réglementation allemande sur l’annonce des prix exige le prix le plus bas des 30 jours précédents ; notre suivi des prix est documenté dans le dossier d’audit du propriétaire.',

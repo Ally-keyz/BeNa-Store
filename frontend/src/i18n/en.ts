@@ -601,9 +601,6 @@ const en = {
     withdrawalReference: 'Reference',
     withdrawalSimulated:
       'Demo mode: the request was recorded locally and was not sent to a provider.',
-    allergenAlertTitle: 'Allergen information',
-    allergenAlertBody: 'Always check the product packaging before consumption.',
-    allergenAlertOpen: 'Show allergen details',
     priceInfoTitle: 'About the previous price',
     priceInfoBody:
       'The crossed-out price is the shop compare-at price. German price-announcement rules require the lowest price of the previous 30 days; our price monitoring is documented in the owner audit folder.',
