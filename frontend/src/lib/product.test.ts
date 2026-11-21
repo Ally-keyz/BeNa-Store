@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Product, ProductVariant } from '@/types';
+import { normalizeCatalogFacets } from '@/features/catalog/facets';
 import {
   getAvailability,
   getDefaultVariant,
@@ -111,6 +112,30 @@ describe('catalog facets', () => {
     const item = product({ vendor: 'BeNa Origins' });
     expect(matchesFacet(item, 'brands', 'bena-origins')).toBe(true);
     expect(matchesFacet(item, 'brands', 'other-brand')).toBe(false);
+  });
+
+  it('treats Bena Shop Taste of Africa as the same brand as Bena Store', () => {
+    const item = product({ vendor: 'Bena Shop Taste of Africa' });
+    expect(matchesFacet(item, 'brands', 'bena-store')).toBe(true);
+  });
+
+  it('merges duplicate brand facets into one option', () => {
+    const facets = {
+      categories: [],
+      brands: [
+        { value: 'bena-store', label: 'Bena Store', count: 52 },
+        { value: 'bena-shop-taste-of-africa', label: 'Bena Shop Taste Of Africa', count: 2 },
+      ],
+      dietary: [],
+      origins: [],
+      scannedProducts: 54,
+      truncated: false,
+      checkedAt: '',
+    };
+    const normalized = normalizeCatalogFacets(facets);
+    expect(normalized?.brands).toEqual([
+      { value: 'bena-store', label: 'Bena Store', count: 54 },
+    ]);
   });
 
   it('matches dietary and origin facets against catalog text only', () => {

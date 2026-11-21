@@ -68,7 +68,6 @@ export function PurchasePanel({
           </p>
         ) : null}
         {!price ? <p className="mt-1 text-[13px] text-neutral-600">{t('productInfo.priceUnavailable')}</p> : null}
-        <p className="mt-2 text-[13px] text-neutral-600">{t('product.taxesNote')}</p>
         {onSale ? (
           <details className="mt-3 rounded-xl border border-terra-100 bg-terra-50/60 px-3 py-2 text-[12px] leading-5 text-neutral-600">
             <summary className="min-h-9 cursor-pointer font-medium text-ink">
@@ -90,6 +89,7 @@ export function PurchasePanel({
                 value={quantity}
                 onChange={onQuantityChange}
                 label={t('productInfo.quantityLabel', { title: product.title })}
+                unit={t('common.unit', { count: quantity })}
                 disabled={isUpdating}
               />
             </div>

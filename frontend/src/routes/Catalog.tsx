@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, Loader2, SlidersHorizontal } from 'lucide-react';
@@ -11,30 +11,29 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ALL_CATEGORIES, CategoryFilter } from '@/features/home/CategoryFilter';
 import { CatalogFacets } from '@/features/catalog/CatalogFacets';
-import { EMPTY_FACETS, type SelectedFacets } from '@/features/catalog/facets';
+import { EMPTY_FACETS, normalizeCatalogFacets, type SelectedFacets } from '@/features/catalog/facets';
 import { cn } from '@/lib/cn';
 import { pageContainer } from '@/lib/layout';
 import { getDefaultVariant, matchesFacet, matchesProductCategory } from '@/lib/product';
 
-type PriceFilter = 'all' | 'cheap' | 'expensive' | 'other';
+type CatalogFilter = 'all' | 'cheap' | 'popular' | 'other';
 
 const CHEAP_LIMIT = 20;
 
-const PRICE_OPTIONS: Array<{ value: PriceFilter; labelKey: string }> = [
+const PRICE_OPTIONS: Array<{ value: CatalogFilter; labelKey: string }> = [
   { value: 'all', labelKey: 'catalog.priceAll' },
   { value: 'cheap', labelKey: 'catalog.priceCheap' },
-  { value: 'expensive', labelKey: 'catalog.priceExpensive' },
+  { value: 'popular', labelKey: 'catalog.pricePopular' },
   { value: 'other', labelKey: 'catalog.priceOther' },
 ];
 
-function matchesPrice(product: Parameters<typeof getDefaultVariant>[0], filter: PriceFilter): boolean {
-  if (filter === 'all') return true;
+function matchesPrice(product: Parameters<typeof getDefaultVariant>[0], filter: CatalogFilter): boolean {
+  if (filter === 'all' || filter === 'popular') return true;
   const amount = Number(
     getDefaultVariant(product)?.price.amount ?? product.priceRange.minVariantPrice.amount,
   );
   if (!Number.isFinite(amount) || amount <= 0) return filter === 'other';
   if (filter === 'cheap') return amount < CHEAP_LIMIT;
-  if (filter === 'expensive') return amount >= CHEAP_LIMIT;
   return false;
 }
 
@@ -42,12 +41,17 @@ export function CatalogPage() {
   const { t } = useTranslation();
   const { marketParams } = useMarket();
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
-  const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
+  const [priceFilter, setPriceFilter] = useState<CatalogFilter>('all');
   const [selectedFacets, setSelectedFacets] = useState<SelectedFacets>(EMPTY_FACETS);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const query = useInfiniteProducts({ ...marketParams, first: 12, sortKey: 'CREATED_AT' });
+  const query = useInfiniteProducts({
+    ...marketParams,
+    first: 12,
+    sortKey: priceFilter === 'popular' ? 'BEST_SELLING' : 'CREATED_AT',
+  });
   const facetsQuery = useCatalogFacets(marketParams);
+  const facets = useMemo(() => normalizeCatalogFacets(facetsQuery.data), [facetsQuery.data]);
   const allProducts = query.data?.pages.flatMap((page) => page.items) ?? [];
   const products = allProducts.filter(
     (product) =>
@@ -163,7 +167,7 @@ export function CatalogPage() {
             </div>
 
             <CatalogFacets
-              facets={facetsQuery.data}
+              facets={facets}
               selected={selectedFacets}
               onChange={setSelectedFacets}
               loading={facetsQuery.isLoading}

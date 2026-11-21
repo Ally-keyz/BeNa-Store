@@ -195,12 +195,22 @@ export class AiService {
     if (meta.origin) fields.push(`Existing origin: ${meta.origin.value}`);
     if (meta.preparation) fields.push(`Existing preparation: ${meta.preparation.value}`);
     const existing = fields.length > 0 ? fields.join('\n') : 'No existing metafield values found.';
+    const details = [
+      product.productType ? `Product type: ${product.productType}` : null,
+      product.tags.length > 0 ? `Tags: ${product.tags.join(', ')}` : null,
+      product.vendor ? `Supplier: ${product.vendor}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n');
 
     return `Suggest food-label values for the product below.
 
 Product title: ${product.title}
 Product handle: ${product.handle}
-Product description: ${product.description}
+Product description: ${product.description || 'No description supplied.'}
+
+Other product details:
+${details || 'No additional details supplied.'}
 
 Existing metafield values (may be empty or incomplete):
 ${existing}
@@ -208,9 +218,10 @@ ${existing}
 Rules:
 - Treat the product title and description as the primary evidence. If the description explicitly states an ingredient or allergen, extract it exactly instead of guessing.
 - Copy values after labels such as "Ingredients:", "Allergen:" or "Allergen information:" from the description when present.
+- Read all available product details — title, description, product type, tags, supplier and metafields — before suggesting any value.
+- For allergens, extract any explicit declaration first. Otherwise list major allergens plausibly present or possible traces for this product (milk, eggs, fish, shellfish, peanuts, tree nuts, gluten, mustard, celery, soy, sesame, sulphites). Only set the allergen value to null when the product clearly cannot contain any major allergen.
 - Suggest values only from what is plausible for this type of product. Do not invent brands or batch codes.
-- For allergens, list major allergens plausibly present (milk, eggs, fish, shellfish, peanuts, tree nuts, gluten, mustard, celery, soy, sesame, sulphites).
-- When no reliable value can be inferred, set "value" to null. Never use placeholder words such as "unspecified", "unknown", "n/a", "none" or "not provided".
+- When no reliable value can be inferred for a non-allergen field, set "value" to null. Never use placeholder words such as "unspecified", "unknown", "n/a", "none" or "not provided".
 - confidence must be a number between 0 and 1.
 - rationale must be one short sentence.
 - Return ONLY a single JSON object, no markdown fences, no extra text.

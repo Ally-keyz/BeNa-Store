@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Product } from '@/types';
 import { cn } from '@/lib/cn';
@@ -14,13 +14,15 @@ export interface ProductGalleryProps {
 
 /**
  * Compact gallery: thumbnails sit to the left of the main image, which fills
- * the available image area. Clicking the main image opens a full-screen
- * viewer with previous/next controls.
+ * the available image area. Swipe the main image to browse without opening
+ * the viewer; tapping it opens a full-screen viewer with swipe navigation.
  */
 export function ProductGallery({ product }: ProductGalleryProps) {
   const { t } = useTranslation();
   const [active, setActive] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
   const primary = getPrimaryImage(product);
   const images = product.images.length ? product.images : primary ? [primary] : [];
   const lightboxImages = images.filter((image) => !image.url.includes('fixtures.invalid'));
@@ -34,7 +36,32 @@ export function ProductGallery({ product }: ProductGalleryProps) {
   const labelFor = (index: number) =>
     t('productInfo.imageAlt', { title: product.title, number: index + 1 });
 
+  const onTouchStart = (event: TouchEvent<HTMLButtonElement>) => {
+    const touch = event.touches[0];
+    swipeStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+    swiped.current = false;
+  };
+
+  const onTouchEnd = (event: TouchEvent<HTMLButtonElement>) => {
+    const start = swipeStart.current;
+    const touch = event.changedTouches[0];
+    swipeStart.current = null;
+    if (!start || !touch || images.length < 2) return;
+
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
+
+    swiped.current = true;
+    const direction = dx < 0 ? 1 : -1;
+    setActive((current) => (current + direction + images.length) % images.length);
+  };
+
   const openLightbox = () => {
+    if (swiped.current) {
+      swiped.current = false;
+      return;
+    }
     if (!lightboxImages.length) return;
     const url = activeImage?.url;
     const start = url ? lightboxImages.findIndex((image) => image.url === url) : 0;
@@ -75,8 +102,10 @@ export function ProductGallery({ product }: ProductGalleryProps) {
         <button
           type="button"
           onClick={openLightbox}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
           aria-label={t('productInfo.openImage', { number: active + 1 })}
-          className="group relative order-1 flex h-[min(44dvh,420px)] w-full items-center justify-center overflow-hidden rounded-2xl bg-terra-50 p-3 sm:order-2 sm:h-[min(64vh,580px)] sm:p-4"
+          className="group relative order-1 flex h-[min(44dvh,420px)] w-full touch-pan-y items-center justify-center overflow-hidden rounded-2xl bg-terra-50 p-3 sm:order-2 sm:h-[min(64vh,580px)] sm:p-4"
         >
           {activeImage ? (
             <ProductImage

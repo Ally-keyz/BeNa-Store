@@ -24,19 +24,22 @@ describe('ProductFacts', () => {
 
     render(<ProductFacts product={product} />);
 
+    expect(screen.getByRole('note', { name: 'Allergen information' })).toBeVisible();
+
     await user.click(screen.getByRole('button', { name: 'Allergens' }));
     const region = screen.getByRole('region', { name: 'Allergens' });
     expect(within(region).getByText('Contains tree nuts')).toBeVisible();
     expect(within(region).getByText(/Always check the product packaging/i)).toBeVisible();
   });
 
-  it('says allergens are unavailable instead of guessing', async () => {
+  it('explains that AI checks product details instead of showing an allergen alert when none exist', async () => {
     const user = userEvent.setup();
     render(<ProductFacts product={productFixture()} />);
 
     await user.click(screen.getByRole('button', { name: 'Allergens' }));
     const region = screen.getByRole('region', { name: 'Allergens' });
-    expect(within(region).getByText(/No allergen declaration/i)).toBeVisible();
+    expect(within(region).getByText(/AI checks the product description/i)).toBeVisible();
+    expect(screen.queryByRole('note', { name: 'Allergen information' })).toBeNull();
   });
 
   it('marks missing food information as unavailable', async () => {
@@ -92,7 +95,7 @@ describe('ProductFacts', () => {
     await user.click(screen.getByRole('button', { name: 'Allergens' }));
     const allergensRegion = screen.getByRole('region', { name: 'Allergens' });
     expect(await within(allergensRegion).findByText('Tree nuts')).toBeVisible();
-    expect(within(allergensRegion).queryByText(/No allergen declaration/i)).toBeNull();
+    expect(within(allergensRegion).queryByText(/AI checks the product description/i)).toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'Food information' }));
     const foodRegion = screen.getByRole('region', { name: 'Food information' });

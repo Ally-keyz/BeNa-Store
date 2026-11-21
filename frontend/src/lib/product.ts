@@ -80,6 +80,17 @@ export function toFacetValue(value: string): string {
     .replace(/[^a-z0-9-]/g, '');
 }
 
+/** Shopify vendors that represent the same storefront brand. */
+const BRAND_ALIASES: Record<string, string> = {
+  'bena-shop-taste-of-africa': 'bena-store',
+};
+
+/** Normalize vendor aliases so catalog facets and product matching agree. */
+export function canonicalBrandValue(value: string): string {
+  const normalized = toFacetValue(value);
+  return BRAND_ALIASES[normalized] ?? normalized;
+}
+
 /** Text searched by catalog-derived dietary/origin facets. */
 export function productFacetText(product: Product): string {
   return [
@@ -101,7 +112,7 @@ export type FacetGroup = 'brands' | 'dietary' | 'origins';
 export function matchesFacet(product: Product, group: FacetGroup, value: string): boolean {
   const normalized = toFacetValue(value);
   if (!normalized) return true;
-  if (group === 'brands') return toFacetValue(product.vendor) === normalized;
+  if (group === 'brands') return canonicalBrandValue(product.vendor) === canonicalBrandValue(value);
   return productFacetText(product)
     .replace(/[^a-z0-9]+/g, ' ')
     .includes(normalized.replace(/-/g, ' '));

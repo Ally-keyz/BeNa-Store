@@ -87,7 +87,6 @@ export function CartSummary({ cart, compact = false }: CartSummaryProps) {
         <span className="text-sm font-medium text-ink">{t('cart.subtotal')}</span>
         <span className="tabular text-lg font-semibold text-ink">{subtotal}</span>
       </div>
-      <p className="text-[13px] text-neutral-600">{t('cart.taxesNote')}</p>
 
       <Button size="lg" fullWidth onClick={onCheckout} disabled={!canCheckout}>
         <LockKeyhole className="h-4 w-4" aria-hidden="true" />

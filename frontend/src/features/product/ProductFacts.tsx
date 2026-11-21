@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import type { Product, ProductMetafields, AISuggestion } from '@/types';
-import { decodeMetafield, hasMetafield, metafieldLines } from '@/lib/metafields';
+import { decodeMetafield, metafieldLines } from '@/lib/metafields';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { Accordion, type AccordionItem } from '@/components/ui/Accordion';
 import { getAiSuggestions } from '@/api/endpoints';
@@ -143,7 +143,7 @@ export function ProductFacts({ product }: ProductFactsProps) {
   const descriptionHtml = sanitizeHtml(product.descriptionHtml);
   const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
   const aiAllergens = cleanFactValue(aiSuggestion?.allergens?.value);
-  const declaredAllergens = aiSuggestion ? aiAllergens : cleanFactValue(allergens);
+  const declaredAllergens = aiAllergens ?? cleanFactValue(allergens);
 
   const fetchAiSuggestions = useCallback(async () => {
     try {
@@ -175,23 +175,13 @@ export function ProductFacts({ product }: ProductFactsProps) {
     {
       id: 'allergens',
       title: t('product.allergens'),
-      content: aiSuggestion ? (
-        aiAllergens ? (
-          <div>
-            <p className="whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
-              {aiAllergens}
-            </p>
-            <AiNote />
-          </div>
-        ) : (
-          <AiNoData />
-        )
-      ) : hasMetafield(product.metafields.allergens) ? (
+      content: declaredAllergens ? (
         <div>
           <p className="whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
-            {allergens}
+            {declaredAllergens}
           </p>
           <p className="mt-1 text-[12px] text-neutral-600">{t('productInfo.allergensNote')}</p>
+          {aiSuggestion && aiAllergens ? <AiNote /> : null}
         </div>
       ) : (
         <p className="text-[13px] leading-5 text-neutral-600">
@@ -243,27 +233,29 @@ export function ProductFacts({ product }: ProductFactsProps) {
         {t('product.details')}
       </h2>
 
-      <div
-        role="note"
-        aria-label={t('remediation.allergenAlertTitle')}
-        className="rounded-card border border-terra-200 bg-terra-50 p-4"
-      >
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-terra-700" aria-hidden="true" />
-          <div className="min-w-0">
-            <h3 className="text-[13px] font-semibold text-ink">
-              {t('remediation.allergenAlertTitle')}
-            </h3>
-            <p className="mt-1 break-words whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
-              {declaredAllergens ?? t('productInfo.allergensUnavailable')}
-            </p>
-            <p className="mt-1 text-[12px] leading-5 text-neutral-600">
-              {t('remediation.allergenAlertBody')}
-            </p>
-            {aiSuggestion && aiAllergens ? <AiNote /> : null}
+      {declaredAllergens ? (
+        <div
+          role="note"
+          aria-label={t('remediation.allergenAlertTitle')}
+          className="rounded-card border border-terra-200 bg-terra-50 p-4"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-terra-700" aria-hidden="true" />
+            <div className="min-w-0">
+              <h3 className="text-[13px] font-semibold text-ink">
+                {t('remediation.allergenAlertTitle')}
+              </h3>
+              <p className="mt-1 break-words whitespace-pre-line text-[13px] font-medium leading-5 text-ink">
+                {declaredAllergens}
+              </p>
+              <p className="mt-1 text-[12px] leading-5 text-neutral-600">
+                {t('remediation.allergenAlertBody')}
+              </p>
+              {aiSuggestion && aiAllergens ? <AiNote /> : null}
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
 
       <Accordion items={items} allowMultiple />
     </section>

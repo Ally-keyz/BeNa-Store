@@ -100,6 +100,7 @@ export function CartLines({ lines, compact = false }: CartLinesProps) {
                   value={line.quantity}
                   onChange={(quantity) => void run(() => updateLine(line.id, quantity))}
                   label={t('cart.quantityFor', { title })}
+                  unit={t('common.unit', { count: line.quantity })}
                   disabled={isUpdating || !merchandise?.availableForSale}
                 />
                 <button
