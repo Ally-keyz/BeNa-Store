@@ -43,7 +43,7 @@ export function CollectionPage() {
         <Breadcrumbs
           items={[
             { label: t('nav.home'), href: '/' },
-            { label: t('collections.eyebrow'), href: '/collections' },
+            { label: t('collections.eyebrow') },
             { label: title },
           ]}
           label={t('a11y.breadcrumb')}

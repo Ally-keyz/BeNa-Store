@@ -20,6 +20,7 @@ import {
 import { isApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useMarket } from '@/context/MarketContext';
 import { readStorage, writeStorage } from '@/lib/storage';
 import { useToast } from '@/components/ui/Toast';
 import type { Cart } from '@/types';
@@ -61,6 +62,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const track = useAnalytics();
+  const { marketParams } = useMarket();
   const [cartId, setCartId] = useState<string | null>(() => readStorage(CART_KEY));
   const [isUpdating, setIsUpdating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -106,11 +108,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const result = await createCart({
         lines: [{ merchandiseId, quantity }],
         buyerIdentity: countryCode ? { countryCode } : undefined,
+        // Shopify fixes the checkout locale when the cart is created, so send
+        // the current site language with every new cart.
+        language: marketParams.language,
       });
       commitCart(result.data);
       return result.data;
     },
-    [commitCart],
+    [commitCart, marketParams.language],
   );
 
   const addItem = useCallback(
@@ -209,7 +214,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setIsUpdating(true);
       try {
         if (!cartId) {
-          const result = await createCart({ buyerIdentity: identity });
+          const result = await createCart({ buyerIdentity: identity, language: marketParams.language });
           commitCart(result.data);
           return;
         }
@@ -218,7 +223,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
           commitCart(result.data);
         } catch (error) {
           if (isApiError(error) && error.code === 'NOT_FOUND') {
-            const result = await createCart({ buyerIdentity: identity });
+            const result = await createCart({
+              buyerIdentity: identity,
+              language: marketParams.language,
+            });
             commitCart(result.data);
           } else {
             throw error;
@@ -228,7 +236,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsUpdating(false);
       }
     },
-    [cartId, commitCart],
+    [cartId, commitCart, marketParams.language],
   );
 
   const value = useMemo<CartContextValue>(

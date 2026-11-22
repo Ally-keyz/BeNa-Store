@@ -43,19 +43,32 @@ describe('product stories', () => {
     }
   });
 
-  it('uses the exact supplied coffee page copy', () => {
+  it('never shows chapter numbers in story copy', () => {
+    for (const story of PRODUCT_STORIES) {
+      const copy = [
+        ...Object.values(story.title),
+        ...Object.values(story.summary),
+        ...Object.values(story.body),
+        ...Object.values(story.detail),
+        ...story.sections.flatMap((section) => Object.values(section.body)),
+      ];
+      expect(copy.some((text) => /Chapter\s+\d+/i.test(text))).toBe(false);
+    }
+  });
+
+  it('uses clear, translated coffee copy', () => {
     const coffee = PRODUCT_STORIES.find((story) => story.slug === 'coffee');
-    expect(coffee?.title.en).toBe('Meet Your Coffee');
-    expect(coffee?.summary.en).toBe('From Her Hands, to Your Cup.');
-    expect(coffee?.detail.en).toContain('This is Rwanda in your hands.');
+    expect(coffee?.title.en).toBe('BeNa SheGrows Coffee');
+    expect(coffee?.summary.en).toBe('Rwandan coffee from women-led farms, hand-sorted with care.');
+    expect(coffee?.detail.en).toContain('bright citrus and berry notes');
     expect(coffee?.sections.find((section) => section.key === 'grown')?.body.en).toContain(
-      'At over 1,500 metres above sea level, the air is cool, the soil is volcanic',
+      'more than 1,500 metres above sea level',
     );
     expect(coffee?.sections.find((section) => section.key === 'made')?.body.en).toContain(
-      'Hundreds of Hands. One Standard.',
+      'raised beds under the highland sun',
     );
     expect(coffee?.sections.find((section) => section.key === 'packed')?.body.en).toContain(
-      'Handpicked in Rwanda. Crafted for the World.',
+      'hand-sorted in Rwanda',
     );
   });
 

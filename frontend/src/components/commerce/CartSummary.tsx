@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LockKeyhole } from 'lucide-react';
 import type { Cart } from '@/types';
 import { formatMoney } from '@/lib/money';
+import { localizedCheckoutUrl } from '@/lib/checkout';
 import { useMarket } from '@/context/MarketContext';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/components/ui/Toast';
@@ -15,7 +16,7 @@ export interface CartSummaryProps {
 }
 
 export function useCartSummary(cart: Cart) {
-  const { formatLocale } = useMarket();
+  const { formatLocale, language } = useMarket();
   const subtotal = formatMoney(cart.cost.subtotalAmount, { locale: formatLocale });
   const canCheckout =
     cart.lines.length > 0 &&
@@ -23,7 +24,7 @@ export function useCartSummary(cart: Cart) {
     Boolean(cart.checkoutUrl);
 
   const onCheckout = () => {
-    if (canCheckout) window.location.assign(cart.checkoutUrl);
+    if (canCheckout) window.location.assign(localizedCheckoutUrl(cart.checkoutUrl, language));
   };
 
   return { subtotal, canCheckout, onCheckout };

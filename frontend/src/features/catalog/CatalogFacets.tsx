@@ -15,6 +15,21 @@ export interface CatalogFacetsProps {
 /** Long lists collapse to this many rows; selected values always stay visible. */
 const VISIBLE_LIMIT = 6;
 
+/** Canonical facet values whose labels are translated for the current locale. */
+const FACET_LABEL_KEYS: Partial<Record<FacetGroup, Record<string, string>>> = {
+  dietary: {
+    'gluten-free': 'remediation.facetGlutenFree',
+  },
+  origins: {
+    rwandan: 'remediation.facetRwandan',
+    african: 'remediation.facetAfrican',
+    ugandan: 'remediation.facetUgandan',
+    kenyan: 'remediation.facetKenyan',
+    ethiopian: 'remediation.facetEthiopian',
+    tanzanian: 'remediation.facetTanzanian',
+  },
+};
+
 /** Catalog-derived filters for brand, dietary claims and origin (audit #20). */
 export function CatalogFacets({ facets, selected, onChange, loading = false }: CatalogFacetsProps) {
   const { t } = useTranslation();
@@ -93,6 +108,7 @@ export function CatalogFacets({ facets, selected, onChange, loading = false }: C
                   <ul className="mt-1">
                     {visible.map((facet) => {
                       const active = selected[group].includes(facet.value);
+                      const labelKey = FACET_LABEL_KEYS[group]?.[facet.value];
                       return (
                         <li key={facet.value}>
                           <label className="group flex min-h-11 cursor-pointer items-center gap-2.5 text-[13px] sm:min-h-8">
@@ -110,7 +126,7 @@ export function CatalogFacets({ facets, selected, onChange, loading = false }: C
                                   : 'text-neutral-700 group-hover:text-ink',
                               )}
                             >
-                              {facet.label}
+                              {labelKey ? t(labelKey) : facet.label}
                             </span>
                             <span className="tabular text-[12px] text-neutral-500">{facet.count}</span>
                           </label>

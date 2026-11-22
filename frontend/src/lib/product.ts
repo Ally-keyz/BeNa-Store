@@ -138,12 +138,47 @@ export function productFacetText(product: Product): string {
 
 export type FacetGroup = 'brands' | 'dietary' | 'origins';
 
+const ORIGIN_ALIASES: Array<{ canonical: string; terms: string[] }> = [
+  { canonical: 'rwandan', terms: ['rwanda', 'rwandan'] },
+  { canonical: 'african', terms: ['africa', 'african'] },
+  { canonical: 'ugandan', terms: ['uganda', 'ugandan'] },
+  { canonical: 'kenyan', terms: ['kenya', 'kenyan'] },
+  { canonical: 'ethiopian', terms: ['ethiopia', 'ethiopian'] },
+  { canonical: 'tanzanian', terms: ['tanzania', 'tanzanian'] },
+];
+
+const GLUTEN_FREE_TERMS = ['gluten-free', 'gluten-frei', 'glutenfree', 'glutenfrei'];
+
+/** Map multilingual facet synonyms to one stable value used by the UI. */
+export function canonicalFacetValue(group: FacetGroup, value: string): string {
+  const normalized = toFacetValue(value);
+  if (group === 'brands') return canonicalBrandValue(normalized);
+  if (group === 'dietary' && GLUTEN_FREE_TERMS.includes(normalized)) return 'gluten-free';
+  if (group === 'origins') {
+    const alias = ORIGIN_ALIASES.find(({ terms }) =>
+      terms.some((term) => normalized === term || normalized.startsWith(`${term}-`)),
+    );
+    return alias?.canonical ?? normalized;
+  }
+  return normalized;
+}
+
+function facetSearchTerms(group: FacetGroup, value: string): string[] {
+  const canonical = canonicalFacetValue(group, value);
+  if (group === 'dietary' && canonical === 'gluten-free') return GLUTEN_FREE_TERMS;
+  if (group === 'origins') {
+    return ORIGIN_ALIASES.find(({ canonical: origin }) => origin === canonical)?.terms ?? [canonical];
+  }
+  return [canonical];
+}
+
 /** Match a selected facet value against a product without inventing metadata. */
 export function matchesFacet(product: Product, group: FacetGroup, value: string): boolean {
-  const normalized = toFacetValue(value);
+  const normalized = canonicalFacetValue(group, value);
   if (!normalized) return true;
-  if (group === 'brands') return canonicalBrandValue(product.vendor) === canonicalBrandValue(value);
-  return productFacetText(product)
-    .replace(/[^a-z0-9]+/g, ' ')
-    .includes(normalized.replace(/-/g, ' '));
+  if (group === 'brands') return canonicalBrandValue(product.vendor) === normalized;
+  const text = productFacetText(product).replace(/[^a-z0-9]+/g, ' ');
+  return facetSearchTerms(group, value).some((term) =>
+    text.includes(toFacetValue(term).replace(/-/g, ' ')),
+  );
 }

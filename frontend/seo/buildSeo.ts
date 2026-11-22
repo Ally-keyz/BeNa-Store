@@ -76,11 +76,6 @@ const STATIC_PAGES: Record<string, StaticPage> = {
     description: 'Browse every coffee, food and craft product currently available from BeNa Origins.',
     type: 'website',
   },
-  '/collections': {
-    title: 'Collections | BeNa Origins',
-    description: 'Explore BeNa Origins collections of African coffee, food and handwoven crafts.',
-    type: 'website',
-  },
   '/about': {
     title: 'About us | BeNa Origins',
     description: 'Learn how BeNa Origins sources African coffee, food and crafts with care.',

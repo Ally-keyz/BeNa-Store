@@ -10,9 +10,6 @@ const HomePage = lazy(() => import('@/routes/Home').then((module) => ({ default:
 const CatalogPage = lazy(() =>
   import('@/routes/Catalog').then((module) => ({ default: module.CatalogPage })),
 );
-const CollectionsPage = lazy(() =>
-  import('@/routes/Collections').then((module) => ({ default: module.CollectionsPage })),
-);
 const CollectionPage = lazy(() =>
   import('@/routes/Collection').then((module) => ({ default: module.CollectionPage })),
 );
@@ -93,7 +90,6 @@ export function App() {
             <Route path="african-products" element={<AfricanProductsPage />} />
             <Route path="rwandan-products" element={<Navigate to="/african-products" replace />} />
             <Route path="catalog" element={<CatalogPage />} />
-            <Route path="collections" element={<CollectionsPage />} />
             <Route path="collections/:handle" element={<CollectionPage />} />
             <Route path="products/:handle" element={<ProductPage />} />
             <Route path="search" element={<SearchPage />} />

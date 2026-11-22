@@ -194,11 +194,43 @@ describe('catalog facets', () => {
     ]);
   });
 
+  it('merges translated origin and gluten-free facets into one option each', () => {
+    const facets = {
+      categories: [],
+      brands: [],
+      dietary: [
+        { value: 'gluten-free', label: 'Gluten-Free', count: 2 },
+        { value: 'glutenfrei', label: 'Glutenfrei', count: 3 },
+      ],
+      origins: [
+        { value: 'rwanda', label: 'Rwanda', count: 4 },
+        { value: 'rwandan', label: 'Rwandan', count: 5 },
+        { value: 'africa', label: 'Africa', count: 2 },
+        { value: 'african', label: 'African', count: 6 },
+      ],
+      scannedProducts: 20,
+      truncated: false,
+      checkedAt: '',
+    };
+    const normalized = normalizeCatalogFacets(facets);
+    expect(normalized?.dietary).toEqual([
+      { value: 'gluten-free', label: 'Gluten free', count: 5 },
+    ]);
+    expect(normalized?.origins).toEqual([
+      { value: 'rwandan', label: 'Rwandan', count: 9 },
+      { value: 'african', label: 'African', count: 8 },
+    ]);
+  });
+
   it('matches dietary and origin facets against catalog text only', () => {
     const item = product({ title: 'Rwandan Gluten-Free Coffee', tags: ['vegan'] });
     expect(matchesFacet(item, 'dietary', 'gluten-free')).toBe(true);
     expect(matchesFacet(item, 'dietary', 'vegan')).toBe(true);
     expect(matchesFacet(item, 'origins', 'rwanda')).toBe(true);
+    expect(matchesFacet(item, 'origins', 'rwandan')).toBe(true);
+    const germanLabels = product({ title: 'Rwanda coffee', tags: ['glutenfrei'] });
+    expect(matchesFacet(germanLabels, 'dietary', 'gluten-free')).toBe(true);
+    expect(matchesFacet(germanLabels, 'dietary', 'glutenfrei')).toBe(true);
     expect(matchesFacet(item, 'dietary', 'halal')).toBe(false);
   });
 });
