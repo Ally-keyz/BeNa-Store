@@ -105,7 +105,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
           aria-label={t('productInfo.openImage', { number: active + 1 })}
-          className="group relative order-1 flex h-[min(44dvh,420px)] w-full touch-pan-y items-center justify-center overflow-hidden rounded-2xl border-2 border-night bg-white p-3 sm:order-2 sm:h-[min(64vh,580px)] sm:p-4"
+          className="group relative order-1 flex h-[min(44dvh,420px)] w-full touch-pan-y items-center justify-center overflow-hidden rounded-2xl border-2 border-neutral-600 bg-white p-3 sm:order-2 sm:h-[min(64vh,580px)] sm:p-4"
         >
           {activeImage ? (
             <ProductImage

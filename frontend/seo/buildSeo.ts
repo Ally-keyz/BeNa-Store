@@ -311,14 +311,38 @@ function productFacts(jsonLd: unknown[]): string {
   return '';
 }
 
+const SECTION_TITLES: Record<string, string> = {
+  people: 'The people who prepare it',
+  grown: 'How it is grown or made',
+  made: 'Who makes it',
+  exported: 'How it is exported',
+  packed: 'Packed by BeNa Origins',
+};
+
+/** Process steps with images, included in the static story HTML for crawlers. */
+function storySections(path: string): string {
+  const match = /^\/about\/products\/([^/]+)$/.exec(path);
+  const slug = match?.[1];
+  if (!slug) return '';
+  const story = PRODUCT_STORIES.find((item) => item.slug === slug);
+  if (!story) return '';
+  return story.sections
+    .map(
+      (section) =>
+        `      <section>\n        <h2>${escapeHtml(SECTION_TITLES[section.key] ?? section.key)}</h2>\n        <p>${escapeHtml(section.body.en)}</p>\n        <img src="${escapeHtml(section.image)}" alt="${escapeHtml(section.imageAlt.en)}" loading="lazy" />\n      </section>`,
+    )
+    .join('\n');
+}
+
 /** Text-only content that crawlers can read before React hydrates. */
-function staticContent(meta: PageMetadata): string {
+function staticContent(meta: PageMetadata, path: string): string {
   return [
     '      <div data-bena-prerender="true">',
     breadcrumbLinks(meta.jsonLd ?? []),
     `      <h1>${escapeHtml(meta.openGraph?.title ?? meta.title)}</h1>`,
     `      <p>${escapeHtml(meta.description)}</p>`,
     productFacts(meta.jsonLd ?? []),
+    storySections(path),
     '      </div>',
   ]
     .filter(Boolean)
@@ -337,7 +361,7 @@ function replaceHeadBlock(html: string, head: string): string {
 function buildDocument(shell: string, meta: PageMetadata | null, path: string): string {
   const withHead = replaceHeadBlock(shell, meta ? seoHead(meta, path) : noindexHead(path));
   const content = meta
-    ? staticContent(meta)
+    ? staticContent(meta, path)
     : '      <div data-bena-prerender="true"><h1>BeNa Origins</h1></div>';
   return withHead.replace('<div id="root"></div>', `<div id="root">\n${content}\n    </div>`);
 }

@@ -10,10 +10,19 @@ import {
   getProductStory,
   getProductStoryHref,
   localizedText,
+  type StorySectionKey,
 } from '@/content/productStories';
 import { useMarket } from '@/context/MarketContext';
 import { contentContainer } from '@/lib/layout';
 import { NotFoundPage } from './NotFoundPage';
+
+const SECTION_TITLE_KEYS: Record<StorySectionKey, string> = {
+  people: 'productStories.sectionPeople',
+  grown: 'productStories.sectionGrown',
+  made: 'productStories.sectionMade',
+  exported: 'productStories.sectionExported',
+  packed: 'productStories.sectionPacked',
+};
 
 export function ProductStoryPage() {
   const { slug = '' } = useParams();
@@ -49,26 +58,81 @@ export function ProductStoryPage() {
           className="pt-6"
         />
 
-        <article className="pb-10 pt-8 text-center sm:pb-16 sm:pt-12">
-          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-terra-50 text-terra-700">
-            <ProductStoryIcon icon={story.icon} className="h-7 w-7" />
-          </span>
-          <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
-            {t('productStories.eyebrow')}
-          </p>
-          <h1 className="mx-auto mt-3 max-w-3xl break-words text-[clamp(30px,4vw,52px)] font-semibold leading-[1.08] tracking-tight text-ink">
-            {title}
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl break-words text-[17px] leading-8 text-neutral-600">
-            {summary}
-          </p>
+        <article className="pb-10 pt-8 sm:pb-16 sm:pt-12">
+          <header className="text-center">
+            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-terra-50 text-terra-700">
+              <ProductStoryIcon icon={story.icon} className="h-7 w-7" />
+            </span>
+            <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
+              {t('productStories.eyebrow')}
+            </p>
+            <h1 className="mx-auto mt-3 max-w-3xl break-words text-[clamp(30px,4vw,52px)] font-semibold leading-[1.08] tracking-tight text-ink">
+              {title}
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl break-words text-[17px] leading-8 text-neutral-600">
+              {summary}
+            </p>
+          </header>
 
           <div className="mx-auto mt-10 max-w-2xl space-y-5 text-left text-base leading-8 text-neutral-600">
             <p>{localizedText(story.body, language)}</p>
             <p>{localizedText(story.detail, language)}</p>
           </div>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <section className="mt-14 sm:mt-20" aria-labelledby="process-title">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2
+                id="process-title"
+                className="break-words text-2xl font-semibold tracking-tight text-ink sm:text-[28px]"
+              >
+                {t('productStories.processTitle')}
+              </h2>
+              <p className="mt-3 break-words text-sm leading-7 text-neutral-600">
+                {t('productStories.processIntro')}
+              </p>
+            </div>
+
+            <ol className="mx-auto mt-10 max-w-4xl space-y-12 sm:mt-12 sm:space-y-16">
+              {story.sections.map((section, index) => (
+                <li key={section.key} className="border-t border-neutral-200 pt-8 sm:pt-10">
+                  <article className="grid items-center gap-5 md:grid-cols-2 md:gap-10">
+                    <div className={index % 2 === 1 ? 'md:order-2' : undefined}>
+                      <img
+                        src={section.image}
+                        alt={localizedText(section.imageAlt, language)}
+                        loading="lazy"
+                        decoding="async"
+                        className="aspect-[16/10] w-full rounded-2xl border border-neutral-200 bg-neutral-100 object-cover"
+                      />
+                      <p className="mt-2 text-[11px] leading-4 text-neutral-500">
+                        <a
+                          href={section.creditUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:text-terra-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                        >
+                          {t('productStories.photoCredit', { credit: section.credit })}
+                        </a>
+                      </p>
+                    </div>
+                    <div className={index % 2 === 1 ? 'md:order-1' : undefined}>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
+                        {t('productStories.stepLabel', { number: index + 1 })}
+                      </p>
+                      <h3 className="mt-2 break-words text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+                        {t(SECTION_TITLE_KEYS[section.key])}
+                      </h3>
+                      <p className="mt-3 break-words text-base leading-8 text-neutral-600">
+                        {localizedText(section.body, language)}
+                      </p>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {shopHref ? (
               <Link
                 to={shopHref}

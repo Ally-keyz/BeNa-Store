@@ -438,6 +438,16 @@ const en = {
     shopProduct: 'Shop this product',
     findProduct: 'Find it in the catalog',
     moreStories: 'More product stories',
+    processTitle: 'From origin to your doorstep',
+    processIntro:
+      'Every product has a journey. These are the typical stages it passes through before it reaches our store in Zierenberg and then your kitchen. The photos illustrate the process and may show other origins or producers.',
+    sectionPeople: 'The people who prepare it',
+    sectionGrown: 'How it is grown or made',
+    sectionMade: 'Who makes it',
+    sectionExported: 'How it is exported',
+    sectionPacked: 'Packed by BeNa Origins',
+    stepLabel: 'Step {{number}}',
+    photoCredit: 'Photo: {{credit}}',
   },
   contact: {
     eyebrow: 'Contact',
