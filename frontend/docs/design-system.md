@@ -107,7 +107,7 @@ Product grid:
 - `20–24px` gutters.
 - Each card is a **square `1:1` tile** with a square image, rounded `16px`, no border and no shadow.
 - Featured and catalog feeds grow automatically with an IntersectionObserver sentinel — no "Load more" click.
-- Title left, price right; unit price underneath in muted text; compare-at struck through only when strictly greater than the current price.
+- Title left, price right; compare-at struck through only when strictly greater than the current price. No per-kg or per-unit price labels are rendered.
 - Coming Soon never renders Add to cart.
 
 Product detail:
@@ -125,11 +125,11 @@ Product detail:
 
 ## 8. Audit alignment
 
-The October 2026 audit asked for a clearer value proposition, a coherent category hierarchy, visible localization, unit prices, allergen/food information, honest shipping claims and trust cues near purchase decisions. The frontend responds by:
+The October 2026 audit asked for a clearer value proposition, a coherent category hierarchy, visible localization, allergen/food information, honest shipping claims and trust cues near purchase decisions. The frontend responds by:
 
 - leading the hero with broad Rwandan products rather than generic coffee copy;
 - using the required five-item navigation and a real region/language selector;
-- keeping unit-price and compare-at safeguards in `src/lib/money.ts`;
+- keeping compare-at safeguards in `src/lib/money.ts`;
 - reserving product-detail space for allergens, nutrition, ingredients, origin and preparation;
 - using one brand/email config constant;
 - labelling all missing photography and legal content as placeholders.

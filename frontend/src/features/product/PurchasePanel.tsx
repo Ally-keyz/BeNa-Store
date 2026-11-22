@@ -5,11 +5,6 @@ import type { Product, ProductVariant } from '@/types';
 import { BRAND } from '@/config';
 import { formatMoney, isOnSale, toAmount } from '@/lib/money';
 import { getAvailability } from '@/lib/product';
-import {
-  formatWeightKg,
-  getKilogramPackageWeightKg,
-  getPricePerKg,
-} from '@/lib/units';
 import { useCart } from '@/context/CartContext';
 import { useMarket } from '@/context/MarketContext';
 import { Button, buttonVariants } from '@/components/ui/Button';
@@ -42,23 +37,6 @@ export function PurchasePanel({
   const price = variant?.price ?? product.priceRange.minVariantPrice;
   const compareAt = variant?.compareAtPrice ?? null;
   const onSale = isOnSale(price, compareAt);
-  const weightContext = {
-    handle: product.handle,
-    title: product.title,
-    productType: product.productType,
-    tags: product.tags,
-    variantTitle: variant?.title,
-    selectedOptions: variant?.selectedOptions,
-    measurement: variant?.unitPriceMeasurement,
-  };
-  const pricePerKg = getPricePerKg({
-    unitPrice: variant?.unitPrice,
-    unitPriceMeasurement: variant?.unitPriceMeasurement,
-  });
-  const packageWeightKg = getKilogramPackageWeightKg(weightContext);
-  const quantityUnit = packageWeightKg
-    ? t('common.packageWeight', { weight: formatWeightKg(packageWeightKg, formatLocale) })
-    : t('common.unit', { count: quantity });
   const totalAmount =
     price && quantity > 1
       ? { amount: (toAmount(price) * quantity).toFixed(2), currencyCode: price.currencyCode }
@@ -84,17 +62,6 @@ export function PurchasePanel({
             </span>
           ) : null}
         </div>
-        {pricePerKg ? (
-          <p className="mt-1 text-[13px] text-neutral-600">
-            <span className="sr-only">{t('common.pricePerKgLabel')}: </span>
-            {t('common.pricePerKg', {
-              price: formatMoney(pricePerKg, {
-                locale: formatLocale,
-                alwaysDecimals: true,
-              }),
-            })}
-          </p>
-        ) : null}
         {totalAmount ? (
           <p className="mt-1 tabular text-[20px] font-bold text-terra-700">
             {t('productInfo.total')}: {formatMoney(totalAmount, { locale: formatLocale })}
@@ -122,7 +89,6 @@ export function PurchasePanel({
                 value={quantity}
                 onChange={onQuantityChange}
                 label={t('productInfo.quantityLabel', { title: product.title })}
-                unit={quantityUnit}
                 disabled={isUpdating}
               />
             </div>

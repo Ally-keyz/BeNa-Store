@@ -34,7 +34,7 @@ repository.**
 | Item | Code delivered | Status / remaining owner action |
 | --- | --- | --- |
 | #1 withdrawal | `POST /api/v1/withdrawals`, provider-agnostic webhook/mock adapter, full frontend form at `/legal/withdrawal` | Delivered; legal approval gate removed at owner request |
-| #2 unit prices | Backend flags + frontend display | Configure unit prices on Shopify (optional) |
+| #2 unit prices | Backend flags retained; no frontend unit-price labels are rendered | Configure unit prices on Shopify only if needed for other channels (optional) |
 | #3 food info | AI suggestions with unverified labels; metafield UI kept for future | Rely on AI for now; metafield apply is blocked |
 | #4 allergens | Prominent allergen callout plus emphasized accordion block, with packaging warning | Delivered |
 | #5 price history | Invalid compare-at values hidden; price-info disclosure | `scripts/export-sale-prices.ts` produces evidence CSV; manual 30-day-low check still needed |

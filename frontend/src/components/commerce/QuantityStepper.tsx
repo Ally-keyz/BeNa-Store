@@ -6,8 +6,6 @@ export interface QuantityStepperProps {
   value: number;
   onChange: (value: number) => void;
   label: string;
-  /** Visible unit suffix, e.g. `unit` / `units`. */
-  unit?: string;
   max?: number;
   disabled?: boolean;
   className?: string;
@@ -18,7 +16,6 @@ export function QuantityStepper({
   value,
   onChange,
   label,
-  unit,
   max = 100,
   disabled = false,
   className,
@@ -52,11 +49,6 @@ export function QuantityStepper({
         disabled={disabled}
         className="tabular h-11 w-10 border-0 bg-transparent text-center text-sm font-medium text-ink focus-visible:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
-      {unit ? (
-        <span aria-hidden="true" className="pr-3 text-[12px] text-neutral-600">
-          {unit}
-        </span>
-      ) : null}
       <button
         type="button"
         onClick={() => set(value + 1)}

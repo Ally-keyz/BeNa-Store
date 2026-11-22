@@ -17,8 +17,3 @@ export function clampQuantity(value: number, max = 100): number {
   if (Number.isNaN(value)) return 1;
   return Math.min(max, Math.max(1, Math.round(value)));
 }
-
-/** Normalize a unit token for display, e.g. "KG" -> "kg", "L" -> "l". */
-export function normalizeUnit(unit: string | null | undefined): string {
-  return (unit ?? '').trim().toLowerCase();
-}

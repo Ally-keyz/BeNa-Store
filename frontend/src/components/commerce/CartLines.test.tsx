@@ -15,12 +15,14 @@ function line(
   selectedOptions: Array<{ name: string; value: string }>,
   variantTitle = 'Default Title',
   product: { handle: string; title: string } = { handle: 'rwanda-honey', title: 'Rwanda Honey' },
+  quantity = 1,
 ): CartLine {
   const amount = money('12.50');
+  const subtotal = money((Number.parseFloat(amount.amount) * quantity).toFixed(2));
   return {
     id: 'gid://shopify/CartLine/1',
-    quantity: 1,
-    cost: { amountPerQuantity: amount, subtotalAmount: amount, totalAmount: amount },
+    quantity,
+    cost: { amountPerQuantity: amount, subtotalAmount: subtotal, totalAmount: subtotal },
     merchandise: {
       id: 'gid://shopify/ProductVariant/1',
       title: variantTitle,
@@ -63,7 +65,7 @@ describe('CartLines', () => {
     expect(screen.getByText('Short honey note from the product card.')).toBeVisible();
   });
 
-  it('shows the package weight for coffee lines and keeps generic units otherwise', () => {
+  it('shows no kilogram suffix for coffee lines and no unit suffix otherwise', () => {
     const { unmount } = render(
       <MemoryRouter>
         <CartLines
@@ -71,13 +73,14 @@ describe('CartLines', () => {
             line([{ name: 'Title', value: 'Default Title' }], 'Default Title', {
               handle: 'premium-rwandan-arabica-coffee-freshly-roasted-250g',
               title: 'Premium Rwandan Arabica Coffee 250g',
-            }),
+            }, 2),
           ]}
         />
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('× 0.25 kg')).toBeVisible();
+    expect(screen.queryByText(/kg/)).toBeNull();
+    expect(screen.queryByText(/unit/)).toBeNull();
     unmount();
 
     render(
@@ -85,6 +88,19 @@ describe('CartLines', () => {
         <CartLines lines={[line([{ name: 'Title', value: 'Default Title' }])]} />
       </MemoryRouter>,
     );
-    expect(screen.getByText('unit')).toBeVisible();
+    expect(screen.queryByText(/kg|unit/)).toBeNull();
+  });
+
+  it('does not show a per-unit price when the quantity is greater than one', () => {
+    render(
+      <MemoryRouter>
+        <CartLines
+          lines={[line([{ name: 'Title', value: 'Default Title' }], 'Default Title', undefined, 3)]}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByText(/each|pro Stück|l’unité/)).toBeNull();
+    expect(screen.getByText('€37.50')).toBeVisible();
   });
 });

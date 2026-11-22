@@ -9,7 +9,7 @@ The audit has **23 findings** across compliance/trust, catalog/merchandising and
 | # | Audit finding | Frontend responsibility |
 | --- | --- | --- |
 | 1 | Withdrawal function not evident | Legal stub route exists; electronic withdrawal scaffold needs legal review before launch. |
-| 2 | Unit prices need checking | `src/lib/money.ts` formats EUR/kg and EUR/L; unknown unit prices render nothing. |
+| 2 | Unit prices need checking | Unit-price data stays in the API payload, but no per-kg or per-unit label is rendered; `src/lib/money.ts` only formats the pack price. |
 | 3 | Food information may be incomplete | Product detail must show nutrition, ingredients and origin when metafields exist; otherwise show an honest unavailable state. |
 | 4 | Allergens not visibly emphasized | Product detail must place allergens in a distinct, visibly emphasized block. |
 | 5 | Sale-price references need a 30-day check | Frontend only strikes compare-at when it is strictly greater than price; history remains an owner/legal task. |
@@ -29,7 +29,7 @@ The audit has **23 findings** across compliance/trust, catalog/merchandising and
 | 14 | Product naming and copy inconsistent | Frontend does not rewrite live titles; inconsistency is reported, not auto-fixed. |
 | 15 | €0.00 comparison value | `isOnSale()` rejects zero/equal/lower compare-at values. |
 
-Catalog standard adopted by the cards: one clear title, correct availability, descriptive URL, accurate price, unit price where known, and consistent delivery/returns/support cues near purchase.
+Catalog standard adopted by the cards: one clear title, correct availability, descriptive URL, accurate pack price, and consistent delivery/returns/support cues near purchase.
 
 ## 3. Buying experience
 

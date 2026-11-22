@@ -19,33 +19,13 @@ function pricedProduct(handle: string, title: string, amount: string) {
   };
 }
 
-describe('ProductCard price per kg', () => {
-  it('does not derive a per-kg price from a pack price', () => {
-    const { rerender } = render(
-      <MemoryRouter>
-        <ProductCard
-          product={pricedProduct(
-            'premium-rwandan-arabica-coffee-freshly-roasted-250g',
-            'Premium Rwandan Arabica Coffee 250g',
-            '10.99',
-          )}
-        />
-      </MemoryRouter>,
+describe('ProductCard unit labels', () => {
+  it('never renders per-kg pricing, even when Shopify supplies a unit price', () => {
+    const base = pricedProduct(
+      'premium-rwandan-arabica-coffee-freshly-roasted-250g',
+      'Premium Rwandan Arabica Coffee 250g',
+      '10.99',
     );
-    expect(screen.queryByText(/\/kg/)).toBeNull();
-
-    rerender(
-      <MemoryRouter>
-        <ProductCard
-          product={pricedProduct('ifu-y-indagara-200g', 'Ifu Y’Indagara 200g', '12.00')}
-        />
-      </MemoryRouter>,
-    );
-    expect(screen.queryByText(/\/kg/)).toBeNull();
-  });
-
-  it('shows the Shopify unit price when it is available', () => {
-    const base = pricedProduct('indagara-200g', 'Indagara Z’Indundi 200g', '12.00');
     const withUnitPrice = {
       ...base,
       variants: [
@@ -62,14 +42,23 @@ describe('ProductCard price per kg', () => {
         },
       ],
     };
-
-    render(
+    const { rerender } = render(
       <MemoryRouter>
         <ProductCard product={withUnitPrice} />
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('€60.00 / kg')).toBeInTheDocument();
+    expect(screen.queryByText(/\/kg/)).toBeNull();
+    expect(screen.queryByText('€60.00')).toBeNull();
+
+    rerender(
+      <MemoryRouter>
+        <ProductCard
+          product={pricedProduct('ifu-y-indagara-200g', 'Ifu Y’Indagara 200g', '12.00')}
+        />
+      </MemoryRouter>,
+    );
+    expect(screen.queryByText(/\/kg/)).toBeNull();
   });
 });
 
