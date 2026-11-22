@@ -1,59 +1,11 @@
 [
   {
-    "key": "beans-grown",
-    "title": "Harvest of Nutritious Beans.jpg",
-    "author": "Mr. Snatch",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Harvest_of_Nutritious_Beans.jpg"
-  },
-  {
-    "key": "beans-made",
-    "title": "BEANS IN GOMBE OLD MARKET.jpg",
-    "author": "Yahuzaishat",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:BEANS_IN_GOMBE_OLD_MARKET.jpg"
-  },
-  {
-    "key": "beans-people",
-    "title": "Bean harvest at Bobonong farms.jpg",
-    "author": "Deborah Tjituka",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bean_harvest_at_Bobonong_farms.jpg"
-  },
-  {
     "key": "export",
     "title": "Container Ship at the Hai Phong International Container Terminal 01.jpg",
     "author": "Nathan.cima",
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Container_Ship_at_the_Hai_Phong_International_Container_Terminal_01.jpg"
-  },
-  {
-    "key": "fish-grown",
-    "title": "Drying fish at Daepo Port.jpg",
-    "author": "Bernard Gagnon",
-    "license": "CC0",
-    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Drying_fish_at_Daepo_Port.jpg"
-  },
-  {
-    "key": "fish-made",
-    "title": "Dried fish in Chittagong 03.jpg",
-    "author": "Kritzolina",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dried_fish_in_Chittagong_03.jpg"
-  },
-  {
-    "key": "fish-people",
-    "title": "Boat and fishermen in lake kivu.jpg",
-    "author": "Ukundamahoro8",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Boat_and_fishermen_in_lake_kivu.jpg"
   },
   {
     "key": "honey-grown",
@@ -80,16 +32,8 @@
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Beekeeper_Inspecting_the_Hive_-_51014819065.jpg"
   },
   {
-    "key": "packing",
-    "title": "Sticking a label onto a parcel for shipping.jpg",
-    "author": "Meanwell Packaging",
-    "license": "CC BY 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sticking_a_label_onto_a_parcel_for_shipping.jpg"
-  },
-  {
     "key": "coffee-supplied",
-    "title": "Coffee photography and footage supplied by BeNa",
+    "title": "Coffee photography, logo and packaging supplied by BeNa",
     "author": "BeNa Origins",
     "license": "Supplied by store owner",
     "licenseUrl": "",
@@ -97,7 +41,7 @@
   },
   {
     "key": "honey-supplied",
-    "title": "honey image2.jpeg",
+    "title": "honey image2.jpeg, BeNa_honey_logo.pdf",
     "author": "BeNa Origins",
     "license": "Supplied by store owner",
     "licenseUrl": "",

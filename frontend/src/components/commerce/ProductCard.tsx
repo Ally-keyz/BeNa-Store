@@ -6,7 +6,13 @@ import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import type { Product } from '@/types';
 import { cn } from '@/lib/cn';
 import { formatMoney, isOnSale } from '@/lib/money';
-import { getAvailability, getDefaultVariant, getPrimaryImage, hasVariantChoice } from '@/lib/product';
+import {
+  getAvailability,
+  getDefaultVariant,
+  getPrimaryImage,
+  getStockQuantity,
+  hasVariantChoice,
+} from '@/lib/product';
 import { getPricePerKg } from '@/lib/units';
 import { stripHtml } from '@/lib/sanitize';
 import { useCart } from '@/context/CartContext';
@@ -37,6 +43,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
   const [notifyOpen, setNotifyOpen] = useState(false);
 
   const availability = getAvailability(product);
+  const stock = getStockQuantity(product);
   const variant = getDefaultVariant(product);
   const image = getPrimaryImage(product);
   const price = variant?.price ?? product.priceRange.minVariantPrice;
@@ -129,7 +136,13 @@ export function ProductCard({ product, priority = false, className }: ProductCar
             <Badge tone="soon">{t('common.comingSoon')}</Badge>
           ) : availability === 'sold-out' ? (
             <Badge tone="soldout">{t('common.soldOut')}</Badge>
-          ) : onSale ? (
+          ) : null}
+          {stock !== null && stock > 0 ? (
+            <Badge tone="neutral" className="tabular">
+              {t('productCard.stockLeft', { count: stock })}
+            </Badge>
+          ) : null}
+          {availability === 'available' && onSale ? (
             <Badge tone="sale">{t('productCard.onDiscount')}</Badge>
           ) : null}
         </div>

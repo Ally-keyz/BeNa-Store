@@ -2,7 +2,6 @@ import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { PageSeo } from '@/features/seo/PageSeo';
-import { ProductStoryIcon } from '@/features/about/ProductStoryIcon';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Reveal } from '@/components/motion/Reveal';
 import { buttonVariants } from '@/components/ui/Button';
@@ -84,8 +83,14 @@ export function ProductStoryPage() {
 
         <article className="pb-10 pt-8 sm:pb-16 sm:pt-12">
           <header className="text-center">
-            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-terra-50 text-terra-700">
-              <ProductStoryIcon icon={story.icon} className="h-7 w-7" />
+            <span className="inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white p-2">
+              <img
+                src={story.logo.image}
+                alt=""
+                loading="eager"
+                decoding="async"
+                className="h-full w-full object-contain"
+              />
             </span>
             <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
               {t('productStories.eyebrow')}
@@ -291,18 +296,14 @@ export function ProductStoryPage() {
                 to={`/about/products/${item.slug}`}
                 className="group flex min-w-0 items-center gap-3 rounded-2xl border border-terra-100 bg-surface p-4 text-left transition-colors hover:border-terra-300 hover:bg-terra-50/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               >
-                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-terra-50 text-terra-700">
-                  {item.hero ? (
-                    <img
-                      src={item.hero.image}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <ProductStoryIcon icon={item.icon} className="h-5 w-5" />
-                  )}
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-white p-1.5">
+                  <img
+                    src={item.logo.image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-contain"
+                  />
                 </span>
                 <span className="min-w-0 flex-1 break-words text-sm font-medium text-ink">
                   {localizedText(item.title, language)}

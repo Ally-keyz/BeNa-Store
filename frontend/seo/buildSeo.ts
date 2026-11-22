@@ -340,7 +340,18 @@ function storySections(path: string): string {
   if (!story) return '';
 
   const blocks: string[] = [];
+  blocks.push(crawlerImageBlock('Product logo', story.logo));
   if (story.hero) blocks.push(crawlerImageBlock('Product photo', story.hero));
+
+  const intro = [story.body.en, story.detail.en]
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph) => `        <p>${escapeHtml(paragraph)}</p>`)
+    .join('\n');
+  if (intro) {
+    blocks.push(`      <section>\n        <h2>About this product</h2>\n${intro}\n      </section>`);
+  }
+
   for (const section of story.sections) {
     blocks.push(
       crawlerImageBlock(

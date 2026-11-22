@@ -212,6 +212,7 @@ const fr = {
     addError: 'Impossible d’ajouter cet article. Veuillez réessayer.',
     priceUnavailable: 'Prix sur demande',
     onDiscount: 'En promotion',
+    stockLeft: '{{count}} restants',
   },
   product: {
     breadcrumbHome: 'Accueil',
@@ -408,7 +409,7 @@ const fr = {
       'Nous avons commencé avec le café rwandais et une idée simple : rendre les produits de garde-manger et les artisanats africains plus faciles à trouver en Europe. Aujourd’hui, la gamme dépasse le Rwanda, et chaque produit garde son nom, son origine et son histoire.',
     storiesTitle: 'Les produits que nous vendons',
     storiesBody:
-      'Quatre essentiels de nos rayons : le café, l’ubuki (miel), l’indagara et l’ibishyimbo (haricots). Chacun a sa page d’histoire, et nous en ajouterons d’autres au fil de la gamme.',
+      'Deux essentiels de nos rayons : le café BeNa SheGrows et l’ubuki (miel). Chacun a son logo, son emballage et sa page d’histoire, et nous en ajouterons d’autres au fil de la gamme.',
     missionTitle: 'Notre mission',
     missionBody:
       'Faire découvrir les aliments, boissons et artisanats du quotidien d’Afrique à davantage de tables en Europe — avec des informations claires, une présentation honnête et le respect des personnes qui les produisent.',

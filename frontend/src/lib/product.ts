@@ -3,18 +3,45 @@ import type { Product, ProductVariant } from '@/types';
 export type AvailabilityStatus = 'available' | 'coming-soon' | 'sold-out';
 
 /**
- * Shopify's live sale state is the source of truth. A stale "coming soon"
- * label in a title, handle or tag must not block a product that is actually in
- * the store and purchasable. The label is only used to distinguish genuinely
- * unavailable products from ordinary sold-out ones.
+ * Total units currently in stock across variants, or `null` when Shopify did
+ * not expose inventory quantities (the field needs the inventory scope).
+ * A single unknown variant makes the total unknown so we never show a
+ * misleading partial count.
+ */
+export function getStockQuantity(product: Product): number | null {
+  if (product.variants.length === 0) return null;
+
+  let total = 0;
+  for (const variant of product.variants) {
+    if (variant.quantityAvailable === null) return null;
+    total += variant.quantityAvailable;
+  }
+  return Math.max(0, total);
+}
+
+function hasComingSoonSignal(product: Product): boolean {
+  const signalText = `${product.handle} ${product.title} ${product.tags.join(' ')}`;
+  return /coming[\s-]?soon/i.test(signalText);
+}
+
+/**
+ * Stock quantity drives the label: products with units in the store are
+ * always shown as available, even if their title/tags still say "coming soon".
+ * "Coming soon" / "Sold out" are only shown when stock is known to be zero
+ * (or when stock is unknown and Shopify also says the product cannot be sold).
+ * Actual add-to-cart is still gated by Shopify's `availableForSale` flag.
  */
 export function getAvailability(product: Product): AvailabilityStatus {
+  const stock = getStockQuantity(product);
+
+  if (stock === 0) return hasComingSoonSignal(product) ? 'coming-soon' : 'sold-out';
+  if (stock !== null && stock > 0) return 'available';
+
   const anyAvailable =
     product.availableForSale && product.variants.some((variant) => variant.availableForSale);
   if (anyAvailable) return 'available';
 
-  const signalText = `${product.handle} ${product.title} ${product.tags.join(' ')}`;
-  return /coming[\s-]?soon/i.test(signalText) ? 'coming-soon' : 'sold-out';
+  return hasComingSoonSignal(product) ? 'coming-soon' : 'sold-out';
 }
 
 /** Best image for cards/detail: featured image, else first image, else variant image. */

@@ -72,3 +72,70 @@ describe('ProductCard price per kg', () => {
     expect(screen.getByText('€60.00 / kg')).toBeInTheDocument();
   });
 });
+
+describe('ProductCard stock labels', () => {
+  it('shows the exact quantity left instead of coming soon when stock exists', () => {
+    const base = productFixture({ title: 'Hand Craft Igiseke (Coming Soon)' });
+    const inStock = {
+      ...base,
+      variants: [
+        {
+          ...base.variants[0]!,
+          quantityAvailable: 2,
+          availableForSale: true,
+        },
+      ],
+    };
+
+    render(
+      <MemoryRouter>
+        <ProductCard product={inStock} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('2 left')).toBeInTheDocument();
+    expect(screen.queryByText('Coming soon')).toBeNull();
+    expect(screen.queryByText('Sold out')).toBeNull();
+  });
+
+  it('shows sold out only when there is zero stock', () => {
+    const base = productFixture();
+    const empty = {
+      ...base,
+      variants: [
+        {
+          ...base.variants[0]!,
+          quantityAvailable: 0,
+          availableForSale: false,
+        },
+      ],
+      availableForSale: false,
+    };
+
+    render(
+      <MemoryRouter>
+        <ProductCard product={empty} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Sold out')).toBeInTheDocument();
+    expect(screen.queryByText(/left/)).toBeNull();
+  });
+
+  it('does not invent a quantity when Shopify does not expose stock', () => {
+    const base = productFixture();
+    const unknown = {
+      ...base,
+      variants: [{ ...base.variants[0]!, quantityAvailable: null }],
+    };
+
+    render(
+      <MemoryRouter>
+        <ProductCard product={unknown} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByText(/left/)).toBeNull();
+    expect(screen.queryByText('Sold out')).toBeNull();
+  });
+});

@@ -219,6 +219,7 @@ const de: Resources = {
     addError: 'Der Artikel konnte nicht hinzugefügt werden. Bitte versuche es erneut.',
     priceUnavailable: 'Preis auf Anfrage',
     onDiscount: 'Im Angebot',
+    stockLeft: 'Noch {{count}} verfügbar',
   },
   product: {
     breadcrumbHome: 'Start',
@@ -415,7 +416,7 @@ const de: Resources = {
       'Wir begannen mit ruandischem Kaffee und einer einfachen Idee: afrikanische Vorratsprodukte und Crafts in Europa leichter zugänglich zu machen. Heute reicht das Sortiment über Ruanda hinaus, und jedes Produkt behält seinen eigenen Namen, seine Herkunft und seine Geschichte.',
     storiesTitle: 'Unsere Produkte',
     storiesBody:
-      'Vier Grundnahrungsmittel aus unserem Sortiment: Kaffee, Ubuki (Honig), Indagara und Ibishyimbo (Bohnen). Jedes hat eine eigene Geschichtsseite; weitere kommen mit dem Sortiment dazu.',
+      'Zwei Grundnahrungsmittel aus unserem Sortiment: BeNa SheGrows Kaffee und Ubuki (Honig). Jedes hat ein eigenes Logo, eine eigene Verpackung und eine Geschichtsseite; weitere kommen mit dem Sortiment dazu.',
     missionTitle: 'Unsere Mission',
     missionBody:
       'Die alltäglichen Lebensmittel, Getränke und Crafts Afrikas auf mehr Tische in Europa zu bringen — mit klaren Informationen, fairer Darstellung und Respekt für die Menschen, die sie herstellen.',

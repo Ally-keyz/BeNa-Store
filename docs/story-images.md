@@ -2,9 +2,14 @@
 
 The product journey pages at `/about/products/:slug` describe five stages for
 each story: the people who prepare it, how it is grown or made, who makes it,
-how it is exported and how BeNa packs it. Every stage has an image. Coffee also
-has a hero image, a photo gallery and two short process videos; honey has a hero
-image.
+how it is exported and how BeNa packs it. Every stage has an image. Coffee and
+honey each also have their own logo and packaging image; coffee additionally has
+a hero image, a photo gallery and two short process videos.
+
+The About page now only contains the two products BeNa currently tells stories
+about: `coffee` and `ubuki`. The old `indagara` and `ibishyimbo` stories were
+removed from `PRODUCT_STORIES`, so their routes are no longer prerendered or
+added to the sitemap.
 
 ## Folder structure
 
@@ -14,12 +19,11 @@ host.
 ```text
 frontend/public/
   images/stories/
-    beans/    people, grown, made
-    coffee/   feature, farm-team, harvesting, grains-in-hands,
-              plant, tree, drying, in-sacks, sacks-detail
-    fish/     people, grown, made
-    honey/    feature, people, grown, made
-    shared/   export, packing
+    coffee/   logo, packaging-1, packaging-2, feature, farm-team,
+              harvesting, grains-in-hands, plant, tree, drying,
+              in-sacks, sacks-detail
+    honey/    logo, packaging, feature, people, grown, made
+    shared/   export
     credits.json
   videos/stories/coffee/
     coffee-making-machine.mp4
@@ -27,46 +31,47 @@ frontend/public/
 ```
 
 The original uploads are still in `new about us images and video contents/` at
-the repository root. They were copied into the structure above, converted to
-optimised WebP (max 1400 px, quality 82) and renamed to clear, consistent
-kebab-case names. Two uploaded files (`coffe making vid2.mp4` and
-`person working in coffe factory operating a coffe machine.mp4`) were byte-for-byte
-duplicates, so only one copy is included as `coffee-factory-operator.mp4`.
+the repository root. The newer brand files were supplied at the repository root
+(`Logo-Final.webp`, `coffe packaging 1.jpeg`, `coffe packaging 2.jpeg` and
+`BeNa_honey_logo.pdf`). They were converted to optimised WebP and placed in the
+structure above:
 
-## Attribution
+- `coffee/logo.webp` comes from `Logo-Final.webp`.
+- `coffee/packaging-1.webp` and `coffee/packaging-2.webp` come from the two
+  `coffe packaging` photos. The first is used in the "Packed by BeNa Origins"
+  step and as the story packaging image; the second appears in the gallery.
+- `honey/logo.webp` comes from the single-page `BeNa_honey_logo.pdf`. The flat
+  off-white page background was made transparent so the logo works on both
+  light and white surfaces.
+- `honey/packaging.webp` comes from `honey image2.jpeg`.
 
-Owner-supplied coffee and honey media is credited on the page as
+Owner-supplied photography and footage is credited on the page as
 `Photo: BeNa Origins`. Licence and ownership of those uploads still need to be
 confirmed by the store owner before publication.
 
 The remaining illustrative stock photos come from Wikimedia Commons. Attribution
 is shown under each image and full source details are in
-`frontend/public/images/stories/credits.json`. The old flat
-`coffee-people.webp`, `coffee-grown.webp` and `coffee-made.webp` placeholders
-were removed because the supplied coffee photos replaced them.
+`frontend/public/images/stories/credits.json`. The former `fish/` and `beans/`
+folders were removed with their stories.
 
 | Image | Source | Licence |
 | --- | --- | --- |
 | `honey/people.webp` | Beekeeper Inspecting the Hive | CC0 |
 | `honey/grown.webp` | Beekeeping frame | Public domain |
 | `honey/made.webp` | Honey jars | CC BY-SA 4.0 |
-| `fish/people.webp` | Boat and fishermen in Lake Kivu | CC BY-SA 4.0 |
-| `fish/grown.webp` | Drying fish at Daepo Port | CC0 |
-| `fish/made.webp` | Dried fish in Chittagong | CC BY-SA 4.0 |
-| `beans/people.webp` | Bean harvest at Bobonong farms | CC BY-SA 4.0 |
-| `beans/grown.webp` | Harvest of Nutritious Beans | CC BY-SA 4.0 |
-| `beans/made.webp` | Beans in Gombe old market | CC BY-SA 4.0 |
 | `shared/export.webp` | Container ship at Hai Phong terminal | CC BY-SA 4.0 |
-| `shared/packing.webp` | Sticking a label onto a parcel | CC BY 2.0 |
 
-## Copy disclaimer
+## Copy source
 
-The process copy is deliberately general: it explains the typical steps for
-each product type and does not name a specific farm, cooperative, exporter or
-certification. The on-page introduction tells visitors that photos and videos
-illustrate the process and may show other origins or producers.
+The coffee story copy is the verbatim text supplied by the owner from
+`https://benaafricanshop.myshopify.com/pages/meet-your-coffee`. The seven
+chapters are grouped into the five story stages without rewriting the wording:
+the land and harvest, the women and community, the drying and scale, export,
+and the closing "BeNa SheGrows Coffee" launch copy. The supplied image captions
+are also used as alt text where they describe the local asset. Because the owner
+asked for these exact texts, the coffee story copy is intentionally identical
+in the English, German and French data slots.
 
-The supplied filenames describe their contents, but they do not verify that the
-footage shows BeNa's own producers or facility. Before making specific
-provenance claims, replace the generic wording in
-`frontend/src/content/productStories.ts` with owner-verified details.
+The five required section keys remain in place because the About grid, story
+route, build-time SEO and tests all depend on them. The two videos are still
+labelled as process illustrations rather than verified footage of a named farm.

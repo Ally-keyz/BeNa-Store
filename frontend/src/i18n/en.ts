@@ -212,6 +212,7 @@ const en = {
     addError: 'Could not add this item. Please try again.',
     priceUnavailable: 'Price on request',
     onDiscount: 'On discount',
+    stockLeft: '{{count}} left',
   },
   product: {
     breadcrumbHome: 'Home',
@@ -408,7 +409,7 @@ const en = {
       'We began with Rwandan coffee and a simple idea: make African pantry staples and crafts easier to find in Europe. Today the range reaches beyond Rwanda, and every product keeps its own name, origin and story.',
     storiesTitle: 'The products we sell',
     storiesBody:
-      'Start with four staples from our shelves: coffee, ubuki (honey), indagara and ibishyimbo (beans). Each has its own story page, and we will add more as the range grows.',
+      'Start with two staples from our shelves: BeNa SheGrows Coffee and ubuki (honey). Each has its own logo, packaging and story page, and we will add more as the range grows.',
     missionTitle: 'Our mission',
     missionBody:
       'To bring the everyday foods, drinks and crafts of Africa to more tables in Europe — with clear information, fair presentation and respect for the people who make them.',

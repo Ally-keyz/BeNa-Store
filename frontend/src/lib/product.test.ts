@@ -5,6 +5,7 @@ import {
   getAvailability,
   getDefaultVariant,
   getProductCategory,
+  getStockQuantity,
   hasVariantChoice,
   matchesFacet,
   toFacetValue,
@@ -69,40 +70,73 @@ function product(overrides: Partial<Product> = {}): Product {
 }
 
 describe('product availability', () => {
-  it('treats stale coming-soon labels as available when Shopify says they are in store', () => {
+  it('sums known stock across variants and reports unknown stock as null', () => {
+    expect(getStockQuantity(product())).toBe(1);
+    expect(
+      getStockQuantity(
+        product({
+          variants: [
+            variant({ id: 'a', quantityAvailable: 2 }),
+            variant({ id: 'b', quantityAvailable: 5 }),
+          ],
+        }),
+      ),
+    ).toBe(7);
+    expect(getStockQuantity(product({ variants: [] }))).toBeNull();
+    expect(
+      getStockQuantity(product({ variants: [variant({ quantityAvailable: null })] })),
+    ).toBeNull();
+  });
+
+  it('shows products with stock as available even when a stale label says coming soon', () => {
     expect(getAvailability(product({ title: 'Coming Soon — test' }))).toBe('available');
     expect(getAvailability(product({ handle: 'coming-soon-1' }))).toBe('available');
     expect(getAvailability(product({ tags: ['coming soon'] }))).toBe('available');
     expect(
       getAvailability(
-        product({ title: 'Coming Soon — test', variants: [variant({ availableForSale: true })] }),
+        product({
+          title: 'Coming Soon — test',
+          variants: [variant({ quantityAvailable: 2, availableForSale: false })],
+        }),
       ),
     ).toBe('available');
   });
 
-  it('keeps the coming-soon label only for genuinely unavailable products', () => {
-    expect(getAvailability(product({ title: 'Coming Soon — test', availableForSale: false }))).toBe(
-      'coming-soon',
+  it('shows zero-stock products as coming soon or sold out', () => {
+    expect(
+      getAvailability(
+        product({ title: 'Coming Soon — test', variants: [variant({ quantityAvailable: 0 })] }),
+      ),
+    ).toBe('coming-soon');
+    expect(
+      getAvailability(product({ variants: [variant({ quantityAvailable: 0 })] })),
+    ).toBe('sold-out');
+    // Zero stock wins even when Shopify reports the product as purchasable.
+    expect(
+      getAvailability(
+        product({
+          availableForSale: true,
+          variants: [variant({ quantityAvailable: 0, availableForSale: true })],
+        }),
+      ),
+    ).toBe('sold-out');
+  });
+
+  it('falls back to Shopify availability when stock quantity is unknown', () => {
+    const unknownStock = [variant({ quantityAvailable: null })];
+    expect(getAvailability(product({ variants: unknownStock }))).toBe('available');
+    expect(getAvailability(product({ variants: unknownStock, availableForSale: false }))).toBe(
+      'sold-out',
     );
     expect(
       getAvailability(
         product({
-          handle: 'coming-soon-1',
-          variants: [variant({ availableForSale: false })],
+          title: 'Coming Soon — test',
+          variants: unknownStock,
+          availableForSale: false,
         }),
       ),
     ).toBe('coming-soon');
-    expect(getAvailability(product({ tags: ['coming soon'], availableForSale: false }))).toBe(
-      'coming-soon',
-    );
-  });
-
-  it('uses Shopify availability when no coming-soon signal exists', () => {
-    expect(getAvailability(product())).toBe('available');
-    expect(getAvailability(product({ availableForSale: false }))).toBe('sold-out');
-    expect(getAvailability(product({ variants: [variant({ availableForSale: false })] }))).toBe(
-      'sold-out',
-    );
   });
 
   it('selects the first purchasable variant and detects variant choice', () => {
