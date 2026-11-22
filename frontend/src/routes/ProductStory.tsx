@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { PageSeo } from '@/features/seo/PageSeo';
 import { ProductStoryIcon } from '@/features/about/ProductStoryIcon';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Reveal } from '@/components/motion/Reveal';
 import { buttonVariants } from '@/components/ui/Button';
 import {
   PRODUCT_STORIES,
@@ -23,6 +24,29 @@ const SECTION_TITLE_KEYS: Record<StorySectionKey, string> = {
   exported: 'productStories.sectionExported',
   packed: 'productStories.sectionPacked',
 };
+
+const CREDIT_CLASS =
+  'text-[11px] leading-4 text-neutral-500 hover:text-terra-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
+
+function MediaCredit({
+  label,
+  creditUrl,
+}: {
+  label: string;
+  creditUrl?: string;
+}) {
+  return (
+    <p className="mt-2 text-[11px] leading-4 text-neutral-500">
+      {creditUrl ? (
+        <a href={creditUrl} target="_blank" rel="noreferrer" className={CREDIT_CLASS}>
+          {label}
+        </a>
+      ) : (
+        label
+      )}
+    </p>
+  );
+}
 
 export function ProductStoryPage() {
   const { slug = '' } = useParams();
@@ -74,6 +98,24 @@ export function ProductStoryPage() {
             </p>
           </header>
 
+          {story.hero ? (
+            <figure className="mt-10 overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100">
+              <img
+                src={story.hero.image}
+                alt={localizedText(story.hero.imageAlt, language)}
+                loading="eager"
+                decoding="async"
+                className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
+              />
+              <figcaption className="px-4 py-2 text-right">
+                <MediaCredit
+                  label={t('productStories.photoCredit', { credit: story.hero.credit })}
+                  creditUrl={story.hero.creditUrl}
+                />
+              </figcaption>
+            </figure>
+          ) : null}
+
           <div className="mx-auto mt-10 max-w-2xl space-y-5 text-left text-base leading-8 text-neutral-600">
             <p>{localizedText(story.body, language)}</p>
             <p>{localizedText(story.detail, language)}</p>
@@ -92,45 +134,126 @@ export function ProductStoryPage() {
               </p>
             </div>
 
-            <ol className="mx-auto mt-10 max-w-4xl space-y-12 sm:mt-12 sm:space-y-16">
-              {story.sections.map((section, index) => (
-                <li key={section.key} className="border-t border-neutral-200 pt-8 sm:pt-10">
-                  <article className="grid items-center gap-5 md:grid-cols-2 md:gap-10">
-                    <div className={index % 2 === 1 ? 'md:order-2' : undefined}>
+            {/*
+             * The five stages sit in a calm two-column card grid instead of one
+             * very long alternating stack. The final card spans both columns so
+             * the "packed by BeNa" step closes the journey cleanly.
+             */}
+            <div className="mx-auto mt-10 grid max-w-5xl gap-4 sm:mt-12 sm:grid-cols-2">
+              {story.sections.map((section, index) => {
+                const isFinal = index === story.sections.length - 1;
+                return (
+                  <Reveal
+                    key={section.key}
+                    delay={index * 0.04}
+                    className={isFinal ? 'sm:col-span-2' : undefined}
+                  >
+                    <article className="h-full overflow-hidden rounded-2xl border border-neutral-200 bg-surface transition-shadow duration-300 hover:shadow-[0_16px_40px_-24px_rgba(0,0,0,0.25)] motion-reduce:transition-none">
                       <img
                         src={section.image}
                         alt={localizedText(section.imageAlt, language)}
                         loading="lazy"
                         decoding="async"
-                        className="aspect-[16/10] w-full rounded-2xl border border-neutral-200 bg-neutral-100 object-cover"
+                        className={`w-full object-cover ${isFinal ? 'aspect-[21/9]' : 'aspect-[16/10]'}`}
                       />
-                      <p className="mt-2 text-[11px] leading-4 text-neutral-500">
-                        <a
-                          href={section.creditUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="hover:text-terra-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-                        >
-                          {t('productStories.photoCredit', { credit: section.credit })}
-                        </a>
-                      </p>
-                    </div>
-                    <div className={index % 2 === 1 ? 'md:order-1' : undefined}>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
-                        {t('productStories.stepLabel', { number: index + 1 })}
-                      </p>
-                      <h3 className="mt-2 break-words text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-                        {t(SECTION_TITLE_KEYS[section.key])}
-                      </h3>
-                      <p className="mt-3 break-words text-base leading-8 text-neutral-600">
-                        {localizedText(section.body, language)}
-                      </p>
-                    </div>
-                  </article>
-                </li>
-              ))}
-            </ol>
+                      <div className="p-5 sm:p-6">
+                        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-terra-600">
+                          {t('productStories.stepLabel', { number: index + 1 })}
+                        </p>
+                        <h3 className="mt-2 break-words text-lg font-semibold tracking-tight text-ink">
+                          {t(SECTION_TITLE_KEYS[section.key])}
+                        </h3>
+                        <p className="mt-3 break-words text-sm leading-7 text-neutral-600">
+                          {localizedText(section.body, language)}
+                        </p>
+                        <MediaCredit
+                          label={t('productStories.photoCredit', { credit: section.credit })}
+                          creditUrl={section.creditUrl}
+                        />
+                      </div>
+                    </article>
+                  </Reveal>
+                );
+              })}
+            </div>
           </section>
+
+          {story.gallery?.length ? (
+            <section className="mt-14 sm:mt-20" aria-labelledby="story-gallery-title">
+              <div className="mx-auto max-w-2xl text-center">
+                <h2
+                  id="story-gallery-title"
+                  className="break-words text-2xl font-semibold tracking-tight text-ink sm:text-[28px]"
+                >
+                  {t('productStories.galleryTitle')}
+                </h2>
+                <p className="mt-3 break-words text-sm leading-7 text-neutral-600">
+                  {t('productStories.galleryIntro')}
+                </p>
+              </div>
+              <div className="mx-auto mt-8 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3">
+                {story.gallery.map((item, index) => (
+                  <figure
+                    key={item.image}
+                    className="group overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100"
+                  >
+                    <img
+                      src={item.image}
+                      alt={localizedText(item.imageAlt, language)}
+                      loading="lazy"
+                      decoding="async"
+                      className={`w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none ${
+                        index === 0 ? 'aspect-[16/9] sm:aspect-[16/7]' : 'aspect-square'
+                      } ${index === 0 ? 'sm:col-span-2' : ''}`}
+                    />
+                    <figcaption className="px-3 py-2 text-right">
+                      <MediaCredit
+                        label={t('productStories.photoCredit', { credit: item.credit })}
+                        creditUrl={item.creditUrl}
+                      />
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {story.videos?.length ? (
+            <section className="mt-14 sm:mt-20" aria-labelledby="story-videos-title">
+              <div className="mx-auto max-w-2xl text-center">
+                <h2
+                  id="story-videos-title"
+                  className="break-words text-2xl font-semibold tracking-tight text-ink sm:text-[28px]"
+                >
+                  {t('productStories.videoTitle')}
+                </h2>
+              </div>
+              <div className="mx-auto mt-8 grid max-w-4xl gap-4 sm:grid-cols-2">
+                {story.videos.map((video) => (
+                  <figure
+                    key={video.src}
+                    className="overflow-hidden rounded-2xl border border-neutral-200 bg-surface"
+                  >
+                    <video
+                      src={video.src}
+                      poster={video.poster}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      aria-label={localizedText(video.posterAlt, language)}
+                      className="aspect-video w-full bg-ink object-cover"
+                    />
+                    <figcaption className="px-3 py-2 text-right">
+                      <MediaCredit
+                        label={t('productStories.photoCredit', { credit: video.credit })}
+                        creditUrl={video.creditUrl}
+                      />
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {shopHref ? (
@@ -168,8 +291,18 @@ export function ProductStoryPage() {
                 to={`/about/products/${item.slug}`}
                 className="group flex min-w-0 items-center gap-3 rounded-2xl border border-terra-100 bg-surface p-4 text-left transition-colors hover:border-terra-300 hover:bg-terra-50/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               >
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terra-50 text-terra-700">
-                  <ProductStoryIcon icon={item.icon} className="h-5 w-5" />
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-terra-50 text-terra-700">
+                  {item.hero ? (
+                    <img
+                      src={item.hero.image}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <ProductStoryIcon icon={item.icon} className="h-5 w-5" />
+                  )}
                 </span>
                 <span className="min-w-0 flex-1 break-words text-sm font-medium text-ink">
                   {localizedText(item.title, language)}

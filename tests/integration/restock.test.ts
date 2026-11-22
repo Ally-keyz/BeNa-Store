@@ -116,7 +116,7 @@ describe('restock subscriptions', () => {
     expect(events.map((event) => event.name)).toContain('product.changed');
   });
 
-  it('keeps signups pending for coming-soon products', async () => {
+  it('notifies subscribers when a stale coming-soon product is actually in stock', async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
     const { app, container, events } = buildTestContext({
@@ -132,8 +132,12 @@ describe('restock subscriptions', () => {
     });
     await deliverProductUpdate(app, 'wh-restock-coming-soon', 'coming-soon');
     await vi.waitFor(() => expect(events.length).toBeGreaterThanOrEqual(2), { timeout: 2000 });
+    await vi.waitFor(
+      async () => expect(await container.services.restock.pendingCount('coming-soon')).toBe(0),
+      { timeout: 2000 },
+    );
 
-    expect(await container.services.restock.pendingCount('coming-soon')).toBe(1);
-    expect(fetchMock).not.toHaveBeenCalled();
+    // Shopify availability wins over the stale "coming soon" tag/title.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

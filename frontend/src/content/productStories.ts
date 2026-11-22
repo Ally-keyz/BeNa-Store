@@ -3,8 +3,9 @@
  *
  * Each story walks through five stages of the product's journey: the people who
  * prepare it, how it is grown or made, who makes it, how it is exported and how
- * BeNa packs it. Every stage has its own image. The photography is illustrative
- * stock imagery from Wikimedia Commons; credits are shown on the story page.
+ * BeNa packs it. Every stage has its own image. Coffee and honey use media
+ * supplied by the store owner; other stories use illustrative Wikimedia Commons
+ * photography. Credits are shown on the story page.
  *
  * To add a product:
  * 1. Add one object to PRODUCT_STORIES with a unique `slug`.
@@ -21,15 +22,27 @@ export type StorySectionKey = 'people' | 'grown' | 'made' | 'exported' | 'packed
 
 export type LocalizedText = Record<ProductStoryLanguage, string>;
 
-export interface StorySection {
-  key: StorySectionKey;
-  body: LocalizedText;
+export interface StoryImage {
   /** Local asset under /public/images/stories. */
   image: string;
   imageAlt: LocalizedText;
   /** Visible attribution, e.g. "Photographer · CC BY-SA 4.0". */
   credit: string;
-  creditUrl: string;
+  /** Omitted for imagery supplied by BeNa. */
+  creditUrl?: string;
+}
+
+export interface StoryVideo {
+  src: string;
+  poster: string;
+  posterAlt: LocalizedText;
+  credit: string;
+  creditUrl?: string;
+}
+
+export interface StorySection extends StoryImage {
+  key: StorySectionKey;
+  body: LocalizedText;
 }
 
 export interface ProductStory {
@@ -41,13 +54,31 @@ export interface ProductStory {
   summary: LocalizedText;
   body: LocalizedText;
   detail: LocalizedText;
+  hero?: StoryImage;
   sections: readonly StorySection[];
+  gallery?: readonly StoryImage[];
+  videos?: readonly StoryVideo[];
 }
 
-const IMAGE_BASE = '/images/stories';
+const IMAGES = {
+  beans: '/images/stories/beans',
+  coffee: '/images/stories/coffee',
+  fish: '/images/stories/fish',
+  honey: '/images/stories/honey',
+  shared: '/images/stories/shared',
+} as const;
+
+const VIDEOS = {
+  coffee: '/videos/stories/coffee',
+} as const;
+
+/** Attribution for photography and footage supplied by the store owner. */
+const BENA_MEDIA = {
+  credit: 'BeNa Origins',
+} as const;
 
 const EXPORT = {
-  image: `${IMAGE_BASE}/export.webp`,
+  image: `${IMAGES.shared}/export.webp`,
   alt: {
     en: 'Container ship at a port',
     de: 'Containerschiff im Hafen',
@@ -59,7 +90,7 @@ const EXPORT = {
 } as const;
 
 const PACKING = {
-  image: `${IMAGE_BASE}/packing.webp`,
+  image: `${IMAGES.shared}/packing.webp`,
   alt: {
     en: 'A shipping label being stuck on a parcel',
     de: 'Ein Versandetikett wird auf ein Paket geklebt',
@@ -94,6 +125,15 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
       de: 'Wenn der Shop einen Preis pro Kilogramm liefert, kannst du die Optionen 250 g, 500 g und 1 kg vor dem Kauf vergleichen.',
       fr: 'Lorsque la boutique fournit un prix au kilogramme, il permet de comparer les options 250 g, 500 g et 1 kg avant de choisir.',
     },
+    hero: {
+      image: `${IMAGES.coffee}/feature.webp`,
+      imageAlt: {
+        en: 'Coffee beans ready for roasting',
+        de: 'Kaffeebohnen, bereit zum Rösten',
+        fr: 'Des grains de café prêts à être torréfiés',
+      },
+      ...BENA_MEDIA,
+    },
     sections: [
       {
         key: 'people',
@@ -102,14 +142,13 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Ruandischer Kaffee beginnt bei Kleinbauern, die Arabica auf Hügelfeldern anbauen. Reife Kirschen werden von Hand gepflückt, oft von den Familien, die die Bäume pflegen.',
           fr: 'Le café rwandais commence avec de petits producteurs qui cultivent l’arabica sur les collines. Les cerises mûres sont cueillies à la main, souvent par les familles qui entretiennent les arbres.',
         },
-        image: `${IMAGE_BASE}/coffee-people.webp`,
+        image: `${IMAGES.coffee}/farm-team.webp`,
         imageAlt: {
-          en: 'Coffee cherries being harvested by hand',
-          de: 'Von Hand geerntete Kaffeekirschen',
-          fr: 'Cerises de café récoltées à la main',
+          en: 'People working together on a coffee farm',
+          de: 'Menschen, die gemeinsam auf einer Kaffeefarm arbeiten',
+          fr: 'Des personnes travaillant ensemble dans une plantation de café',
         },
-        credit: 'Denis kasozi · CC BY-SA 4.0',
-        creditUrl: 'https://commons.wikimedia.org/wiki/File:Harvesting_Ugandan_coffee.jpg',
+        ...BENA_MEDIA,
       },
       {
         key: 'grown',
@@ -118,14 +157,13 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Nach der Ernte wird das Fruchtfleisch entfernt, die Kirschen werden gewaschen, fermentiert und in der Sonne getrocknet. Das getrocknete Pergament wird geschält und sortiert, übrig bleiben die grünen Bohnen zum Rösten.',
           fr: 'Après la récolte, les cerises sont dépulpées, lavées, fermentées puis séchées au soleil. Le parchemin séché est décortiqué et trié, laissant les grains verts prêts à être torréfiés.',
         },
-        image: `${IMAGE_BASE}/coffee-grown.webp`,
+        image: `${IMAGES.coffee}/harvesting.webp`,
         imageAlt: {
-          en: 'Coffee being dried in the sun',
-          de: 'In der Sonne trocknender Kaffee',
-          fr: 'Café en train de sécher au soleil',
+          en: 'Ripe coffee cherries being harvested',
+          de: 'Reife Kaffeekirschen bei der Ernte',
+          fr: 'Des cerises de café mûres en cours de récolte',
         },
-        credit: 'PHILIP ASEDRI DRADRIO · CC BY-SA 4.0',
-        creditUrl: 'https://commons.wikimedia.org/wiki/File:Women_drying_coffee.jpg',
+        ...BENA_MEDIA,
       },
       {
         key: 'made',
@@ -134,14 +172,13 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Lokale Waschanlagen und Mühlen verarbeiten die Kirschen in der Nähe des Anbaugebiets. Danach wird der grüne Kaffee geröstet, damit sich das Aroma in der Tasse entwickelt.',
           fr: 'Les stations de lavage et les moulins locaux traitent les cerises près des zones de culture. Le café vert est ensuite torréfié pour que les arômes se développent dans la tasse.',
         },
-        image: `${IMAGE_BASE}/coffee-made.webp`,
+        image: `${IMAGES.coffee}/grains-in-hands.webp`,
         imageAlt: {
-          en: 'A coffee roasting machine',
-          de: 'Eine Kaffeeröstmaschine',
-          fr: 'Une machine de torréfaction du café',
+          en: 'Hands holding roasted coffee grains',
+          de: 'Hände mit gerösteten Kaffeebohnen',
+          fr: 'Des mains tenant des grains de café torréfiés',
         },
-        credit: 'Rramirezj · CC0',
-        creditUrl: 'https://commons.wikimedia.org/wiki/File:Coffee_roasting_machine_at_C%C3%BAcuta,_Colombia.jpg',
+        ...BENA_MEDIA,
       },
       {
         key: 'exported',
@@ -166,6 +203,75 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
         imageAlt: PACKING.alt,
         credit: PACKING.credit,
         creditUrl: PACKING.creditUrl,
+      },
+    ],
+    gallery: [
+      {
+        image: `${IMAGES.coffee}/plant.webp`,
+        imageAlt: {
+          en: 'A young coffee plant',
+          de: 'Eine junge Kaffeepflanze',
+          fr: 'Un jeune plant de café',
+        },
+        ...BENA_MEDIA,
+      },
+      {
+        image: `${IMAGES.coffee}/tree.webp`,
+        imageAlt: {
+          en: 'A coffee tree with cherries',
+          de: 'Ein Kaffeebaum mit Kirschen',
+          fr: 'Un caféier avec des cerises',
+        },
+        ...BENA_MEDIA,
+      },
+      {
+        image: `${IMAGES.coffee}/drying.webp`,
+        imageAlt: {
+          en: 'Coffee drying after harvest',
+          de: 'Trocknender Kaffee nach der Ernte',
+          fr: 'Du café en train de sécher après la récolte',
+        },
+        ...BENA_MEDIA,
+      },
+      {
+        image: `${IMAGES.coffee}/in-sacks.webp`,
+        imageAlt: {
+          en: 'Coffee beans in sacks',
+          de: 'Kaffeebohnen in Säcken',
+          fr: 'Des grains de café dans des sacs',
+        },
+        ...BENA_MEDIA,
+      },
+      {
+        image: `${IMAGES.coffee}/sacks-detail.webp`,
+        imageAlt: {
+          en: 'A close-up of coffee in a sack',
+          de: 'Eine Nahaufnahme von Kaffee in einem Sack',
+          fr: 'Gros plan sur du café dans un sac',
+        },
+        ...BENA_MEDIA,
+      },
+    ],
+    videos: [
+      {
+        src: `${VIDEOS.coffee}/coffee-making-machine.mp4`,
+        poster: `${IMAGES.coffee}/feature.webp`,
+        posterAlt: {
+          en: 'A coffee-making machine in operation',
+          de: 'Eine Kaffeemaschine im Betrieb',
+          fr: 'Une machine à café en fonctionnement',
+        },
+        ...BENA_MEDIA,
+      },
+      {
+        src: `${VIDEOS.coffee}/coffee-factory-operator.mp4`,
+        poster: `${IMAGES.coffee}/grains-in-hands.webp`,
+        posterAlt: {
+          en: 'A worker operating coffee-making equipment',
+          de: 'Eine Person bedient eine Kaffeemaschine',
+          fr: 'Une personne utilise un équipement de préparation du café',
+        },
+        ...BENA_MEDIA,
       },
     ],
   },
@@ -193,6 +299,15 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
       de: 'Wenn er ausverkauft ist, zeigt die Produktseite das deutlich. Die Geschichte bleibt hier und wartet auf die nächste Ernte.',
       fr: 'Lorsqu’il est épuisé, la fiche produit l’indique clairement. L’histoire reste ici, prête pour la prochaine récolte.',
     },
+    hero: {
+      image: `${IMAGES.honey}/feature.webp`,
+      imageAlt: {
+        en: 'A jar of golden Rwandan honey',
+        de: 'Ein Glas goldener ruandischer Honig',
+        fr: 'Un pot de miel rwandais doré',
+      },
+      ...BENA_MEDIA,
+    },
     sections: [
       {
         key: 'people',
@@ -201,7 +316,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Ubuki beginnt bei Imkern, die die Bienenstöcke pflegen und den Honig ernten, wenn die Bienen die Waben gefüllt haben.',
           fr: 'L’ubuki commence avec les apiculteurs qui entretiennent les ruches et récoltent le miel lorsque les abeilles ont rempli les rayons.',
         },
-        image: `${IMAGE_BASE}/honey-people.webp`,
+        image: `${IMAGES.honey}/people.webp`,
         imageAlt: {
           en: 'A beekeeper inspecting a hive',
           de: 'Ein Imker prüft einen Bienenstock',
@@ -217,7 +332,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Die Bienen sammeln Nektar und lagern ihn als Honig in den Waben. Der Imker entnimmt die vollen Rahmen und trennt den Honig vom Wachs, bevor er abgefüllt wird.',
           fr: 'Les abeilles butinent le nectar et le stockent dans les rayons sous forme de miel. L’apiculteur retire les cadres pleins et sépare le miel de la cire avant la mise en pot.',
         },
-        image: `${IMAGE_BASE}/honey-grown.webp`,
+        image: `${IMAGES.honey}/grown.webp`,
         imageAlt: {
           en: 'A honeycomb frame from a hive',
           de: 'Eine Wabe aus einem Bienenstock',
@@ -233,7 +348,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Der Honig wird gefiltert, um Wachs und Partikel zu entfernen, und dann in Gläser gefüllt. Kristallisation ist natürlich und lässt sich durch sanftes Erwärmen des Glases lösen.',
           fr: 'Le miel est filtré pour retirer la cire et les particules, puis mis en pots. La cristallisation est naturelle et peut être dissipée en réchauffant doucement le pot.',
         },
-        image: `${IMAGE_BASE}/honey-made.webp`,
+        image: `${IMAGES.honey}/made.webp`,
         imageAlt: {
           en: 'Jars of honey',
           de: 'Gläser mit Honig',
@@ -301,7 +416,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Indagara ist mit Fischergemeinschaften an den großen Seen der Region verbunden. Kleine Fische werden mit Netzen gefangen und nahe dem Ufer angelandet.',
           fr: 'L’indagara est lié aux communautés de pêcheurs des grands lacs de la région. Les petits poissons sont capturés au filet et débarqués près de la rive.',
         },
-        image: `${IMAGE_BASE}/fish-people.webp`,
+        image: `${IMAGES.fish}/people.webp`,
         imageAlt: {
           en: 'Fishermen on Lake Kivu',
           de: 'Fischer auf dem Kivuse',
@@ -317,7 +432,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Der Fang wird gereinigt und zum Trocknen in der Sonne ausgelegt. Ist er trocken, wird der Fisch ganz verpackt oder zu Ifu Y’Indagara gemahlen.',
           fr: 'La pêche est nettoyée puis étalée au soleil pour sécher. Une fois sec, le poisson est emballé entier ou moulu en Ifu Y’Indagara.',
         },
-        image: `${IMAGE_BASE}/fish-grown.webp`,
+        image: `${IMAGES.fish}/grown.webp`,
         imageAlt: {
           en: 'Fish drying in the sun',
           de: 'In der Sonne trocknende Fische',
@@ -333,7 +448,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Trocknen und Mahlen finden in der Nähe der Anlandestellen statt, damit der Fisch ohne Kühlung gelagert und transportiert werden kann.',
           fr: 'Le séchage et le broyage sont effectués près des sites de débarquement, afin que le poisson puisse être stocké et transporté sans réfrigération.',
         },
-        image: `${IMAGE_BASE}/fish-made.webp`,
+        image: `${IMAGES.fish}/made.webp`,
         imageAlt: {
           en: 'Dried fish for sale',
           de: 'Getrocknete Fische im Verkauf',
@@ -400,7 +515,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Ibishyimbo werden von Kleinbauernfamilien angebaut. Bohnen werden oft zusammen mit anderen Kulturen gepflanzt und von Hand geerntet.',
           fr: 'Les ibishyimbo sont cultivés par des familles de petits producteurs. Les haricots sont souvent plantés avec d’autres cultures et récoltés à la main.',
         },
-        image: `${IMAGE_BASE}/beans-people.webp`,
+        image: `${IMAGES.beans}/people.webp`,
         imageAlt: {
           en: 'A bean harvest on a farm',
           de: 'Eine Bohnenernte auf einem Bauernhof',
@@ -416,7 +531,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Die Hülsen werden geerntet, wenn die Bohnen darin reif sind. Sie werden ausgelöst, weiter getrocknet und sortiert, damit beschädigte Bohnen entfernt werden.',
           fr: 'Les gousses sont récoltées lorsque les grains sont matures. Ils sont écossés, séchés davantage et triés pour éliminer les grains abîmés.',
         },
-        image: `${IMAGE_BASE}/beans-grown.webp`,
+        image: `${IMAGES.beans}/grown.webp`,
         imageAlt: {
           en: 'Harvested beans drying',
           de: 'Geerntete Bohnen beim Trocknen',
@@ -432,7 +547,7 @@ export const PRODUCT_STORIES: readonly ProductStory[] = [
           de: 'Lokale Sammelstellen und Märkte sortieren die getrockneten Bohnen, bevor sie in Säcke gefüllt werden. BeNa wählt die Partien aus, die in unseren Katalog kommen.',
           fr: 'Les points de collecte et les marchés locaux classent les haricots secs avant leur mise en sac. BeNa sélectionne les lots qui entrent dans notre catalogue.',
         },
-        image: `${IMAGE_BASE}/beans-made.webp`,
+        image: `${IMAGES.beans}/made.webp`,
         imageAlt: {
           en: 'Beans for sale at a market',
           de: 'Bohnen im Verkauf auf einem Markt',

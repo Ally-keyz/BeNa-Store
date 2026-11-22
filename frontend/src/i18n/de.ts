@@ -447,7 +447,7 @@ const de: Resources = {
     moreStories: 'Weitere Produktgeschichten',
     processTitle: 'Von der Herkunft bis vor deine Tür',
     processIntro:
-      'Jedes Produkt hat einen Weg. Hier sind die typischen Schritte, bis es unseren Store in Zierenberg und danach deine Küche erreicht. Die Fotos illustrieren den Ablauf und können andere Herkünfte oder Produzenten zeigen.',
+      'Jedes Produkt hat einen Weg. Hier sind die typischen Schritte, bis es unseren Store in Zierenberg und danach deine Küche erreicht. Fotos und Videos illustrieren den Ablauf und können andere Herkünfte oder Produzenten zeigen.',
     sectionPeople: 'Die Menschen, die es zubereiten',
     sectionGrown: 'Wie es angebaut oder hergestellt wird',
     sectionMade: 'Wer es herstellt',
@@ -455,6 +455,9 @@ const de: Resources = {
     sectionPacked: 'Verpackt von BeNa Origins',
     stepLabel: 'Schritt {{number}}',
     photoCredit: 'Foto: {{credit}}',
+    galleryTitle: 'Direkt von der Quelle',
+    galleryIntro: 'Weitere Eindrücke vom Weg dieses Produkts.',
+    videoTitle: 'Den Prozess ansehen',
   },
   contact: {
     eyebrow: 'Kontakt',

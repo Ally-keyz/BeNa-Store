@@ -57,6 +57,9 @@ const AddressesPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import('@/routes/NotFoundPage').then((module) => ({ default: module.NotFoundPage })),
 );
+const LegacyRedirect = lazy(() =>
+  import('@/routes/LegacyRedirect').then((module) => ({ default: module.LegacyRedirect })),
+);
 
 function RouteFallback() {
   const { t } = useTranslation();
@@ -109,6 +112,10 @@ export function App() {
             <Route path="account/addresses" element={<AddressesPage />} />
             <Route path="orders" element={<Navigate to="/account/orders" replace />} />
             <Route path="addresses" element={<Navigate to="/account/addresses" replace />} />
+
+            {/* Shopify-era URLs; Render serves 301s for these in production. */}
+            <Route path="pages/:handle" element={<LegacyRedirect kind="page" />} />
+            <Route path="policies/:handle" element={<LegacyRedirect kind="policy" />} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Route>

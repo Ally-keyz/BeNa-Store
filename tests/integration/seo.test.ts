@@ -48,6 +48,10 @@ describe('SEO preparation endpoints', () => {
     expect(urls).toContain('https://benaorigins.de/');
     expect(urls).toContain('https://benaorigins.de/products/rwanda-coffee-250g');
     expect(urls).toContain('https://benaorigins.de/collections/coffee');
+    expect(urls.every((url: string) => url.startsWith('https://benaorigins.de/'))).toBe(true);
+    expect(
+      urls.some((url: string) => url.includes('/pages/') || url.includes('/policies/')),
+    ).toBe(false);
     expect(data.body.data.notes.join(' ')).toMatch(/FIXTURE MODE/);
 
     const xml = await request(app).get('/api/v1/seo/sitemap.xml?limit=100');

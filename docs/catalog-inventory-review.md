@@ -49,9 +49,11 @@ distinct with real variant information, or kept unlisted. Handles are required b
 
 Hand Craft Igiseke (×2), Primus 50cl, Imigongo Wall Art (×2), Petit Mutzing 33cl /pc.
 
-These labels are **kept**: removing "Coming Soon" from genuinely unavailable products would be
-misleading. Code already prevents any product whose title/tags/handle say "coming soon" from
-showing Add to cart, and they are excluded from the home hero.
+These labels are **kept** in Shopify: removing "Coming Soon" from genuinely unavailable products
+would be misleading. The storefront uses Shopify's live availability as the source of truth, so a
+product with stock is shown as available and can be added to the cart even if its title, handle or
+tags still carry the stale label. Unavailable products with the label are shown as "Coming soon"
+and are excluded from the home hero.
 
 ### 5. Missing product categories (4)
 

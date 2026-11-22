@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { languageFromTags } from './detect';
 import en from './en';
 import de from './de';
 import fr from './fr';
@@ -14,16 +15,25 @@ function isLanguage(value: string | null): value is Language {
 }
 
 export function detectLanguage(): Language {
+  // An explicit choice made with the language switch wins on later visits.
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (isLanguage(stored)) return stored;
   } catch {
     // Storage can be unavailable (privacy mode); fall through to navigator.
   }
-  const navigatorLanguage = typeof navigator !== 'undefined' ? navigator.language.toLowerCase() : 'en';
-  if (navigatorLanguage.startsWith('de')) return 'de';
-  if (navigatorLanguage.startsWith('fr')) return 'fr';
-  return 'en';
+
+  if (typeof navigator === 'undefined') return 'en';
+
+  // Use the full ordered preference list, not only the primary tag. This covers
+  // devices whose first language is unsupported but whose second is German,
+  // English or French.
+  const tags =
+    navigator.languages && navigator.languages.length > 0
+      ? navigator.languages
+      : [navigator.language];
+
+  return languageFromTags(tags) ?? 'en';
 }
 
 const initialLanguage = detectLanguage();

@@ -241,10 +241,12 @@ export class RestockService {
   }
 }
 
-/** Mirrors frontend/src/lib/product.ts so alerts never fire for coming-soon items. */
+/**
+ * Mirrors frontend/src/lib/product.ts: Shopify's live availability is the
+ * source of truth, so a stale "coming soon" label must not suppress a restock
+ * alert for a product that is actually in the store.
+ */
 function isProductAvailable(product: Product): boolean {
-  const signalText = `${product.handle} ${product.title} ${product.tags.join(' ')}`;
-  if (/coming[\s-]?soon/i.test(signalText)) return false;
   return product.availableForSale && product.variants.some((variant) => variant.availableForSale);
 }
 

@@ -14,7 +14,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { Plugin } from 'vite';
-import { PRODUCT_STORIES } from '../src/content/productStories';
+import { PRODUCT_STORIES, type StoryImage } from '../src/content/productStories';
 
 const SEO_START = '<!-- BENA_SEO_START -->';
 const SEO_END = '<!-- BENA_SEO_END -->';
@@ -182,12 +182,12 @@ async function getSitemap(): Promise<SitemapPayload | null> {
 }
 
 async function getMetadata(path: string): Promise<PageMetadata | null> {
-  const match = /^\/(products|collections|pages)\/([^/]+)$/.exec(path);
+  const match = /^\/(products|collections)\/([^/]+)$/.exec(path);
   if (!match) return null;
   const resource = match[1];
   const handle = match[2];
   if (!resource || !handle) return null;
-  const singular = resource === 'products' ? 'product' : resource === 'collections' ? 'collection' : 'page';
+  const singular = resource === 'products' ? 'product' : 'collection';
   const payload = await getJson<{ success?: boolean; data?: PageMetadata }>(
     `/seo/${singular}/${encodeURIComponent(handle)}`,
   );
@@ -319,19 +319,46 @@ const SECTION_TITLES: Record<string, string> = {
   packed: 'Packed by BeNa Origins',
 };
 
-/** Process steps with images, included in the static story HTML for crawlers. */
+function crawlerImageBlock(title: string, image: StoryImage, body?: string): string {
+  return [
+    '      <section>',
+    `        <h2>${escapeHtml(title)}</h2>`,
+    body ? `        <p>${escapeHtml(body)}</p>` : '',
+    `        <img src="${escapeHtml(image.image)}" alt="${escapeHtml(image.imageAlt.en)}" loading="lazy" />`,
+    '      </section>',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+/** Image, process, gallery and video content included in static story HTML. */
 function storySections(path: string): string {
   const match = /^\/about\/products\/([^/]+)$/.exec(path);
   const slug = match?.[1];
   if (!slug) return '';
   const story = PRODUCT_STORIES.find((item) => item.slug === slug);
   if (!story) return '';
-  return story.sections
-    .map(
-      (section) =>
-        `      <section>\n        <h2>${escapeHtml(SECTION_TITLES[section.key] ?? section.key)}</h2>\n        <p>${escapeHtml(section.body.en)}</p>\n        <img src="${escapeHtml(section.image)}" alt="${escapeHtml(section.imageAlt.en)}" loading="lazy" />\n      </section>`,
-    )
-    .join('\n');
+
+  const blocks: string[] = [];
+  if (story.hero) blocks.push(crawlerImageBlock('Product photo', story.hero));
+  for (const section of story.sections) {
+    blocks.push(
+      crawlerImageBlock(
+        SECTION_TITLES[section.key] ?? section.key,
+        section,
+        section.body.en,
+      ),
+    );
+  }
+  for (const video of story.videos ?? []) {
+    blocks.push(
+      `      <section>\n        <h2>Watch the process</h2>\n        <img src="${escapeHtml(video.poster)}" alt="${escapeHtml(video.posterAlt.en)}" loading="lazy" />\n      </section>`,
+    );
+  }
+  for (const image of story.gallery ?? []) {
+    blocks.push(crawlerImageBlock('From the source', image));
+  }
+  return blocks.join('\n');
 }
 
 /** Text-only content that crawlers can read before React hydrates. */
@@ -505,6 +532,9 @@ export function buildSeoPlugin(): Plugin {
       for (const entry of sitemapPayload?.entries ?? []) {
         const path = pathFromUrl(entry.url);
         if (!path) continue;
+        // Shopify-era page/policy paths are redirected in render.yaml; they are
+        // not valid storefront routes and must not be submitted as canonical.
+        if (path.startsWith('/pages/') || path.startsWith('/policies/')) continue;
         entries.set(path, {
           loc: `${SITE_URL}${path === '/' ? '/' : path}`,
           ...(entry.lastModified ? { lastmod: entry.lastModified } : {}),
@@ -525,9 +555,9 @@ export function buildSeoPlugin(): Plugin {
         ),
       );
 
-      // Prerender product / collection / page routes using backend metadata.
+      // Prerender product / collection routes using backend metadata.
       const dynamicPaths = [...entries.keys()].filter((path) =>
-        /^\/(products|collections|pages)\/[^/]+$/.test(path),
+        /^\/(products|collections)\/[^/]+$/.test(path),
       );
       const resolved = await mapWithConcurrency(dynamicPaths, 4, async (path) => ({
         path,

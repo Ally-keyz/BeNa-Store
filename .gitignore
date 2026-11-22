@@ -21,6 +21,9 @@ reports/
 audit-report.json
 audit-report.md
 
+# Raw media drops (optimised copies live in frontend/public)
+new about us images and video contents/
+
 # Editor / OS
 .vscode/
 .idea/

@@ -3,15 +3,18 @@ import type { Product, ProductVariant } from '@/types';
 export type AvailabilityStatus = 'available' | 'coming-soon' | 'sold-out';
 
 /**
- * Audit #9 fix: a product whose copy/tags/handle say "coming soon" must never
- * render an active add-to-cart, even if Shopify says it is purchasable.
+ * Shopify's live sale state is the source of truth. A stale "coming soon"
+ * label in a title, handle or tag must not block a product that is actually in
+ * the store and purchasable. The label is only used to distinguish genuinely
+ * unavailable products from ordinary sold-out ones.
  */
 export function getAvailability(product: Product): AvailabilityStatus {
-  const signalText = `${product.handle} ${product.title} ${product.tags.join(' ')}`;
-  if (/coming[\s-]?soon/i.test(signalText)) return 'coming-soon';
   const anyAvailable =
     product.availableForSale && product.variants.some((variant) => variant.availableForSale);
-  return anyAvailable ? 'available' : 'sold-out';
+  if (anyAvailable) return 'available';
+
+  const signalText = `${product.handle} ${product.title} ${product.tags.join(' ')}`;
+  return /coming[\s-]?soon/i.test(signalText) ? 'coming-soon' : 'sold-out';
 }
 
 /** Best image for cards/detail: featured image, else first image, else variant image. */

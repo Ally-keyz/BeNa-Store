@@ -69,10 +69,32 @@ function product(overrides: Partial<Product> = {}): Product {
 }
 
 describe('product availability', () => {
-  it('blocks add-to-cart for coming-soon products even when purchasable', () => {
-    expect(getAvailability(product({ title: 'Coming Soon — test' }))).toBe('coming-soon');
-    expect(getAvailability(product({ handle: 'coming-soon-1' }))).toBe('coming-soon');
-    expect(getAvailability(product({ tags: ['coming soon'] }))).toBe('coming-soon');
+  it('treats stale coming-soon labels as available when Shopify says they are in store', () => {
+    expect(getAvailability(product({ title: 'Coming Soon — test' }))).toBe('available');
+    expect(getAvailability(product({ handle: 'coming-soon-1' }))).toBe('available');
+    expect(getAvailability(product({ tags: ['coming soon'] }))).toBe('available');
+    expect(
+      getAvailability(
+        product({ title: 'Coming Soon — test', variants: [variant({ availableForSale: true })] }),
+      ),
+    ).toBe('available');
+  });
+
+  it('keeps the coming-soon label only for genuinely unavailable products', () => {
+    expect(getAvailability(product({ title: 'Coming Soon — test', availableForSale: false }))).toBe(
+      'coming-soon',
+    );
+    expect(
+      getAvailability(
+        product({
+          handle: 'coming-soon-1',
+          variants: [variant({ availableForSale: false })],
+        }),
+      ),
+    ).toBe('coming-soon');
+    expect(getAvailability(product({ tags: ['coming soon'], availableForSale: false }))).toBe(
+      'coming-soon',
+    );
   });
 
   it('uses Shopify availability when no coming-soon signal exists', () => {

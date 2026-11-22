@@ -55,9 +55,11 @@ suffer. Every indexable page needs, in the initial HTML:
    - `/` home
    - `/products/:handle` (all published products)
    - `/collections/:handle` (all collections; paginate static pages or keep page 1 static)
-   - `/pages/:handle` (About, FAQ, legal pages)
-   - `/policies/:handle`
+   - `/african-products`, `/about`, `/contact`, `/shipping`, `/faq`, `/legal/:page`
    - locale-prefixed variants for enabled markets/languages (see §7)
+   - Shopify-era `/pages/:handle` and `/policies/:handle` URLs are NOT indexable routes.
+     They are served as real 301 redirects to the routes above (see `render.yaml` and
+     `frontend/src/config/legacyRoutes.ts`) and excluded from every sitemap.
 3. Data comes from **this backend**, not directly from Shopify, during the build:
    - `GET /api/v1/products?first=100&after=...` for the sitemap/route list
    - `GET /api/v1/seo/product/:handle` for metadata + JSON-LD
@@ -86,7 +88,7 @@ suffer. Every indexable page needs, in the initial HTML:
 | `GET /api/v1/seo/product/:handle` | title, description, canonical, robots, OG/Twitter, JSON-LD: Product + BreadcrumbList + Organization |
 | `GET /api/v1/seo/collection/:handle` | title, description, canonical, CollectionPage + BreadcrumbList + Organization |
 | `GET /api/v1/seo/page/:handle` | informational page metadata + breadcrumb |
-| `GET /api/v1/seo/sitemap?limit=250` | sitemap data (products, collections, pages, policies, home) |
+| `GET /api/v1/seo/sitemap?limit=250` | sitemap data (home, products, collections only; legacy pages/policies are excluded) |
 | `GET /api/v1/seo/sitemap.xml?limit=250` | sitemap XML (escape-safe) |
 | `GET /api/v1/seo/robots` | robots rules as data |
 | `GET /api/v1/seo/robots.txt` | ready-to-serve robots.txt |
@@ -99,6 +101,8 @@ Assumptions and limits:
 - All `<SEO title/description>` values from Shopify are preferred; fallbacks are generated.
 - Sitemap generation is capped (default 250 products, configurable) and reports `truncated`.
   For the full catalog, run the generator at build time with a higher limit or split sitemaps.
+- Sitemap URLs are normalized to the canonical `SITE_URL` host. Shopify `onlineStoreUrl`
+  values (myshopify.com / checkout.shopify.com) and legacy page/policy paths are dropped.
 - `robots.txt` disallows `/api/`, `/cart`, `/checkout`, `/account`; adjust if the frontend uses
   different cart routes.
 

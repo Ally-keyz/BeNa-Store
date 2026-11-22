@@ -9,7 +9,6 @@ import type {
   RobotsData,
   SitemapData,
   SitemapEntry,
-  StorePage,
 } from '../types/domain';
 import { notFound } from '../utils/errors';
 import { stripHtml, truncate } from '../utils/html';
@@ -175,8 +174,9 @@ export class SeoService {
     }
 
     for (const product of products) {
+      const url = this.canonicalSitemapUrl(product.url, `/products/${product.handle}`);
       entries.push({
-        url: product.url,
+        url,
         lastModified: product.updatedAt,
         changeFrequency: 'weekly',
         priority: 0.8,
@@ -192,43 +192,22 @@ export class SeoService {
     } while (collectionsAfter);
 
     for (const collection of collections) {
+      const url = this.canonicalSitemapUrl(collection.url, `/collections/${collection.handle}`);
       entries.push({
-        url: collection.url,
+        url,
         lastModified: collection.updatedAt,
         changeFrequency: 'weekly',
         priority: 0.7,
       });
     }
 
-    let pages: StorePage[] = [];
-    try {
-      pages = await this.client.getPages('', 100);
-    } catch {
-      notes.push('Store pages could not be loaded; sitemap contains products and collections only.');
-    }
-    for (const page of pages) {
-      entries.push({
-        url: page.url ?? `${this.config.siteUrl}/pages/${page.handle}`,
-        lastModified: page.updatedAt,
-        changeFrequency: 'monthly',
-        priority: 0.5,
-      });
-    }
-
-    try {
-      const bundle = await this.client.getPolicies();
-      for (const policy of Object.values(bundle.policies)) {
-        if (!policy?.url) continue;
-        entries.push({
-          url: policy.url,
-          lastModified: null,
-          changeFrequency: 'yearly',
-          priority: 0.3,
-        });
-      }
-    } catch {
-      notes.push('Policies could not be loaded for the sitemap.');
-    }
+    // Shopify pages and policies are either hosted on the myshopify domain or
+    // use legacy `/pages/*` / `/policies/*` paths that the SPA no longer routes.
+    // The storefront redirects those URLs (see render.yaml), so they must never
+    // appear in a sitemap that search engines use for canonical URL discovery.
+    notes.push(
+      'Legacy Shopify pages and policies are excluded; storefront routes are listed in /sitemap.xml.',
+    );
 
     if (truncated) {
       notes.push(
@@ -261,6 +240,21 @@ export class SeoService {
       sitemaps: [`${this.config.siteUrl}/sitemap.xml`],
       host: this.config.siteUrl,
     };
+  }
+
+  /** Rewrite Shopify-provided URLs to the canonical storefront host. */
+  private canonicalSitemapUrl(raw: string, fallbackPath: string): string {
+    const base = this.config.siteUrl.replace(/\/+$/, '');
+    if (!raw) return `${base}${fallbackPath}`;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return `${base}${fallbackPath}`;
+      }
+      return `${base}${parsed.pathname}`;
+    } catch {
+      return `${base}${fallbackPath}`;
+    }
   }
 
   sitemapXml(data: SitemapData): string {

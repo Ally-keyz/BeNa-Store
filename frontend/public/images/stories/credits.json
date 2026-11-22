@@ -24,30 +24,6 @@
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bean_harvest_at_Bobonong_farms.jpg"
   },
   {
-    "key": "coffee-grown",
-    "title": "Women drying coffee.jpg",
-    "author": "PHILIP ASEDRI DRADRIO",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Women_drying_coffee.jpg"
-  },
-  {
-    "key": "coffee-made",
-    "title": "Coffee roasting machine at Cúcuta, Colombia.jpg",
-    "author": "Rramirezj",
-    "license": "CC0",
-    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Coffee_roasting_machine_at_C%C3%BAcuta,_Colombia.jpg"
-  },
-  {
-    "key": "coffee-people",
-    "title": "Harvesting Ugandan coffee.jpg",
-    "author": "Denis kasozi",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Harvesting_Ugandan_coffee.jpg"
-  },
-  {
     "key": "export",
     "title": "Container Ship at the Hai Phong International Container Terminal 01.jpg",
     "author": "Nathan.cima",
@@ -110,5 +86,21 @@
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sticking_a_label_onto_a_parcel_for_shipping.jpg"
+  },
+  {
+    "key": "coffee-supplied",
+    "title": "Coffee photography and footage supplied by BeNa",
+    "author": "BeNa Origins",
+    "license": "Supplied by store owner",
+    "licenseUrl": "",
+    "sourceUrl": ""
+  },
+  {
+    "key": "honey-supplied",
+    "title": "honey image2.jpeg",
+    "author": "BeNa Origins",
+    "license": "Supplied by store owner",
+    "licenseUrl": "",
+    "sourceUrl": ""
   }
 ]

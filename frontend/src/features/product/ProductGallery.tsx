@@ -91,7 +91,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
                     : 'opacity-70 hover:opacity-100',
                 )}
               >
-                <ProductImage image={image} alt="" sizes="64px" className="h-full w-full object-contain p-1" />
+                <ProductImage image={image} alt="" sizes="64px" className="h-full w-full  object-contain p-1" />
               </button>
             ))}
           </div>
@@ -105,7 +105,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
           aria-label={t('productInfo.openImage', { number: active + 1 })}
-          className="group relative order-1 flex h-[min(44dvh,420px)] w-full touch-pan-y items-center justify-center overflow-hidden rounded-2xl border-2 border-neutral-600 bg-white p-3 sm:order-2 sm:h-[min(64vh,580px)] sm:p-4"
+          className="group relative order-1 flex h-[min(44dvh,420px)] w-full touch-pan-y items-center justify-center overflow-hidden rounded-2xl border border-neutral-100 bg-white p-3 sm:order-2 sm:h-[min(64vh,580px)] sm:p-4"
         >
           {activeImage ? (
             <ProductImage

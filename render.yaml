@@ -23,6 +23,93 @@ services:
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     routes:
+      # Shopify-era URLs that Google indexed under benaorigins.de. Keep this
+      # list in sync with frontend/src/config/legacyRoutes.ts. Rules run before
+      # the catch-all rewrite and issue real 301 responses.
+      - type: redirect
+        source: /pages/about-us
+        destination: /about
+      - type: redirect
+        source: /pages/contact
+        destination: /contact
+      - type: redirect
+        source: /pages/shipping-policy
+        destination: /shipping
+      - type: redirect
+        source: /pages/zahlung-und-versand
+        destination: /shipping
+      - type: redirect
+        source: /pages/refund-return-policy-1
+        destination: /legal/refund
+      - type: redirect
+        source: /pages/refund-policy
+        destination: /legal/refund
+      - type: redirect
+        source: /pages/faq-frequently-asked-questions
+        destination: /faq
+      - type: redirect
+        source: /pages/faq
+        destination: /faq
+      - type: redirect
+        source: /pages/homepage
+        destination: /
+      - type: redirect
+        source: /pages/meet-your-coffee
+        destination: /about/products/coffee
+      - type: redirect
+        source: /pages/allgemeine-geschaftsbedingungen-und-kundeninformationen
+        destination: /legal/terms
+      - type: redirect
+        source: /pages/terms-of-service
+        destination: /legal/terms
+      - type: redirect
+        source: /pages/widerrufsrecht-fur-den-verkauf-von-waren
+        destination: /legal/withdrawal
+      - type: redirect
+        source: /pages/datenschutzerklarung
+        destination: /legal/privacy
+      - type: redirect
+        source: /pages/privacy-policy
+        destination: /legal/privacy
+      - type: redirect
+        source: /pages/impressum
+        destination: /legal/impressum
+      - type: redirect
+        source: /pages/legal-notice
+        destination: /legal/impressum
+      - type: redirect
+        source: /policies/shipping-policy
+        destination: /shipping
+      - type: redirect
+        source: /policies/54579265869.html
+        destination: /shipping
+      - type: redirect
+        source: /policies/refund-policy
+        destination: /legal/refund
+      - type: redirect
+        source: /policies/54476603725.html
+        destination: /legal/refund
+      - type: redirect
+        source: /policies/privacy-policy
+        destination: /legal/privacy
+      - type: redirect
+        source: /policies/54035546445.html
+        destination: /legal/privacy
+      - type: redirect
+        source: /policies/terms-of-service
+        destination: /legal/terms
+      - type: redirect
+        source: /policies/54579331405.html
+        destination: /legal/terms
+      - type: redirect
+        source: /policies/subscription-policy
+        destination: /legal/terms
+      - type: redirect
+        source: /policies/legal-notice
+        destination: /legal/impressum
+      - type: redirect
+        source: /policies/impressum
+        destination: /legal/impressum
       - type: rewrite
         source: /*
         destination: /index.html

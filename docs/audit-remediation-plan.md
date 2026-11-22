@@ -45,7 +45,10 @@ repository.**
 
 ## Phase 2 — Catalog cleanup (findings 9–15)
 
-- ComingSoon items never offer Add to cart; `coming-soon-8` hero priority was removed.
+- Shopify's live `availableForSale` state is the source of truth: products that are actually in
+  the store can be added to the cart even if their title/handle/tag still says "Coming Soon".
+  The stale label is only shown for products Shopify reports as unavailable; `coming-soon-8`
+  hero priority was removed.
 - The owner supplied a **50-product catalog snapshot** in `scripts/data/catalog-inventory.json`.
   It has titles/status/stock/category but **no Shopify handles**, so no handle-based live writes
   are proposed.
