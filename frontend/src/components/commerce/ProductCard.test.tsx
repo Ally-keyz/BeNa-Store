@@ -62,6 +62,24 @@ describe('ProductCard unit labels', () => {
   });
 });
 
+describe('ProductCard quick add visibility', () => {
+  it('keeps the desktop quick add button visible without hovering', () => {
+    render(
+      <MemoryRouter>
+        <ProductCard product={productFixture()} />
+      </MemoryRouter>,
+    );
+
+    const overlayButton = screen
+      .getAllByRole('button', { name: /Quick add/ })
+      .find((button) => button.parentElement?.className.includes('absolute'));
+    expect(overlayButton).toBeDefined();
+    expect(overlayButton?.parentElement?.className).not.toMatch(
+      /opacity-0|pointer-events-none|group-hover/,
+    );
+  });
+});
+
 describe('ProductCard stock labels', () => {
   it('shows the exact quantity left instead of coming soon when stock exists', () => {
     const base = productFixture({ title: 'Hand Craft Igiseke (Coming Soon)' });

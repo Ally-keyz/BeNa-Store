@@ -143,9 +143,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
         </div>
 
         {action ? (
-          <div className="absolute inset-x-3 bottom-3 z-10 hidden transition-opacity duration-200 lg:block lg:pointer-events-none lg:opacity-0 lg:group-hover:pointer-events-auto lg:group-hover:opacity-100 lg:group-focus-within:pointer-events-auto lg:group-focus-within:opacity-100">
-            {action}
-          </div>
+          <div className="absolute inset-x-3 bottom-3 z-10 hidden lg:block">{action}</div>
         ) : null}
       </div>
 
