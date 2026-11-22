@@ -32,7 +32,7 @@ export const BRAND = {
   slogan: read('VITE_BRAND_SLOGAN', 'Taste of Rwanda'),
   social: {
     instagram: read('VITE_SOCIAL_INSTAGRAM', 'https://www.instagram.com/benaorigins/'),
-    whatsapp: read('VITE_SOCIAL_WHATSAPP', 'https://chat.whatsapp.com/CndIu3wGBVgJsgi7Q6Q6Xi'),
+    whatsapp: read('VITE_SOCIAL_WHATSAPP', 'https://wa.me/491759410558'),
   },
 } as const;
 

@@ -62,7 +62,9 @@ export function createApp(container: Container, options: CreateAppOptions = {}):
         callback(forbidden(`Origin ${origin} is not allowed by CORS`));
       },
       methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-token'],
+      // Browser auth calls use credentials: 'include' from the storefront origin.
+      credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-token', 'x-csrf-token'],
       exposedHeaders: ['X-Request-Id', 'RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset'],
       maxAge: 600,
     }),

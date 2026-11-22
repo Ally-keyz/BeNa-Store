@@ -1,7 +1,27 @@
 # BeNa Origins — SEO & prerendering strategy (React without Next.js)
 
-Status: **planning document + backend support implemented**. No frontend code is part of this
-phase. Nothing here publishes or changes the live storefront.
+Status: **backend support + frontend build-time SEO implemented**. Nothing here publishes or
+changes the live storefront; deploy the frontend to make generated files public.
+
+## Implementation (build time)
+
+`frontend/seo/buildSeo.ts` (Vite plugin, registered in `frontend/vite.config.ts`) runs after Vite
+writes `dist/`:
+
+- fetches `GET /api/v1/seo/sitemap?limit=1000` and `/seo/robots.txt` from the API origin
+  (`SEO_API_BASE_URL`, else `VITE_API_BASE_URL`, else `https://bena-origins.onrender.com/api/v1`);
+- emits `dist/sitemap.xml` with all product/collection/page URLs plus local informational routes,
+  all normalised to the canonical `VITE_SITE_URL`;
+- emits `dist/robots.txt` from the backend;
+- writes route HTML at `dist/<path>/index.html` for home, informational routes and every
+  product/collection/page, injecting title, description, canonical, robots, OG/Twitter, Google
+  verification, backend JSON-LD and a text-only content block for non-JS crawlers;
+- writes `noindex,nofollow` HTML for `/cart`, `/search`, `/account/*` and `/checkout`;
+- never fails the build: fetches are retried and fall back to local data.
+
+Render serves real files before the SPA catch-all rewrite, so clean URLs resolve to the prerendered
+HTML. React Router takes over after hydration. New Shopify products are picked up on the next
+frontend deploy (set a deploy hook on `products/update` if faster refresh is needed).
 
 ## 1. Goal
 

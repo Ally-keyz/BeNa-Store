@@ -133,8 +133,8 @@ After the first deploy, deep-link to `/catalog` and refresh to verify the SPA re
 
 - The blocking 2.8-second Lottie intro screen was removed, so first paint is the storefront itself.
 - Vendor code is split into cacheable chunks and Socket.IO is imported only when the listener starts. The production build no longer emits a chunk-size warning.
-- `robots.txt`, `sitemap.xml`, canonical/OG/Twitter tags and Organization JSON-LD are generated at build time in `frontend/vite.config.ts` from `VITE_SITE_URL`; `react-helmet-async` supplies per-route metadata at runtime.
-- Product and collection URLs are not in the static sitemap because they come from Shopify at runtime. Add prerendering or SSR if those pages must be indexed without JavaScript (the backend already serves `/seo/*` metadata with JSON-LD).
+- `robots.txt`, `sitemap.xml`, canonical/OG/Twitter tags, Google site verification and Organization JSON-LD are generated at build time by `frontend/seo/buildSeo.ts` (registered in `vite.config.ts`) from `VITE_SITE_URL`; `react-helmet-async` supplies per-route metadata at runtime.
+- The build fetches `/api/v1/seo/sitemap?limit=1000` and `/seo/*` metadata from `SEO_API_BASE_URL` (fallback: `VITE_API_BASE_URL`, then `https://bena-origins.onrender.com/api/v1`). It emits a full catalog sitemap and prerendered HTML for every product/collection/page route, plus `noindex` HTML for cart/search/account routes. A backend outage never fails the build. See `docs/seo-strategy.md`.
 - The selected language is stored in context rather than in the URL, so hreflang alternates are intentionally omitted — they would all point to the same address.
 
 Free Render services sleep after inactivity and are not suitable for production Socket.IO traffic.
@@ -550,7 +550,7 @@ fails, the AI accordion is simply omitted and the rest of the product page is un
    ```
 
    Always re-fetch REST data after an event; sockets are hints only.
-10. **SEO/SSG.** Follow `docs/seo-strategy.md`; use `/seo/*` endpoints at build time.
+10. **SEO/SSG.** Build-time generation is implemented in `frontend/seo/buildSeo.ts` using `/seo/*`; follow `docs/seo-strategy.md` for validation and refresh strategy.
 11. **Errors/limits.** Expect `429` with `RATE_LIMITED`; back off using `RateLimit-*` headers.
 
 ---
