@@ -27,7 +27,7 @@ export const HERO_FALLBACK_IMAGES: Record<HeroSlideId, string> = {
 export const HERO_SLIDES: HeroSlide[] = [
   { id: 'rwanda', href: '/african-products' },
   { id: 'coffee', href: '/collections/coffee' },
-  { id: 'food', href: '/collections/food' },
+  { id: 'food', href: '/catalog' },
   { id: 'crafts', href: '/collections/crafts' },
   { id: 'shipping', href: '/shipping' },
 ];

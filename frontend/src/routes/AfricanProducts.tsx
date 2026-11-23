@@ -6,7 +6,7 @@ import { useCollection } from '@/hooks/useCatalog';
 import { useMarket } from '@/context/MarketContext';
 import { pageContainer } from '@/lib/layout';
 
-const HERO_CATEGORIES = ['coffee', 'food', 'crafts'] as const;
+const HERO_CATEGORIES = ['coffee', 'drinks', 'spices'] as const;
 
 export function AfricanProductsPage() {
   const { t } = useTranslation();
@@ -19,17 +19,17 @@ export function AfricanProductsPage() {
     sortKey: 'CREATED',
     ...marketParams,
   });
-  const foodQuery = useCollection(HERO_CATEGORIES[1], {
+  const drinksQuery = useCollection(HERO_CATEGORIES[1], {
     first: 2,
     sortKey: 'CREATED',
     ...marketParams,
   });
-  const craftsQuery = useCollection(HERO_CATEGORIES[2], {
+  const spicesQuery = useCollection(HERO_CATEGORIES[2], {
     first: 2,
     sortKey: 'CREATED',
     ...marketParams,
   });
-  const heroProducts = [coffeeQuery, foodQuery, craftsQuery].flatMap(
+  const heroProducts = [coffeeQuery, drinksQuery, spicesQuery].flatMap(
     (query) => query.data?.collection.products ?? [],
   );
 

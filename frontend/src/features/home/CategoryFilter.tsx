@@ -1,12 +1,15 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
+import { ALL_CATEGORIES } from '@/lib/product';
 
-export const ALL_CATEGORIES = 'all';
+export { ALL_CATEGORIES };
 
 const FALLBACK = [
   { handle: 'coffee', titleKey: 'nav.coffee' },
-  { handle: 'food', titleKey: 'nav.food' },
+  { handle: 'drinks', titleKey: 'nav.drinks' },
+  { handle: 'spices', titleKey: 'nav.spices' },
+  { handle: 'flours', titleKey: 'nav.flours' },
   { handle: 'crafts', titleKey: 'nav.crafts' },
 ] as const;
 

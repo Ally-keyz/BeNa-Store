@@ -3,11 +3,13 @@ import type { Product, ProductVariant } from '@/types';
 import { normalizeCatalogFacets } from '@/features/catalog/facets';
 import {
   getAvailability,
+  getCategoryCollectionHandle,
   getDefaultVariant,
   getProductCategory,
   getStockQuantity,
   hasVariantChoice,
   matchesFacet,
+  matchesProductCategory,
   toFacetValue,
 } from './product';
 
@@ -149,11 +151,43 @@ describe('product availability', () => {
     expect(hasVariantChoice(product({ variants: [variant()] }))).toBe(false);
   });
 
-  it('categorises products from type and tags when a collection is missing', () => {
+  it('maps category filters to the live Shopify collection handles', () => {
+    expect(getCategoryCollectionHandle('all')).toBeNull();
+    expect(getCategoryCollectionHandle('coffee')).toBe('coffee');
+    expect(getCategoryCollectionHandle('drinks')).toBe('drinks');
+    expect(getCategoryCollectionHandle('spices')).toBe('spices');
+    expect(getCategoryCollectionHandle('flours')).toBe('flour');
+    expect(getCategoryCollectionHandle('crafts')).toBe('crafts');
+  });
+
+  it('categorises products from type, title, tags and copy when a collection is missing', () => {
     expect(getProductCategory(product({ productType: 'Food', tags: ['coffee'] }))).toBe('coffee');
-    expect(getProductCategory(product({ productType: 'Food', tags: ['pantry'] }))).toBe('food');
+    expect(getProductCategory(product({ title: 'Energy drink' }))).toBe('drinks');
+    expect(getProductCategory(product({ title: 'Pilau Masala' }))).toBe('spices');
+    // Masala wins over the tea mention so spiced tea stays with spices.
+    expect(getProductCategory(product({ title: 'Tea Masala' }))).toBe('spices');
+    expect(getProductCategory(product({ title: 'Akabanga (Chili Oil)' }))).toBe('spices');
+    expect(getProductCategory(product({ title: 'Kinazi Cassava Flour' }))).toBe('flours');
+    expect(
+      getProductCategory(product({ title: 'Sosoma 2', description: 'Sosoma Flour for porridge' })),
+    ).toBe('flours');
     expect(getProductCategory(product({ tags: ['igiseke', 'basket'] }))).toBe('crafts');
+    // Snack copy mentioning coffee breaks or wheat flour is not a category match.
+    expect(
+      getProductCategory(
+        product({ title: 'Riham Biscuits', description: 'Perfect for tea time and coffee breaks' }),
+      ),
+    ).toBe('other');
     expect(getProductCategory(product())).toBe('other');
+  });
+
+  it('only matches products from the selected category', () => {
+    const drink = product({ title: 'Malti Juice' });
+    const spice = product({ title: 'Pilau Masala' });
+    expect(matchesProductCategory(drink, 'all')).toBe(true);
+    expect(matchesProductCategory(drink, 'drinks')).toBe(true);
+    expect(matchesProductCategory(drink, 'spices')).toBe(false);
+    expect(matchesProductCategory(spice, 'spices')).toBe(true);
   });
 });
 

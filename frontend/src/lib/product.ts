@@ -65,39 +65,89 @@ export function hasVariantChoice(product: Product): boolean {
   return product.variants.length > 1;
 }
 
-export type ProductCategory = 'coffee' | 'food' | 'crafts' | 'other';
+export type ProductCategory = 'coffee' | 'drinks' | 'spices' | 'flours' | 'crafts' | 'other';
+
+export const ALL_CATEGORIES = 'all';
+
+/** Shopify collection handles behind the storefront filters. */
+const CATEGORY_COLLECTION_HANDLES: Partial<Record<Exclude<ProductCategory, 'other'>, string>> = {
+  coffee: 'coffee',
+  drinks: 'drinks',
+  spices: 'spices',
+  flours: 'flour', // the live Shopify collection handle is singular
+  crafts: 'crafts',
+};
+
+/** Null means "no collection filter" (All, or an unknown category). */
+export function getCategoryCollectionHandle(category: string): string | null {
+  return CATEGORY_COLLECTION_HANDLES[category as Exclude<ProductCategory, 'other'>] ?? null;
+}
+
+interface CategorySignal {
+  category: Exclude<ProductCategory, 'other'>;
+  pattern: RegExp;
+}
+
+/** Strong signals from the fields Shopify merchants actually maintain. */
+const TITLE_SIGNALS: CategorySignal[] = [
+  { category: 'coffee', pattern: /\b(coffee|kaffee|espresso)\b|kopi/i },
+  {
+    category: 'crafts',
+    pattern:
+      /\b(crafts?|handcraft|handmade|basket|igiseke|imigongo|bracelet|wall art|woven|textile|accessor(?:y|ies)|caps?|wrap)\b/i,
+  },
+  {
+    category: 'spices',
+    pattern: /\b(spices?|masala|seasoning|pilau|royco|onga|akabanga|(?:chili|chilli|chill) oil)\b/i,
+  },
+  {
+    category: 'drinks',
+    pattern: /\b(juice|drink|beverage|soda|fanta|beer|malt|skol|primus|syrup|tea|thé)\b/i,
+  },
+  { category: 'flours', pattern: /\b(flours?|ifu|fufu)\b/i },
+];
+
+/** Weaker description signals, used only when the title is uninformative. */
+const DESCRIPTION_SIGNALS: CategorySignal[] = [
+  { category: 'spices', pattern: /\b(spices?|masala|seasoning|pilau|(?:chili|chilli|chill) oil)\b/i },
+  { category: 'drinks', pattern: /\b(juice|drink|beverage|soda|fanta|beer|malt|syrup|tea)\b/i },
+  { category: 'flours', pattern: /\b(flour|ifu|fufu)\b/i },
+];
+
+/** Pantry items that are deliberately outside the four shopper-facing filters. */
+const OTHER_FOOD_TERMS =
+  /\b(biscuits?|biskuits?|cookies?|snacks?|baked|baking|cakes?|bread|pastry|pastries|mandazi|margarine|honey|sesame|rice)\b/i;
 
 /**
- * Best-effort category for storefront filters. The storefront must keep
- * working even when a Shopify collection handle is missing, so category filters
- * can fall back to product type, tags and handle signals.
+ * Best-effort category for storefront filters. Collection membership is the
+ * source of truth; this classifier keeps filters useful when a Shopify
+ * collection handle is missing by reading type, handle, title, tags and copy.
  */
 export function getProductCategory(product: Product): ProductCategory {
-  const haystack = [
-    product.productType,
-    product.handle,
-    product.title,
-    product.tags.join(' '),
-  ]
+  const titleText = [product.productType, product.handle, product.title, product.tags.join(' ')]
+    .join(' ')
+    .toLowerCase();
+  const descriptionText = [product.description, product.descriptionHtml]
+    .filter(Boolean)
     .join(' ')
     .toLowerCase();
 
-  if (/\bcoffee\b|\bkaffee\b/.test(haystack)) return 'coffee';
-  if (/\bcrafts?\b|\bbasket\b|\bigiseke\b|\bwoven\b|\bhandmade\b|\bhomeware\b/.test(haystack)) {
-    return 'crafts';
+  for (const { category, pattern } of TITLE_SIGNALS) {
+    if (pattern.test(titleText)) return category;
   }
-  if (
-    /\bfood\b|\bpantry\b|\bsnack\b|\bbiscuit\b|\bsauce\b|\boil\b|\bsyrup\b|\bmargarine\b|\bflour\b|\brice\b|\bbeans\b|\bspice\b|\bchocolate\b|\bdrink\b|\bjuice\b|\btea\b/.test(
-      haystack,
-    )
-  ) {
-    return 'food';
+
+  // "Wheat flour" in a biscuit recipe, or "coffee break" in snack copy, is not
+  // a flour or coffee product. Keep these out of the category filters.
+  if (OTHER_FOOD_TERMS.test(`${titleText} ${descriptionText}`)) return 'other';
+
+  for (const { category, pattern } of DESCRIPTION_SIGNALS) {
+    if (pattern.test(descriptionText)) return category;
   }
   return 'other';
 }
 
 export function matchesProductCategory(product: Product, category: string): boolean {
-  if (category === 'all') return true;
+  if (category === ALL_CATEGORIES) return true;
   return getProductCategory(product) === category;
 }
 

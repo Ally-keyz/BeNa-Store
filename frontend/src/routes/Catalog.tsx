@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, Loader2, SlidersHorizontal } from 'lucide-react';
 import { PageSeo } from '@/features/seo/PageSeo';
-import { useCatalogFacets, useInfiniteProducts } from '@/hooks/useCatalog';
+import { useCatalogFacets } from '@/hooks/useCatalog';
+import { useCategoryFeed } from '@/hooks/useCategoryFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMarket } from '@/context/MarketContext';
 import { ProductGrid } from '@/components/commerce/ProductGrid';
@@ -14,7 +15,7 @@ import { CatalogFacets } from '@/features/catalog/CatalogFacets';
 import { EMPTY_FACETS, normalizeCatalogFacets, type SelectedFacets } from '@/features/catalog/facets';
 import { cn } from '@/lib/cn';
 import { pageContainer } from '@/lib/layout';
-import { getDefaultVariant, matchesFacet, matchesProductCategory } from '@/lib/product';
+import { getDefaultVariant, matchesFacet } from '@/lib/product';
 
 type CatalogFilter = 'all' | 'cheap' | 'popular' | 'other';
 
@@ -45,24 +46,28 @@ export function CatalogPage() {
   const [selectedFacets, setSelectedFacets] = useState<SelectedFacets>(EMPTY_FACETS);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const query = useInfiniteProducts({
-    ...marketParams,
-    first: 12,
-    sortKey: priceFilter === 'popular' ? 'BEST_SELLING' : 'CREATED_AT',
+  const { query, products: categoryProducts, hasNextPage } = useCategoryFeed({
+    category,
+    allParams: {
+      ...marketParams,
+      first: 12,
+      sortKey: priceFilter === 'popular' ? 'BEST_SELLING' : 'CREATED_AT',
+    },
+    collectionParams: {
+      ...marketParams,
+      first: 12,
+      sortKey: priceFilter === 'popular' ? 'BEST_SELLING' : 'CREATED',
+    },
   });
   const facetsQuery = useCatalogFacets(marketParams);
   const facets = useMemo(() => normalizeCatalogFacets(facetsQuery.data), [facetsQuery.data]);
-  const allProducts = query.data?.pages.flatMap((page) => page.items) ?? [];
-  const products = allProducts.filter(
+  const products = categoryProducts.filter(
     (product) =>
-      matchesProductCategory(product, category) &&
       matchesPrice(product, priceFilter) &&
       (['brands', 'dietary', 'origins'] as const).every((group) =>
         selectedFacets[group].every((value) => matchesFacet(product, group, value)),
       ),
   );
-  const pages = query.data?.pages ?? [];
-  const hasNextPage = pages.at(-1)?.hasNextPage ?? false;
   const activeFilterCount =
     (category === ALL_CATEGORIES ? 0 : 1) +
     (priceFilter === 'all' ? 0 : 1) +

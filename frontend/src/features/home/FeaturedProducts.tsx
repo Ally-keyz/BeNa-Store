@@ -8,10 +8,9 @@ import { buttonVariants } from '@/components/ui/Button';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ProductCard } from '@/components/commerce/ProductCard';
-import { useInfiniteCollectionProducts, useInfiniteProducts } from '@/hooks/useCatalog';
+import { useCategoryFeed } from '@/hooks/useCategoryFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMarket } from '@/context/MarketContext';
-import { matchesProductCategory } from '@/lib/product';
 import { errorMessageKey, isApiError } from '@/api/errors';
 import { ALL_CATEGORIES, CategoryFilter } from './CategoryFilter';
 
@@ -69,26 +68,11 @@ export function FeaturedProducts({
   const { marketParams } = useMarket();
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
 
-  const allQuery = useInfiniteProducts({ first, sortKey: 'CREATED_AT', ...marketParams });
-  const isCollection = category !== ALL_CATEGORIES;
-  const collectionQuery = useInfiniteCollectionProducts(
-    isCollection ? category : '',
-    { first, sortKey: 'CREATED', ...marketParams },
-  );
-  // Shopify collections are optional in some markets. If a collection handle is
-  // missing, keep the filter useful by narrowing the live product feed instead
-  // of showing a page-level error.
-  const collectionProducts = (collectionQuery.data?.pages ?? []).flatMap((page) => page.items);
-  const useFeedFallback =
-    isCollection &&
-    (collectionQuery.isError || (collectionQuery.isSuccess && collectionProducts.length === 0));
-  const query = isCollection && !useFeedFallback ? collectionQuery : allQuery;
-  const feedProducts = (query.data?.pages ?? []).flatMap((page) => page.items);
-  const products =
-    isCollection && useFeedFallback
-      ? feedProducts.filter((product) => matchesProductCategory(product, category))
-      : feedProducts;
-  const hasNextPage = query.data?.pages.at(-1)?.hasNextPage ?? false;
+  const { query, products, hasNextPage, useFeedFallback } = useCategoryFeed({
+    category,
+    allParams: { first, sortKey: 'CREATED_AT', ...marketParams },
+    collectionParams: { first, sortKey: 'CREATED', ...marketParams },
+  });
 
   const sentinelRef = useInfiniteScroll<HTMLDivElement>({
     hasNextPage,
