@@ -65,9 +65,10 @@ function brandSlide(t: (key: string, options?: Record<string, unknown>) => strin
     key: 'hero-brand-logo',
     href: '/african-products',
     image: logoUrl,
-    // The source PNG is a 500x500 canvas with a small mark in the middle, so
-    // trim the CSS padding and scale it up to make the logo read at hero size.
-    imageClassName: 'bg-[#fff7ef] object-contain px-3 py-2 sm:px-6 sm:py-3 scale-[1.8]',
+    // The source PNG is a 500x500 transparent canvas with a small dark mark in
+    // the middle. Trim the CSS padding, scale it up and invert it to white so
+    // the logo reads on the dark hero without a solid background panel.
+    imageClassName: 'bg-transparent object-contain px-3 py-2 sm:px-6 sm:py-3 scale-[1.8] brightness-0 invert',
     eyebrow: t('hero.slides.rwanda.eyebrow'),
     title: t('hero.slides.rwanda.title'),
     subtitle: t('hero.slides.rwanda.subtitle'),

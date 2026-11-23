@@ -53,6 +53,8 @@ describe('HeroCarousel brand slide', () => {
     const logo = screen.getByRole('img');
     expect(logo).toHaveAttribute('src', logoUrl);
     expect(logo).toHaveAttribute('alt', BRAND.name);
+    expect(logo).toHaveClass('bg-transparent', 'invert');
+    expect(logo.className).not.toContain('bg-[#fff7ef]');
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       String(i18n.t('hero.slides.rwanda.title')),
     );
