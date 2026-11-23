@@ -65,63 +65,123 @@ export function hasVariantChoice(product: Product): boolean {
   return product.variants.length > 1;
 }
 
-export type ProductCategory = 'coffee' | 'drinks' | 'spices' | 'flours' | 'crafts' | 'other';
+export type ProductCategory =
+  | 'coffee'
+  | 'drinks'
+  | 'tea'
+  | 'spices'
+  | 'flours'
+  | 'snacks'
+  | 'spreads'
+  | 'sesame'
+  | 'perfumes'
+  | 'beauty-hair'
+  | 'crafts'
+  | 'other';
 
 export const ALL_CATEGORIES = 'all';
 
-/** Shopify collection handles behind the storefront filters. */
-const CATEGORY_COLLECTION_HANDLES: Partial<Record<Exclude<ProductCategory, 'other'>, string>> = {
-  coffee: 'coffee',
-  drinks: 'drinks',
-  spices: 'spices',
-  flours: 'flour', // the live Shopify collection handle is singular
-  crafts: 'crafts',
-};
-
-/** Null means "no collection filter" (All, or an unknown category). */
-export function getCategoryCollectionHandle(category: string): string | null {
-  return CATEGORY_COLLECTION_HANDLES[category as Exclude<ProductCategory, 'other'>] ?? null;
-}
+/** Shopper-facing filters, in display order. */
+export const CATEGORY_FILTER_HANDLES = [
+  'coffee',
+  'drinks',
+  'tea',
+  'spices',
+  'flours',
+  'snacks',
+  'spreads',
+  'sesame',
+  'perfumes',
+  'beauty-hair',
+  'crafts',
+] as const satisfies readonly Exclude<ProductCategory, 'other'>[];
 
 interface CategorySignal {
   category: Exclude<ProductCategory, 'other'>;
   pattern: RegExp;
 }
 
-/** Strong signals from the fields Shopify merchants actually maintain. */
+/**
+ * Strong signals from the fields Shopify merchants actually maintain. Order
+ * matters: "Tea Masala" is a spice blend, and a biscuit that mentions coffee
+ * breaks in its copy is still a snack.
+ */
 const TITLE_SIGNALS: CategorySignal[] = [
-  { category: 'coffee', pattern: /\b(coffee|kaffee|espresso)\b|kopi/i },
   {
     category: 'crafts',
     pattern:
-      /\b(crafts?|handcraft|handmade|basket|igiseke|imigongo|bracelet|wall art|woven|textile|accessor(?:y|ies)|caps?|wrap)\b/i,
+      /\b(crafts?|handcraft|handmade|basket|igiseke|imigongo|bracelet|beaded|wall art|woven|textile|accessor(?:y|ies)|caps?|wrap)\b/i,
+  },
+  {
+    category: 'perfumes',
+    pattern: /\b(perfumes?|parfum|fragrance|body mist|eau de (?:parfum|toilette))\b/i,
+  },
+  {
+    category: 'beauty-hair',
+    pattern:
+      /\b(hair|relaxer|soap|skin|jelly|lotion|shampoo|conditioner|cosmetics?|body care)\b|\bmovit\b/i,
+  },
+  {
+    category: 'spreads',
+    pattern: /\b(spreads?|blue ?band|margarine|honey|ubuki|jam|peanut butter)\b/i,
+  },
+  { category: 'sesame', pattern: /\b(sesame|simsim)\b/i },
+  {
+    category: 'snacks',
+    pattern:
+      /\b(biscuits?|biskuits?|cookies?|snacks?|mandazi|chips|crisps|nuts?|cakes?|pastry|pastries|compact)\b/i,
+  },
+  {
+    category: 'flours',
+    pattern: /\b(flours?|ifu|fufu|sosoma)\b/i,
   },
   {
     category: 'spices',
-    pattern: /\b(spices?|masala|seasoning|pilau|royco|onga|akabanga|(?:chili|chilli|chill) oil)\b/i,
+    pattern:
+      /\b(spices?|masala|seasoning|pilau|royco|onga|akabanga|simba mbili|(?:chili|chilli|chill) oil)\b/i,
   },
+  { category: 'tea', pattern: /\btea\b|thé/i },
   {
     category: 'drinks',
-    pattern: /\b(juice|drink|beverage|soda|fanta|beer|malt|skol|primus|syrup|tea|thé)\b/i,
+    pattern:
+      /\b(juice|drink|beverage|soda|fanta|beer|malt|skol|primus|syrup|lemonade|water|carbonated)\b/i,
   },
-  { category: 'flours', pattern: /\b(flours?|ifu|fufu)\b/i },
+  { category: 'coffee', pattern: /\b(coffee|kaffee|espresso|arabica)\b|kopi/i },
 ];
+
+/**
+ * Products that belong to no shopper-facing group even though incidental
+ * words in their name or copy resemble a category. "Fish Masala" stays with
+ * spices; plain fish, baking ingredients and prepared dishes do not match.
+ */
+const OTHER_PRODUCT_TERMS = /\b(fish|indagara|isombe|cassava leaves|baking powder|bicarbonate)\b/i;
 
 /** Weaker description signals, used only when the title is uninformative. */
 const DESCRIPTION_SIGNALS: CategorySignal[] = [
-  { category: 'spices', pattern: /\b(spices?|masala|seasoning|pilau|(?:chili|chilli|chill) oil)\b/i },
-  { category: 'drinks', pattern: /\b(juice|drink|beverage|soda|fanta|beer|malt|syrup|tea)\b/i },
-  { category: 'flours', pattern: /\b(flour|ifu|fufu)\b/i },
+  {
+    category: 'crafts',
+    pattern: /\b(basket|igiseke|imigongo|bracelet|wall art|handcraft|handmade|woven)\b/i,
+  },
+  { category: 'perfumes', pattern: /\b(fragrance|perfume|parfum|body mist)\b/i },
+  {
+    category: 'beauty-hair',
+    pattern: /\b(hair|skin|soap|relaxer|jelly|lotion|shampoo|conditioner|moisturiz)\b/i,
+  },
+  { category: 'spreads', pattern: /\b(margarine|blue ?band|honey|spread)\b/i },
+  { category: 'sesame', pattern: /\bsesame\b/i },
+  { category: 'snacks', pattern: /\b(food bars?|emergency food|ready to eat)\b/i },
+  {
+    category: 'flours',
+    pattern:
+      /\b(cassava flour|millet flour|wheat flour|maize flour|corn flour|composite flour|flour blend|traditional [a-z ]{0,20}flour)\b/i,
+  },
+  { category: 'drinks', pattern: /\b(juice|drink|beverage|soda|beer|malt|fanta|skol|primus)\b/i },
 ];
 
-/** Pantry items that are deliberately outside the four shopper-facing filters. */
-const OTHER_FOOD_TERMS =
-  /\b(biscuits?|biskuits?|cookies?|snacks?|baked|baking|cakes?|bread|pastry|pastries|mandazi|margarine|honey|sesame|rice)\b/i;
-
 /**
- * Best-effort category for storefront filters. Collection membership is the
- * source of truth; this classifier keeps filters useful when a Shopify
- * collection handle is missing by reading type, handle, title, tags and copy.
+ * Best-effort category for the storefront filters. Shopify collections are
+ * incomplete, so product text is authoritative here: a drink such as Fanta
+ * must appear under Drinks even when the live Drinks collection omits it.
  */
 export function getProductCategory(product: Product): ProductCategory {
   const titleText = [product.productType, product.handle, product.title, product.tags.join(' ')]
@@ -132,13 +192,11 @@ export function getProductCategory(product: Product): ProductCategory {
     .join(' ')
     .toLowerCase();
 
+  if (OTHER_PRODUCT_TERMS.test(titleText) && !/\bmasala\b/i.test(titleText)) return 'other';
+
   for (const { category, pattern } of TITLE_SIGNALS) {
     if (pattern.test(titleText)) return category;
   }
-
-  // "Wheat flour" in a biscuit recipe, or "coffee break" in snack copy, is not
-  // a flour or coffee product. Keep these out of the category filters.
-  if (OTHER_FOOD_TERMS.test(`${titleText} ${descriptionText}`)) return 'other';
 
   for (const { category, pattern } of DESCRIPTION_SIGNALS) {
     if (pattern.test(descriptionText)) return category;

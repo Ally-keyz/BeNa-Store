@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { Product, ProductVariant } from '@/types';
 import { normalizeCatalogFacets } from '@/features/catalog/facets';
 import {
+  CATEGORY_FILTER_HANDLES,
   getAvailability,
-  getCategoryCollectionHandle,
   getDefaultVariant,
   getProductCategory,
   getStockQuantity,
@@ -151,34 +151,77 @@ describe('product availability', () => {
     expect(hasVariantChoice(product({ variants: [variant()] }))).toBe(false);
   });
 
-  it('maps category filters to the live Shopify collection handles', () => {
-    expect(getCategoryCollectionHandle('all')).toBeNull();
-    expect(getCategoryCollectionHandle('coffee')).toBe('coffee');
-    expect(getCategoryCollectionHandle('drinks')).toBe('drinks');
-    expect(getCategoryCollectionHandle('spices')).toBe('spices');
-    expect(getCategoryCollectionHandle('flours')).toBe('flour');
-    expect(getCategoryCollectionHandle('crafts')).toBe('crafts');
+  it('exposes every shopper-facing filter handle', () => {
+    expect(CATEGORY_FILTER_HANDLES).toEqual([
+      'coffee',
+      'drinks',
+      'tea',
+      'spices',
+      'flours',
+      'snacks',
+      'spreads',
+      'sesame',
+      'perfumes',
+      'beauty-hair',
+      'crafts',
+    ]);
   });
 
-  it('categorises products from type, title, tags and copy when a collection is missing', () => {
+  it('categorises products from type, title, tags and copy', () => {
     expect(getProductCategory(product({ productType: 'Food', tags: ['coffee'] }))).toBe('coffee');
-    expect(getProductCategory(product({ title: 'Energy drink' }))).toBe('drinks');
-    expect(getProductCategory(product({ title: 'Pilau Masala' }))).toBe('spices');
-    // Masala wins over the tea mention so spiced tea stays with spices.
-    expect(getProductCategory(product({ title: 'Tea Masala' }))).toBe('spices');
-    expect(getProductCategory(product({ title: 'Akabanga (Chili Oil)' }))).toBe('spices');
+    expect(getProductCategory(product({ title: 'Premium Rwandan Arabica Coffee' }))).toBe('coffee');
     expect(getProductCategory(product({ title: 'Kinazi Cassava Flour' }))).toBe('flours');
     expect(
       getProductCategory(product({ title: 'Sosoma 2', description: 'Sosoma Flour for porridge' })),
     ).toBe('flours');
     expect(getProductCategory(product({ tags: ['igiseke', 'basket'] }))).toBe('crafts');
-    // Snack copy mentioning coffee breaks or wheat flour is not a category match.
+    expect(getProductCategory(product())).toBe('other');
+  });
+
+  it('classifies every beverage as a drink, regardless of Shopify collection membership', () => {
+    for (const title of [
+      'Fanta Orange 33 Cl',
+      'Skol Malt 50cl',
+      'Primus 50cl',
+      'Energy drink',
+      'Malti Juice',
+      'Agashya Juice',
+    ]) {
+      expect(getProductCategory(product({ title }))).toBe('drinks');
+    }
+    expect(getProductCategory(product({ title: 'Green Tea' }))).toBe('tea');
+    expect(getProductCategory(product({ title: 'Thé Vert / Loose Green Tea' }))).toBe('tea');
+    expect(getProductCategory(product({ title: 'Strong Blend Black Tea' }))).toBe('tea');
+    // Masala wins over the tea mention because it is a spice blend.
+    expect(getProductCategory(product({ title: 'Tea Masala' }))).toBe('spices');
+  });
+
+  it('classifies the other grouped product categories', () => {
+    expect(getProductCategory(product({ title: 'Blueband /250g' }))).toBe('spreads');
+    expect(getProductCategory(product({ title: 'BeNa R&D Honey' }))).toBe('spreads');
+    expect(getProductCategory(product({ title: 'Riham Biscuits' }))).toBe('snacks');
+    expect(getProductCategory(product({ title: 'Akarabo Biskuit' }))).toBe('snacks');
+    expect(getProductCategory(product({ title: 'Sesame' }))).toBe('sesame');
+    expect(getProductCategory(product({ title: 'Sweet Love Fragrance Mist' }))).toBe('perfumes');
+    expect(getProductCategory(product({ title: 'Miadi Hair Relaxer' }))).toBe('beauty-hair');
+    expect(getProductCategory(product({ title: 'Pyaar Soap' }))).toBe('beauty-hair');
+    expect(
+      getProductCategory(product({ title: 'Movit', description: 'Skin Jelly and Hair care' })),
+    ).toBe('beauty-hair');
+    expect(getProductCategory(product({ title: 'Rwandan baseball Caps' }))).toBe('crafts');
+    expect(getProductCategory(product({ title: 'Rwandan Flag Wrap' }))).toBe('crafts');
+    expect(getProductCategory(product({ title: 'Imigongo Wall Art' }))).toBe('crafts');
+    expect(getProductCategory(product({ title: 'Simba Mbili' }))).toBe('spices');
+    // Incidental category words do not pull unrelated products into a filter.
+    expect(getProductCategory(product({ title: 'Ground Dried Small Fish' }))).toBe('other');
+    expect(getProductCategory(product({ title: 'Bicarbonate' }))).toBe('other');
+    expect(getProductCategory(product({ title: 'Isombe Ku Munota' }))).toBe('other');
+    // Snack copy mentioning tea time or coffee breaks stays with snacks.
     expect(
       getProductCategory(
         product({ title: 'Riham Biscuits', description: 'Perfect for tea time and coffee breaks' }),
       ),
-    ).toBe('other');
-    expect(getProductCategory(product())).toBe('other');
+    ).toBe('snacks');
   });
 
   it('only matches products from the selected category', () => {
@@ -186,8 +229,10 @@ describe('product availability', () => {
     const spice = product({ title: 'Pilau Masala' });
     expect(matchesProductCategory(drink, 'all')).toBe(true);
     expect(matchesProductCategory(drink, 'drinks')).toBe(true);
+    expect(matchesProductCategory(drink, 'tea')).toBe(false);
     expect(matchesProductCategory(drink, 'spices')).toBe(false);
     expect(matchesProductCategory(spice, 'spices')).toBe(true);
+    expect(matchesProductCategory(product({ title: 'Blueband' }), 'spreads')).toBe(true);
   });
 });
 

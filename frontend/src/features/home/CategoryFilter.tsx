@@ -1,17 +1,23 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
-import { ALL_CATEGORIES } from '@/lib/product';
+import { ALL_CATEGORIES, CATEGORY_FILTER_HANDLES } from '@/lib/product';
 
 export { ALL_CATEGORIES };
 
-const FALLBACK = [
-  { handle: 'coffee', titleKey: 'nav.coffee' },
-  { handle: 'drinks', titleKey: 'nav.drinks' },
-  { handle: 'spices', titleKey: 'nav.spices' },
-  { handle: 'flours', titleKey: 'nav.flours' },
-  { handle: 'crafts', titleKey: 'nav.crafts' },
-] as const;
+const CATEGORY_LABEL_KEYS: Record<(typeof CATEGORY_FILTER_HANDLES)[number], string> = {
+  coffee: 'nav.coffee',
+  drinks: 'nav.drinks',
+  tea: 'nav.tea',
+  spices: 'nav.spices',
+  flours: 'nav.flours',
+  snacks: 'nav.snacks',
+  spreads: 'nav.spreads',
+  sesame: 'nav.sesame',
+  perfumes: 'nav.perfumes',
+  'beauty-hair': 'nav.beautyHair',
+  crafts: 'nav.crafts',
+};
 
 interface CategoryFilterProps {
   value: string;
@@ -26,9 +32,9 @@ export function CategoryFilter({ value, onChange, controls }: CategoryFilterProp
 
   const options = [
     { handle: ALL_CATEGORIES, label: t('home.filterAll') },
-    ...FALLBACK.map((fallback) => ({
-      handle: fallback.handle as string,
-      label: t(fallback.titleKey),
+    ...CATEGORY_FILTER_HANDLES.map((handle) => ({
+      handle: handle as string,
+      label: t(CATEGORY_LABEL_KEYS[handle]),
     })),
   ];
 

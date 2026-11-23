@@ -53,11 +53,6 @@ export function CatalogPage() {
       first: 12,
       sortKey: priceFilter === 'popular' ? 'BEST_SELLING' : 'CREATED_AT',
     },
-    collectionParams: {
-      ...marketParams,
-      first: 12,
-      sortKey: priceFilter === 'popular' ? 'BEST_SELLING' : 'CREATED',
-    },
   });
   const facetsQuery = useCatalogFacets(marketParams);
   const facets = useMemo(() => normalizeCatalogFacets(facetsQuery.data), [facetsQuery.data]);

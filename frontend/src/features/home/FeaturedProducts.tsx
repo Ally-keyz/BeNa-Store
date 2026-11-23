@@ -68,10 +68,9 @@ export function FeaturedProducts({
   const { marketParams } = useMarket();
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
 
-  const { query, products, hasNextPage, useFeedFallback } = useCategoryFeed({
+  const { query, products, hasNextPage } = useCategoryFeed({
     category,
     allParams: { first, sortKey: 'CREATED_AT', ...marketParams },
-    collectionParams: { first, sortKey: 'CREATED', ...marketParams },
   });
 
   const sentinelRef = useInfiniteScroll<HTMLDivElement>({
@@ -135,7 +134,7 @@ export function FeaturedProducts({
                   <ProductSkeleton key={item} />
                 ))}
               </div>
-            ) : query.isError && !useFeedFallback ? (
+            ) : query.isError ? (
               <div className={cn('mt-8', PANEL)} role="alert">
                 <p className="font-medium text-ink">{t('common.errorTitle')}</p>
                 <p className="mt-1 text-sm text-neutral-600">
@@ -153,7 +152,7 @@ export function FeaturedProducts({
                 </button>
               </div>
             ) : products.length === 0 ? (
-              useFeedFallback && hasNextPage ? (
+              hasNextPage ? (
                 <div className={cn('mt-8', GRID)}>
                   {[0, 1, 2].map((item) => (
                     <ProductSkeleton key={item} />
